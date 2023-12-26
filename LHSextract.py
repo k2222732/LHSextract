@@ -27,6 +27,12 @@ driver.implicitly_wait(10)
 driver.get("http://10.242.32.4:7122/sso/login")
 # 之后可以添加更多的操作，如登录操作等
 
+page_source0 = driver.page_source
+
+with open("page_source0.txt", "w", encoding="utf-8") as file:
+    file.write(page_source0)
+
+print(page_source0)
 
 
 # 填写登录信息
@@ -51,9 +57,22 @@ Databaseofparty = driver.find_elements(By.XPATH, '//img[contains(@src, "党组�
 Databaseofparty.click()
 
 
-wait = WebDriverWait(driver, 10)
-droplist = wait.until(EC.presence_of_element_located((By.CSS_SELECTOR, '.avatar-wrapper.fs-dropdown-selfdefine')))
+for handle in driver.window_handles:
+    driver.switch_to.window(handle)
+    if '党组织和党员信息' in driver.title:
+        break
 
+time.sleep(10)
+
+page_source1 = driver.page_source
+
+with open("page_source1.txt", "w", encoding="utf-8") as file:
+    file.write(page_source1)
+
+print(page_source1)
+
+
+droplist = wait.until(EC.presence_of_element_located((By.CSS_SELECTOR, '.avatar-wrapper.fs-dropdown-selfdefine')))
 
 
 droplist.click()
