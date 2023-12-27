@@ -27,14 +27,6 @@ driver.implicitly_wait(10)
 driver.get("http://10.242.32.4:7122/sso/login")
 # 之后可以添加更多的操作，如登录操作等
 
-page_source0 = driver.page_source
-
-with open("page_source0.txt", "w", encoding="utf-8") as file:
-    file.write(page_source0)
-
-print(page_source0)
-
-
 # 填写登录信息
 # 注意：以下ID 'username', 'password', 'captcha', 和 'login_button' 需要根据实际网页元素进行替换
 username = driver.find_element(By.ID, 'username')
@@ -62,21 +54,22 @@ for handle in driver.window_handles:
     if '党组织和党员信息' in driver.title:
         break
 
-time.sleep(10)
-
-page_source1 = driver.page_source
-
-with open("page_source1.txt", "w", encoding="utf-8") as file:
-    file.write(page_source1)
-
-print(page_source1)
-
-
-droplist = wait.until(EC.presence_of_element_located((By.CSS_SELECTOR, '.avatar-wrapper.fs-dropdown-selfdefine')))
-
+droplist = driver.find_element(By.CSS_SELECTOR, '.avatar-wrapper.fs-dropdown-selfdefine')
 
 droplist.click()
 
+
+wait = WebDriverWait(driver, 10)
+
+role = wait.until(EC.presence_of_element_located((By.XPATH, '//SPAN[contains(text(), "中国共产党山东汶上经济开发区工作委员会-具有审批预备党员权限的基层党委管理员")]')))
+
+role.click()
+
+#在容量较大的磁盘上新建一个文件夹命名为"今天的日期&党员信息库"
+#在这个文件夹里新建一个excel文件同样命名为"今天的日期&党员信息库"
+#保存"共1155条"到本地变量
+#保存"100条/页"到本地变量
+#计算总页数到本地变量
 
 
 
