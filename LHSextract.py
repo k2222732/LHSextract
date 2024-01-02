@@ -13,9 +13,9 @@ wait = WebDriverWait(driver, 10)
 
 
 def main():
-    booting.login(account, password, driver, url)
-    booting.access_member_database(driver)
-    booting.switch_role(driver)
+    booting.login(account, password, driver, url, wait)
+    booting.access_member_database(driver, wait)
+    booting.switch_role(wait)
     booting.new_excel()
     #保存"共1155条"到本地变量
     #保存"100条/页"到本地变量

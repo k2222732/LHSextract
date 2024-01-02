@@ -29,10 +29,10 @@ def driver_create(chrome_path, chromedriver_path):
 def login(account, password, driver, url, wait):
     # 打开网址
     driver.get(url)
-    username_box = wait.until(EC.visibility_of_element_located(By.ID, 'username'))
-    password_box = wait.until(EC.visibility_of_element_located(By.ID, 'password'))
-    validatecode = wait.until(EC.visibility_of_element_located(By.ID, 'validateCode'))
-    login_button = wait.until(EC.element_to_be_clickable(By.CSS_SELECTOR, '.js-submit.tianze-loginbtn'))
+    username_box = wait.until(EC.visibility_of_element_located((By.ID, 'username')))
+    password_box = wait.until(EC.visibility_of_element_located((By.ID, 'password')))
+    validatecode = wait.until(EC.visibility_of_element_located((By.ID, 'validateCode')))
+    login_button = wait.until(EC.element_to_be_clickable((By.CSS_SELECTOR, '.js-submit.tianze-loginbtn')))
     username_box.send_keys(account)
     password_box.send_keys(password)
     # 等待手动输入验证码
@@ -45,7 +45,7 @@ def login(account, password, driver, url, wait):
 
 
 def access_member_database(driver, wait):
-    Databaseofparty = wait.until(EC.element_to_be_clickable(By.XPATH, '//img[contains(@src, "党组织和党员信息库.png")][1]'))
+    Databaseofparty = wait.until(EC.element_to_be_clickable((By.XPATH, '(//img[contains(@src, "党组织和党员信息库.png")])[2]')))
     Databaseofparty.click()
     try:
         for handle in driver.window_handles:
