@@ -8,23 +8,34 @@ chromedriver_path = r'G:/project/LHSextract/package/chromedriver.exe'
 account = "370830198309261711"
 password = "Kfq123456"
 url = "http://10.242.32.4:7122/sso/login"
-driver = booting.driver_create(chrome_path, chromedriver_path)
-wait = WebDriverWait(driver, 10)
+
+
+complete_number_member = 0
 
 
 def main():
+    global member_excel
+    global chrome_path
+    global chromedriver_path
+    global account
+    global password
+    global url
+    driver = booting.driver_create(chrome_path, chromedriver_path)
+    wait = WebDriverWait(driver, 10)
+    member_excel_path = ''
+    member_excel = 0
+    complete_number_member = 0
     booting.login(account, password, driver, url, wait)
     booting.access_member_database(driver, wait)
     booting.switch_role(wait)
-    booting.new_excel()
+    member_excel, member_excel_path= booting.new_excel()
     #保存"共1155条"到本地变量
     #保存"100条/页"到本地变量
     #计算总页数到本地变量
     #
+    booting.cycle(wait)
+    booting.synchronizing(complete_number_member, member_excel, wait, member_excel_path)
 
-    
-    member = driver.find_element(By.XPATH, "(//table[@class='fs-table__body'])[3]/tbody/tr[1]/td[3]")
-    member.click()
     input("Press Enter to exit...")
 
 if __name__ == "__main__":
