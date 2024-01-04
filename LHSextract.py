@@ -24,19 +24,20 @@ def main():
     wait = WebDriverWait(driver, 10)
     member_excel_path = ''
     member_excel = 0
-    complete_number_member = 0
-    amount_total_member = 0
+
+    member_total_amount = 0
     booting.login(account, password, driver, url, wait)
     booting.access_member_database(driver, wait)
     booting.switch_role(wait)
+    #获取党员总人数
+    member_total_amount = booting.get_amountof_member(wait)
+    #设置一次性爬取的条目数
+    booting.set_amount_perpage(wait)
+    #指定位置创建excel工作簿
     member_excel, member_excel_path= booting.new_excel()
-    #保存"共1155条"到本地变量
-    #保存"100条/页"到本地变量
-    #计算总页数到本地变量
+
     
-    
-    booting.cycle(wait)
-    booting.synchronizing(complete_number_member, member_excel, wait, member_excel_path)
+    booting.synchronizing(wait, member_total_amount, member_excel, member_excel_path)
 
     input("Press Enter to exit...")
 
