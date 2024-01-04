@@ -10,7 +10,12 @@ from datetime import datetime
 import pandas as pd
 import time 
 import os
+import re
 import inspect
+
+amount_that_complete = 0
+
+
 
 
 def driver_create(chrome_path, chromedriver_path):
@@ -90,92 +95,251 @@ def new_excel():
     workbook = load_workbook(excel_file_path)
     print(f"文件 '{excel_file_path}' 已成功创建。")
     return workbook, excel_file_path
+  
 
 
-def cycle(wait):
-    time.sleep(3)
-    member = wait.until(EC.element_to_be_clickable((By.XPATH, "(//table[@class='fs-table__body'])[3]/tbody/tr[1]/td[3]")))
+def get_amountof_member(wait):
+    #//div[@class = 'page']//span[@class = 'fs-pagination__total'] 
+    char_amountof_member = wait.until(EC.presence_of_element_located((By.XPATH, "//div[@class = 'page']//span[@class = 'fs-pagination__total']"))).text
+    int_amountof_members = re.findall(r'\d+', char_amountof_member)
+    int_amountof_member = int(int_amountof_members[0]) if int_amountof_members else None
+    return int(int_amountof_member)
+
+
+def set_amount_perpage(wait):
+    list = wait.until(EC.element_to_be_clickable((By.XPATH, "//div[@class = 'page']//input[@type = 'text']")))
+    list.click()
+    option = wait.until(EC.element_to_be_clickable((By.XPATH, "//li[@class = 'fs-select-dropdown__item hover']")))
+    option.click()
+
+    #//div[@class = 'page']//input[@type = 'text']
+
+def access_info_page(wait, row):
+    xpath = f"(//table[@class='fs-table__body'])[3]/tbody/tr[{row}]/td[3]"
+    wait.until(EC.presence_of_element_located((By.XPATH, xpath)))
+    member = wait.until(EC.element_to_be_clickable((By.XPATH, xpath)))
     member.click() 
-    print(f"进入党员个人页面成功")   
+    print(f"进入党员个人页面成功") 
+
+def synchronizing(wait, member_total_amount, member_excel, member_excel_path):
+    global amount_that_complete
+    while amount_that_complete < member_total_amount:
+        page_number = amount_that_complete / 100 + 1
+        row_number = amount_that_complete % 100 + 2
+        #(//div[@class = 'page']//input)[2]
+        input_page = wait.until(EC.visibility_of_element_located((By.XPATH, "(//div[@class = 'page']//input)[2]")))
+        input_page.send_keys(page_number)
+        access_info_page(wait, row_number)
+        downloading(amount_that_complete, member_excel, wait, member_excel_path)
+        amount_that_complete = amount_that_complete + 1
 
 
 
 
-def synchronizing(count, file, wait, path):
-    
-    pass
+def downloading(count, file, wait, path):
+
+    rylb = wait.until(EC.presence_of_element_located((By.XPATH, "(//div[@class = 'card-class']//div[@class = 'fs-tabs__content']//div[@class = 'row-val-shot'])[7]"))).text
+    if rylb == '正式党员':
+        downloading_formal(count, file, wait, path)
+    elif rylb == '预备党员':
+        downloading_informal(count, file, wait, path)
+    else:
+        print('既不是正式党员也不是预备党员')
+
+        
 
 
 
-
-def synchronizing_informal(count, file, wait, path):
-    pass
-
-
-
-def synchronizing_formal(count, file, wait, path):
-    count = count +1
+def downloading_informal(count, file, wait, path):
     countx = count + 1
-    #在member_excel的第countx行第一列存countx
+    #填写序号
     file.active.cell(row=countx, column=1).value = count
     file.save(path)
-    file.active.cell(row=countx, column=2).value = wait.until(EC.presence_of_element_located((By.XPATH, "(//div[@class = 'card-class']//div[@class = 'fs-tabs__content']//div[@class = 'row-val-shot'])[1]"))).text
+    #填写姓名
+    name_temp = wait.until(EC.presence_of_element_located((By.XPATH, "(//div[@class = 'card-class']//div[@class = 'fs-tabs__content']//div[@class = 'row-val-shot'])[1]"))).text
+    file.active.cell(row=countx, column=2).value = name_temp
     file.save(path)
+    #性别
     file.active.cell(row=countx, column=3).value = wait.until(EC.presence_of_element_located((By.XPATH, "(//div[@class = 'card-class']//div[@class = 'fs-tabs__content']//div[@class = 'row-val-shot'])[3]"))).text
     file.save(path)
+    #身份证
     file.active.cell(row=countx, column=4).value = wait.until(EC.presence_of_element_located((By.XPATH, "(//div[@class = 'card-class']//div[@class = 'fs-tabs__content']//div[@class = 'row-val-shot'])[2]"))).text
     file.save(path)
+    #民族
     file.active.cell(row=countx, column=5).value = wait.until(EC.presence_of_element_located((By.XPATH, "(//div[@class = 'card-class']//div[@class = 'fs-tabs__content']//div[@class = 'row-val-shot'])[4]"))).text
     file.save(path)
+    #出生日期
     file.active.cell(row=countx, column=6).value = wait.until(EC.presence_of_element_located((By.XPATH, "(//div[@class = 'card-class']//div[@class = 'fs-tabs__content']//div[@class = 'row-val-shot'])[5]"))).text
     file.save(path)
+    #学历
     file.active.cell(row=countx, column=7).value = wait.until(EC.presence_of_element_located((By.XPATH, "(//div[@class = 'card-class']//div[@class = 'fs-tabs__content']//div[@class = 'row-val-shot'])[6]"))).text
     file.save(path)
+    #人员类别
     file.active.cell(row=countx, column=8).value = wait.until(EC.presence_of_element_located((By.XPATH, "(//div[@class = 'card-class']//div[@class = 'fs-tabs__content']//div[@class = 'row-val-shot'])[7]"))).text
     file.save(path)
+    #学位
     file.active.cell(row=countx, column=9).value = wait.until(EC.presence_of_element_located((By.XPATH, "(//div[@class = 'card-class']//div[@class = 'fs-tabs__content']//div[@class = 'row-val-shot'])[8]"))).text
     file.save(path)
+    #所在党支部
     file.active.cell(row=countx, column=10).value = wait.until(EC.presence_of_element_located((By.XPATH, "//div[@class = 'card-class']//div[@class = 'row-vals-shot']"))).text
     file.save(path)
+    #手机号码
     file.active.cell(row=countx, column=11).value = wait.until(EC.presence_of_element_located((By.XPATH, "(//div[@class = 'card-class']//div[@class = 'fs-tabs__content']//div[@class = 'row-val-shot'])[9]"))).text
     file.save(path)
+    #入党日期
     file.active.cell(row=countx, column=12).value = wait.until(EC.presence_of_element_located((By.XPATH, "(//div[@class = 'card-class']//div[@class = 'fs-tabs__content']//div[@class = 'row-val-shot'])[10]"))).text
     file.save(path)
-    file.active.cell(row=countx, column=13).value = wait.until(EC.presence_of_element_located((By.XPATH, "(//div[@class = 'card-class']//div[@class = 'fs-tabs__content']//div[@class = 'row-val-big'])[1]"))).text
+
+    #转正日期
+    file.active.cell(row=countx, column=13).value = '-'
     file.save(path)
-    file.active.cell(row=countx, column=14).value = wait.until(EC.presence_of_element_located((By.XPATH, "(//div[@class = 'card-class']//div[@class = 'table-row'])[7]//div[2]"))).text
+    #党龄
+    file.active.cell(row=countx, column=14).value = '-'
     file.save(path)
-    file.active.cell(row=countx, column=15).value = wait.until(EC.presence_of_element_located((By.XPATH, "(//div[@class = 'card-class']//div[@class = 'fs-tabs__content']//div[@class = 'row-val-big'])[2]"))).text
+    #党龄矫正值
+    file.active.cell(row=countx, column=15).value = '-'
     file.save(path)
-    file.active.cell(row=countx, column=17).value = wait.until(EC.presence_of_element_located((By.XPATH, "(//div[@class = 'card-class']//div[@class = 'fs-tabs__content']//div[@class = 'row-val-big'])[3]"))).text
+
+    #新社会阶层类型
+    file.active.cell(row=countx, column=17).value = wait.until(EC.presence_of_element_located((By.XPATH, "(//div[@class = 'card-class']//div[@class = 'fs-tabs__content']//div[@class = 'row-val-big'])[2]"))).text
     file.save(path)
-    file.active.cell(row=countx, column=16).value = wait.until(EC.presence_of_element_located((By.XPATH, "(//div[@class = 'card-class']//div[@class = 'fs-tabs__content']//div[@class = 'row-val-big'])[4]"))).text
+    #工作岗位
+    file.active.cell(row=countx, column=16).value = wait.until(EC.presence_of_element_located((By.XPATH, "(//div[@class = 'card-class']//div[@class = 'fs-tabs__content']//div[@class = 'row-val-big'])[1]"))).text
     file.save(path)
-    file.active.cell(row=countx, column=19).value = wait.until(EC.presence_of_element_located((By.XPATH, "(//div[@class = 'card-class']//div[@class = 'fs-tabs__content']//div[@class = 'row-val-big'])[5]"))).text
+    #从事专业技术职务
+    file.active.cell(row=countx, column=19).value = wait.until(EC.presence_of_element_located((By.XPATH, "((//div[@class = 'table-row'])[8]//div[@class= 'select-dict'])[1]"))).text
     file.save(path)
-    file.active.cell(row=countx, column=18).value = wait.until(EC.presence_of_element_located((By.XPATH, "(//div[@class = 'card-class']//div[@class = 'fs-tabs__content']//div[@class = 'row-val-shot'])[11]"))).text
+    #是否农民工
+    file.active.cell(row=countx, column=18).value = wait.until(EC.presence_of_element_located((By.XPATH, "(//div[@class = 'table-row'])[9]//span[@style = 'margin-top: auto; margin-bottom: auto;']"))).text
     file.save(path)
-    file.active.cell(row=countx, column=20).value = wait.until(EC.presence_of_element_located((By.XPATH, "(//div[@class = 'card-class']//div[@class = 'table-row'])[11]/div[@class = 'row-vals']"))).text
+    #现居住地
+    file.active.cell(row=countx, column=20).value = wait.until(EC.presence_of_element_located((By.XPATH, "((//div[@class = 'card-class']//div[@class = 'table-row'])/div[@class = 'row-vals'])[1]"))).text
     file.save(path)
-    file.active.cell(row=countx, column=21).value = wait.until(EC.presence_of_element_located((By.XPATH, "(//div[@class = 'card-class']//div[@class = 'table-row'])[12]/div[@class = 'row-vals']"))).text
+    #户籍所在地
+    file.active.cell(row=countx, column=21).value = wait.until(EC.presence_of_element_located((By.XPATH, "((//div[@class = 'card-class']//div[@class = 'table-row'])/div[@class = 'row-vals'])[2]"))).text
     file.save(path)
-    file.active.cell(row=countx, column=22).value = wait.until(EC.presence_of_element_located((By.XPATH, "(//div[@class = 'card-class']//div[@class = 'table-row'])[13]/div[@class = 'row-vals']"))).text
+    #是否失联党员
+    file.active.cell(row=countx, column=22).value = wait.until(EC.presence_of_element_located((By.XPATH, "((//div[@class = 'card-class']//div[@class = 'table-row'])/div[@class = 'row-vals'])[3]"))).text
     file.save(path)
-    file.active.cell(row=countx, column=23).value = wait.until(EC.presence_of_element_located((By.XPATH, "(//div[@class = 'card-class']//div[@class = 'table-row'])[14]/div[@class = 'row-vals']"))).text
+    #是否流动党员
+    file.active.cell(row=countx, column=23).value = wait.until(EC.presence_of_element_located((By.XPATH, "((//div[@class = 'card-class']//div[@class = 'table-row'])/div[@class = 'row-vals'])[4]"))).text
     file.save(path)
+    #切换选项卡
     switch_card_joininfo = wait.until(EC.element_to_be_clickable((By.ID, "tab-enterInfo")))
     switch_card_joininfo.click()
+    #入党类型
     wait.until(EC.text_to_be_present_in_element((By.XPATH, "(//div[@class = 'table-row'])[1]/div[@class = 'row-key'][1]"), '入党类型'))
     file.active.cell(row=countx, column=24).value = wait.until(EC.presence_of_element_located((By.XPATH, "(//div[@class = 'row-val'])[1]"))).text
     file.save(path)
+    #转正情况
     file.active.cell(row=countx, column=25).value = wait.until(EC.presence_of_element_located((By.XPATH, "(//div[@class = 'row-val'])[3]"))).text
     file.save(path)
+    #入党时所在党支部
     file.active.cell(row=countx, column=26).value = wait.until(EC.presence_of_element_located((By.XPATH, "(//div[@class = 'row-val'])[5]"))).text
     file.save(path)
+    #延长预备期时间
     file.active.cell(row=countx, column=27).value = wait.until(EC.presence_of_element_located((By.XPATH, "(//div[@class = 'row-val'])[6]"))).text
     file.save(path)
-    debugging()
-    print(f"填写党员姓名成功")  
+    #debugging()
+    print("填写第",count,"名预备党员",name_temp,"信息成功") 
+    exit_member_card = wait.until(EC.element_to_be_clickable((By.XPATH, "(//button[@class = 'fs-button fs-button--default fs-button--small'])[2]")))
+    exit_member_card.click()
+
+
+
+def downloading_formal(count, file, wait, path):
+    countx = count + 1
+    #填写序号
+    file.active.cell(row=countx, column=1).value = count
+    file.save(path)
+    #填写姓名
+    name_temp = wait.until(EC.presence_of_element_located((By.XPATH, "(//div[@class = 'card-class']//div[@class = 'fs-tabs__content']//div[@class = 'row-val-shot'])[1]"))).text
+    file.active.cell(row=countx, column=2).value = name_temp
+    file.save(path)
+    #性别
+    file.active.cell(row=countx, column=3).value = wait.until(EC.presence_of_element_located((By.XPATH, "(//div[@class = 'card-class']//div[@class = 'fs-tabs__content']//div[@class = 'row-val-shot'])[3]"))).text
+    file.save(path)
+    #身份证
+    file.active.cell(row=countx, column=4).value = wait.until(EC.presence_of_element_located((By.XPATH, "(//div[@class = 'card-class']//div[@class = 'fs-tabs__content']//div[@class = 'row-val-shot'])[2]"))).text
+    file.save(path)
+    #民族
+    file.active.cell(row=countx, column=5).value = wait.until(EC.presence_of_element_located((By.XPATH, "(//div[@class = 'card-class']//div[@class = 'fs-tabs__content']//div[@class = 'row-val-shot'])[4]"))).text
+    file.save(path)
+    #出生日期
+    file.active.cell(row=countx, column=6).value = wait.until(EC.presence_of_element_located((By.XPATH, "(//div[@class = 'card-class']//div[@class = 'fs-tabs__content']//div[@class = 'row-val-shot'])[5]"))).text
+    file.save(path)
+    #学历
+    file.active.cell(row=countx, column=7).value = wait.until(EC.presence_of_element_located((By.XPATH, "(//div[@class = 'card-class']//div[@class = 'fs-tabs__content']//div[@class = 'row-val-shot'])[6]"))).text
+    file.save(path)
+    #人员类别
+    file.active.cell(row=countx, column=8).value = wait.until(EC.presence_of_element_located((By.XPATH, "(//div[@class = 'card-class']//div[@class = 'fs-tabs__content']//div[@class = 'row-val-shot'])[7]"))).text
+    file.save(path)
+    #学位
+    file.active.cell(row=countx, column=9).value = wait.until(EC.presence_of_element_located((By.XPATH, "(//div[@class = 'card-class']//div[@class = 'fs-tabs__content']//div[@class = 'row-val-shot'])[8]"))).text
+    file.save(path)
+    #所在党支部
+    file.active.cell(row=countx, column=10).value = wait.until(EC.presence_of_element_located((By.XPATH, "//div[@class = 'card-class']//div[@class = 'row-vals-shot']"))).text
+    file.save(path)
+    #手机号码
+    file.active.cell(row=countx, column=11).value = wait.until(EC.presence_of_element_located((By.XPATH, "(//div[@class = 'card-class']//div[@class = 'fs-tabs__content']//div[@class = 'row-val-shot'])[9]"))).text
+    file.save(path)
+    #入党日期
+    file.active.cell(row=countx, column=12).value = wait.until(EC.presence_of_element_located((By.XPATH, "(//div[@class = 'card-class']//div[@class = 'fs-tabs__content']//div[@class = 'row-val-shot'])[10]"))).text
+    file.save(path)
+    #转正日期
+    file.active.cell(row=countx, column=13).value = wait.until(EC.presence_of_element_located((By.XPATH, "(//div[@class = 'card-class']//div[@class = 'fs-tabs__content']//div[@class = 'row-val-big'])[1]"))).text
+    file.save(path)
+    #党龄
+    file.active.cell(row=countx, column=14).value = wait.until(EC.presence_of_element_located((By.XPATH, "(//div[@class = 'card-class']//div[@class = 'table-row'])[7]//div[2]"))).text
+    file.save(path)
+    #党龄矫正值
+    file.active.cell(row=countx, column=15).value = wait.until(EC.presence_of_element_located((By.XPATH, "(//div[@class = 'card-class']//div[@class = 'fs-tabs__content']//div[@class = 'row-val-big'])[2]"))).text
+    file.save(path)
+    #新社会阶层类型
+    file.active.cell(row=countx, column=17).value = wait.until(EC.presence_of_element_located((By.XPATH, "(//div[@class = 'card-class']//div[@class = 'fs-tabs__content']//div[@class = 'row-val-big'])[3]"))).text
+    file.save(path)
+    #工作岗位
+    file.active.cell(row=countx, column=16).value = wait.until(EC.presence_of_element_located((By.XPATH, "(//div[@class = 'card-class']//div[@class = 'fs-tabs__content']//div[@class = 'row-val-big'])[4]"))).text
+    file.save(path)
+    #从事专业技术职务
+    file.active.cell(row=countx, column=19).value = wait.until(EC.presence_of_element_located((By.XPATH, "(//div[@class = 'card-class']//div[@class = 'fs-tabs__content']//div[@class = 'row-val-big'])[5]"))).text
+    file.save(path)
+    #是否农民工
+    file.active.cell(row=countx, column=18).value = wait.until(EC.presence_of_element_located((By.XPATH, "(//div[@class = 'card-class']//div[@class = 'fs-tabs__content']//div[@class = 'row-val-shot'])[11]"))).text
+    file.save(path)
+    #现居住地
+    file.active.cell(row=countx, column=20).value = wait.until(EC.presence_of_element_located((By.XPATH, "(//div[@class = 'card-class']//div[@class = 'table-row'])[11]/div[@class = 'row-vals']"))).text
+    file.save(path)
+    #户籍所在地
+    file.active.cell(row=countx, column=21).value = wait.until(EC.presence_of_element_located((By.XPATH, "(//div[@class = 'card-class']//div[@class = 'table-row'])[12]/div[@class = 'row-vals']"))).text
+    file.save(path)
+    #是否失联党员
+    file.active.cell(row=countx, column=22).value = wait.until(EC.presence_of_element_located((By.XPATH, "(//div[@class = 'card-class']//div[@class = 'table-row'])[13]/div[@class = 'row-vals']"))).text
+    file.save(path)
+    #是否流动党员
+    file.active.cell(row=countx, column=23).value = wait.until(EC.presence_of_element_located((By.XPATH, "(//div[@class = 'card-class']//div[@class = 'table-row'])[14]/div[@class = 'row-vals']"))).text
+    file.save(path)
+    #切换选项卡
+    switch_card_joininfo = wait.until(EC.element_to_be_clickable((By.ID, "tab-enterInfo")))
+    switch_card_joininfo.click()
+    #入党类型
+    wait.until(EC.text_to_be_present_in_element((By.XPATH, "(//div[@class = 'table-row'])[1]/div[@class = 'row-key'][1]"), '入党类型'))
+    file.active.cell(row=countx, column=24).value = wait.until(EC.presence_of_element_located((By.XPATH, "(//div[@class = 'row-val'])[1]"))).text
+    file.save(path)
+    #转正情况
+    file.active.cell(row=countx, column=25).value = wait.until(EC.presence_of_element_located((By.XPATH, "(//div[@class = 'row-val'])[3]"))).text
+    file.save(path)
+    #入党时所在党支部
+    file.active.cell(row=countx, column=26).value = wait.until(EC.presence_of_element_located((By.XPATH, "(//div[@class = 'row-val'])[5]"))).text
+    file.save(path)
+    #延长预备期时间
+    file.active.cell(row=countx, column=27).value = wait.until(EC.presence_of_element_located((By.XPATH, "(//div[@class = 'row-val'])[6]"))).text
+    file.save(path)
+    #debugging()
+    print("填写第",count,"名党员",name_temp,"信息成功") 
+    exit_member_card = wait.until(EC.element_to_be_clickable((By.XPATH, "(//button[@class = 'fs-button fs-button--default fs-button--small'])[2]")))
+    exit_member_card.click()
+
 
 
 
