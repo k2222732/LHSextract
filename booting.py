@@ -4,6 +4,7 @@ from selenium.common.exceptions import TimeoutException
 from selenium.webdriver.chrome.options import Options
 from selenium.webdriver.chrome.service import Service
 from selenium.webdriver.common.by import By
+from selenium.webdriver.common.keys import Keys
 from openpyxl import load_workbook
 from selenium import webdriver
 from datetime import datetime
@@ -12,6 +13,7 @@ import time
 import os
 import re
 import inspect
+import LHSextract
 
 amount_that_complete = 0
 
@@ -74,32 +76,37 @@ def switch_role(wait):
     print(f"切换角色成功")
 
 
-def new_excel():
-    #在当前文件夹新建一个文件夹命名为"database"在里面新建一个文件夹名为"database_member"
-    os.makedirs("database/database_member", exist_ok=True)
-    #在database_member文件夹里新建一个excel文件命名为"今天的日期"&"党员信息库"
+def new_excel(wait, member_total_amount):
     today_date = datetime.now().strftime("%Y-%m-%d")
     excel_file_name = f"{today_date}党员信息库.xlsx"
-    excel_file_path = os.path.join("database", "database_member", excel_file_name)
-    #在excel里的第一行建立表头，分别是"姓名、性别、公民身份号码、民族、出生日期、学历、人员类别、学位、所在党支部、手机号码、入党日期
-    #转正日期、党龄、党龄校正值、新社会阶层类型、工作岗位、从事专业技术职务、是否农民工、现居住地、户籍所在地、是否失联党员、是否流动党员、
-    #党员注册时间、注册手机号、党员增加信息、党员减少信息、入党类型、转正情况、入党时所在支部、延长预备期时间
-    columns = ["序号","姓名", "性别", "公民身份号码", "民族", "出生日期", "学历", "人员类别", "学位", 
-           "所在党支部", "手机号码", "入党日期", "转正日期", "党龄", "党龄校正值", "新社会阶层类型", 
-           "工作岗位", "从事专业技术职务", "是否农民工", "现居住地", "户籍所在地", "是否失联党员", 
-           "是否流动党员", "入党类型", "转正情况", "入党时所在支部", "延长预备期时间"]
-    
-    df = pd.DataFrame(columns=columns)
-    df.to_excel(excel_file_path, index=False)
+    excel_file_path = os.path.join(LHSextract.directory, excel_file_name)
+    if os.path.isfile(excel_file_path):
+        member_excel = load_workbook(excel_file_path)
+        rebuild(excel_file_path, wait, member_total_amount, member_excel, excel_file_path)
+    else:
+        #在当前文件夹新建一个文件夹命名为"database"在里面新建一个文件夹名为"database_member"
+        os.makedirs(LHSextract.directory, exist_ok=True)
+        #在database_member文件夹里新建一个excel文件命名为"今天的日期"&"党员信息库"
 
-    workbook = load_workbook(excel_file_path)
-    print(f"文件 '{excel_file_path}' 已成功创建。")
-    return workbook, excel_file_path
+        #在excel里的第一行建立表头，分别是"姓名、性别、公民身份号码、民族、出生日期、学历、人员类别、学位、所在党支部、手机号码、入党日期
+        #转正日期、党龄、党龄校正值、新社会阶层类型、工作岗位、从事专业技术职务、是否农民工、现居住地、户籍所在地、是否失联党员、是否流动党员、
+        #党员注册时间、注册手机号、党员增加信息、党员减少信息、入党类型、转正情况、入党时所在支部、延长预备期时间
+        columns = ["序号","姓名", "性别", "公民身份号码", "民族", "出生日期", "学历", "人员类别", "学位", 
+            "所在党支部", "手机号码", "入党日期", "转正日期", "党龄", "党龄校正值", "新社会阶层类型", 
+            "工作岗位", "从事专业技术职务", "是否农民工", "现居住地", "户籍所在地", "是否失联党员", 
+            "是否流动党员", "入党类型", "转正情况", "入党时所在支部", "延长预备期时间"]
+        
+        df = pd.DataFrame(columns=columns)
+        df.to_excel(excel_file_path, index=False)
+
+        member_excel = load_workbook(excel_file_path)
+        print(f"文件 '{excel_file_path}' 已成功创建。")
+    return member_excel, excel_file_path
   
 
 
 def get_amountof_member(wait):
-    #//div[@class = 'page']//span[@class = 'fs-pagination__total'] 
+    time.sleep(1)
     char_amountof_member = wait.until(EC.presence_of_element_located((By.XPATH, "//div[@class = 'page']//span[@class = 'fs-pagination__total']"))).text
     int_amountof_members = re.findall(r'\d+', char_amountof_member)
     int_amountof_member = int(int_amountof_members[0]) if int_amountof_members else None
@@ -107,37 +114,63 @@ def get_amountof_member(wait):
 
 
 def set_amount_perpage(wait):
+    time.sleep(1)
     list = wait.until(EC.element_to_be_clickable((By.XPATH, "//div[@class = 'page']//input[@type = 'text']")))
     list.click()
-    option = wait.until(EC.element_to_be_clickable((By.XPATH, "//li[@class = 'fs-select-dropdown__item hover']")))
+    time.sleep(1)
+    option = wait.until(EC.element_to_be_clickable((By.XPATH, "(//ul[@class = 'fs-scrollbar__view fs-select-dropdown__list'])[4]/li[6]")))
     option.click()
 
     #//div[@class = 'page']//input[@type = 'text']
 
 def access_info_page(wait, row):
     xpath = f"(//table[@class='fs-table__body'])[3]/tbody/tr[{row}]/td[3]"
-    wait.until(EC.presence_of_element_located((By.XPATH, xpath)))
+    time.sleep(3)
     member = wait.until(EC.element_to_be_clickable((By.XPATH, xpath)))
     member.click() 
     print(f"进入党员个人页面成功") 
 
+def rebuild(excel_file_path, wait, member_total_amount, member_excel, member_excel_path):
+    #先改变全局变量
+    init_complete_amount(excel_file_path)
+    synchronizing(wait, member_total_amount, member_excel, member_excel_path)
+
+
+
+def init_complete_amount(excel_file_path):
+    global amount_that_complete
+    df = pd.read_excel(excel_file_path)
+    amount_that_complete = len(df) - 1
+
+
+
+
+
 def synchronizing(wait, member_total_amount, member_excel, member_excel_path):
     global amount_that_complete
     while amount_that_complete < member_total_amount:
-        page_number = amount_that_complete / 100 + 1
-        row_number = amount_that_complete % 100 + 2
-        #(//div[@class = 'page']//input)[2]
+        page_number = int(amount_that_complete / 100 + 1)
+        row_number = int(amount_that_complete % 100 + 2)
+        time.sleep(1)
         input_page = wait.until(EC.visibility_of_element_located((By.XPATH, "(//div[@class = 'page']//input)[2]")))
+        input_page.clear()
         input_page.send_keys(page_number)
+        input_page.send_keys(Keys.RETURN)
         access_info_page(wait, row_number)
-        downloading(amount_that_complete, member_excel, wait, member_excel_path)
+        while 1:
+            try:
+                downloading(amount_that_complete, member_excel, wait, member_excel_path)
+                break
+            except:
+                access_info_page(wait, row_number)
         amount_that_complete = amount_that_complete + 1
 
 
 
 
 def downloading(count, file, wait, path):
-
+    print("Current line number:", os.path.basename(__file__), inspect.currentframe().f_back.f_lineno)
+    time.sleep(1)
     rylb = wait.until(EC.presence_of_element_located((By.XPATH, "(//div[@class = 'card-class']//div[@class = 'fs-tabs__content']//div[@class = 'row-val-shot'])[7]"))).text
     if rylb == '正式党员':
         downloading_formal(count, file, wait, path)
@@ -189,7 +222,6 @@ def downloading_informal(count, file, wait, path):
     #入党日期
     file.active.cell(row=countx, column=12).value = wait.until(EC.presence_of_element_located((By.XPATH, "(//div[@class = 'card-class']//div[@class = 'fs-tabs__content']//div[@class = 'row-val-shot'])[10]"))).text
     file.save(path)
-
     #转正日期
     file.active.cell(row=countx, column=13).value = '-'
     file.save(path)
@@ -343,13 +375,9 @@ def downloading_formal(count, file, wait, path):
 
 
 
-def current_line_number():
-    return inspect.currentframe().f_back.f_lineno
 
 
-def debugging():
-    current_file_path = __file__
-    current_file_name = os.path.basename(current_file_path)
-    print("Current line number:", current_file_name, current_line_number())
+
+
 
 
