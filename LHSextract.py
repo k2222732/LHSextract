@@ -5,8 +5,6 @@ chromedriver_path = r'd:/project/LHSextract/package/chromedriver.exe'
 account = "370830198309261711"
 password = "Kfq123456"
 url = "http://10.242.32.4:7122/sso/login"
-complete_number_member = 0
-directory = "D:/project/LHSextract/database/database_member"
 
 def main():
     global member_excel
@@ -17,7 +15,6 @@ def main():
     global url
     driver = booting.driver_create(chrome_path, chromedriver_path)
     wait = WebDriverWait(driver, 10, 0.5)
-    member_excel_path = ''
     member_excel = 0
     member_total_amount = 0
     booting.login(account, password, driver, url, wait)
@@ -28,8 +25,8 @@ def main():
     #设置一次性爬取的条目数
     booting.set_amount_perpage(wait)
     #指定位置创建excel工作簿
-    member_excel, member_excel_path= booting.new_excel(wait, member_total_amount)
-    booting.synchronizing(wait, member_total_amount, member_excel, member_excel_path)
+    booting.new_excel(wait, member_total_amount)
+
     input("Press Enter to exit...")
 if __name__ == "__main__":
     main()
