@@ -1,10 +1,9 @@
-from selenium.webdriver.support.ui import WebDriverWait
 from selenium.webdriver.support import expected_conditions as EC
-from selenium.common.exceptions import TimeoutException
 from selenium.webdriver.chrome.options import Options
 from selenium.webdriver.chrome.service import Service
 from selenium.webdriver.common.by import By
 from selenium.webdriver.common.keys import Keys
+#import xlwings as xw
 from openpyxl import load_workbook
 from selenium import webdriver
 from datetime import datetime
@@ -17,9 +16,6 @@ import LHSextract
 
 amount_that_complete = 0
 
-
-
-
 def driver_create(chrome_path, chromedriver_path):
     chrome_options = Options()
     # 替换为你的 Chrome 浏览器的实际安装路径
@@ -31,7 +27,6 @@ def driver_create(chrome_path, chromedriver_path):
     #返回driver
     print(f"浏览器驱动创建成功")
     return driver
-
 
 
 def login(account, password, driver, url, wait):
@@ -70,7 +65,7 @@ def switch_role(wait):
     droplist = wait.until(EC.element_to_be_clickable((By.CSS_SELECTOR, '.avatar-wrapper.fs-dropdown-selfdefine')))
     droplist.click()
     print(f"进入角色下拉列表成功")
-    time.sleep(3)
+    time.sleep(1)
     role = wait.until(EC.element_to_be_clickable((By.XPATH, '//SPAN[contains(text(), "中国共产党山东汶上经济开发区工作委员会-具有审批预备党员权限的基层党委管理员")]')))
     role.click()
     print(f"切换角色成功")
@@ -104,7 +99,6 @@ def new_excel(wait, member_total_amount):
     return member_excel, excel_file_path
   
 
-
 def get_amountof_member(wait):
     time.sleep(1)
     char_amountof_member = wait.until(EC.presence_of_element_located((By.XPATH, "//div[@class = 'page']//span[@class = 'fs-pagination__total']"))).text
@@ -114,21 +108,37 @@ def get_amountof_member(wait):
 
 
 def set_amount_perpage(wait):
-    time.sleep(1)
+    time.sleep(0.5)
     list = wait.until(EC.element_to_be_clickable((By.XPATH, "//div[@class = 'page']//input[@type = 'text']")))
     list.click()
-    time.sleep(1)
+    time.sleep(0.5)
     option = wait.until(EC.element_to_be_clickable((By.XPATH, "(//ul[@class = 'fs-scrollbar__view fs-select-dropdown__list'])[4]/li[6]")))
     option.click()
 
     #//div[@class = 'page']//input[@type = 'text']
 
+
 def access_info_page(wait, row):
     xpath = f"(//table[@class='fs-table__body'])[3]/tbody/tr[{row}]/td[3]"
-    time.sleep(3)
-    member = wait.until(EC.element_to_be_clickable((By.XPATH, xpath)))
-    member.click() 
+    while 1:
+        try:
+            member = wait.until(EC.element_to_be_clickable((By.XPATH, xpath)))
+            break
+        except:
+            time.sleep(0.1)
+    while 1:
+        try:
+            member.click()
+            break
+        except:
+                while 1:
+                    try:
+                        member = wait.until(EC.element_to_be_clickable((By.XPATH, xpath)))
+                        break
+                    except:
+                        time.sleep(0.1)
     print(f"进入党员个人页面成功") 
+
 
 def rebuild(excel_file_path, wait, member_total_amount, member_excel, member_excel_path):
     #先改变全局变量
@@ -136,25 +146,24 @@ def rebuild(excel_file_path, wait, member_total_amount, member_excel, member_exc
     synchronizing(wait, member_total_amount, member_excel, member_excel_path)
 
 
-
 def init_complete_amount(excel_file_path):
     global amount_that_complete
-    df = pd.read_excel(excel_file_path)
-    amount_that_complete = len(df) - 1
-
-
-
+    df = pd.read_excel(excel_file_path, sheet_name=0)
+    row_count = df.dropna(how='all').shape[0]
+    amount_that_complete = row_count - 1
 
 
 def synchronizing(wait, member_total_amount, member_excel, member_excel_path):
     global amount_that_complete
     while amount_that_complete < member_total_amount:
         page_number = int(amount_that_complete / 100 + 1)
-        row_number = int(amount_that_complete % 100 + 2)
-        time.sleep(1)
+        row_number = int(amount_that_complete % 100 + 1)
+        #time.sleep(0.1)
         input_page = wait.until(EC.visibility_of_element_located((By.XPATH, "(//div[@class = 'page']//input)[2]")))
-        input_page.clear()
+        input_page.send_keys(Keys.CONTROL + "a")
+        input_page.send_keys(Keys.BACKSPACE)
         input_page.send_keys(page_number)
+        
         input_page.send_keys(Keys.RETURN)
         access_info_page(wait, row_number)
         while 1:
@@ -166,11 +175,9 @@ def synchronizing(wait, member_total_amount, member_excel, member_excel_path):
         amount_that_complete = amount_that_complete + 1
 
 
-
-
 def downloading(count, file, wait, path):
     print("Current line number:", os.path.basename(__file__), inspect.currentframe().f_back.f_lineno)
-    time.sleep(1)
+    time.sleep(0.1)
     rylb = wait.until(EC.presence_of_element_located((By.XPATH, "(//div[@class = 'card-class']//div[@class = 'fs-tabs__content']//div[@class = 'row-val-shot'])[7]"))).text
     if rylb == '正式党员':
         downloading_formal(count, file, wait, path)
@@ -179,11 +186,9 @@ def downloading(count, file, wait, path):
     else:
         print('既不是正式党员也不是预备党员')
 
-        
-
-
 
 def downloading_informal(count, file, wait, path):
+    count = count + 1
     countx = count + 1
     #填写序号
     file.active.cell(row=countx, column=1).value = count
@@ -231,7 +236,6 @@ def downloading_informal(count, file, wait, path):
     #党龄矫正值
     file.active.cell(row=countx, column=15).value = '-'
     file.save(path)
-
     #新社会阶层类型
     file.active.cell(row=countx, column=17).value = wait.until(EC.presence_of_element_located((By.XPATH, "(//div[@class = 'card-class']//div[@class = 'fs-tabs__content']//div[@class = 'row-val-big'])[2]"))).text
     file.save(path)
@@ -278,8 +282,8 @@ def downloading_informal(count, file, wait, path):
     exit_member_card.click()
 
 
-
 def downloading_formal(count, file, wait, path):
+    count = count + 1
     countx = count + 1
     #填写序号
     file.active.cell(row=countx, column=1).value = count
@@ -371,13 +375,6 @@ def downloading_formal(count, file, wait, path):
     print("填写第",count,"名党员",name_temp,"信息成功") 
     exit_member_card = wait.until(EC.element_to_be_clickable((By.XPATH, "(//button[@class = 'fs-button fs-button--default fs-button--small'])[2]")))
     exit_member_card.click()
-
-
-
-
-
-
-
 
 
 
