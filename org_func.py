@@ -80,20 +80,23 @@ def new_excel(wait):
         member_excel = load_workbook(excel_file_path)
         rebuild(excel_file_path, wait, member_excel, excel_file_path)
     else:
-        #在当前文件夹新建一个文件夹命名为"database"在里面新建一个文件夹名为"database_member"
-        os.makedirs(directory, exist_ok=True)
-        #在database_member文件夹里新建一个excel文件命名为"今天的日期"&"党员信息库"
-
-        #在excel里的第一行建立表头，分别是"姓名、性别、公民身份号码、民族、出生日期、学历、人员类别、学位、所在党支部、手机号码、入党日期
-        #转正日期、党龄、党龄校正值、新社会阶层类型、工作岗位、从事专业技术职务、是否农民工、现居住地、户籍所在地、是否失联党员、是否流动党员、
-        #党员注册时间、注册手机号、党员增加信息、党员减少信息、入党类型、转正情况、入党时所在支部、延长预备期时间
-        columns = ["序号","姓名", "性别", "公民身份号码", "民族", "出生日期", "学历", "人员类别", "学位", 
-            "所在党支部", "手机号码", "入党日期", "转正日期", "党龄", "党龄校正值", "新社会阶层类型", 
-            "工作岗位", "从事专业技术职务", "是否农民工", "现居住地", "户籍所在地", "是否失联党员", 
-            "是否流动党员", "入党类型", "转正情况", "入党时所在支部", "延长预备期时间"]
         
-        df = pd.DataFrame(columns=columns)
-        df.to_excel(excel_file_path, index=False)
+        #创建目录g:/project/LHSextract/database/database_member
+        os.makedirs(directory, exist_ok=True)
+        #设计党组织基本信息表头
+        columns_base_info = ["序号","党组织全称", "党组织简称", "党内统计用党组织简称", "成立日期", "党组织编码", "党组织联系人", "联系电话", "组织类别", 
+            '是否具有"审批预备党员权限"', "功能型党组织", "党组织所在单位情况", "党组织所在行政区划", "批准成立的上级党组织", "是否为新业态", "驻外情况", 
+            "党组织曾用名", "单位名称（全称）", "UUID", "有无统一社会信用代码", "法人单位统一社会信用代码", "单位性质类别", 
+            "法人单位标识", "建立党组情况", "法人单位建立党组织情况", "单位所在目录", "单位隶属关系", "单位所在行政区划", "单位名称(全称)", "机构类型", "法人单位统一社会信用代码"
+            , "新经济行业", "经济行业", "经济类型", "新经济类型", "成立日期", "注册地行政区划", "注册地址", "组织机构代码", "上级主管部门名称"]
+        #设计党组织委员会信息表头
+        columns_committee_info = ["序号", "党内职务", "姓名", "公民身份证号码", "性别", "出生日期", "学历", "领导职务", "任职日期", "离职日期", "排序", "公司职务"]
+        #设计党组织奖惩信息表头
+        columns_rewards_and_punishments_info = ["奖惩名称", "批准机关", "批准日期"]
+        #创建一个dataframe表头为columns_base_info中的元素
+        df = pd.DataFrame(columns = columns_base_info)
+        #dataframe导出到excel
+        df.to_excel(excel_file_path, index = False)
 
         member_excel = load_workbook(excel_file_path)
         print(f"文件 '{excel_file_path}' 已成功创建。")

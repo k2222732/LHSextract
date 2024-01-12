@@ -14,7 +14,7 @@ import re
 import inspect
 
 amount_that_complete = 0
-directory = "D:/project/LHSextract/database/database_member"
+directory = "G:/project/LHSextract/database/database_member"
 
 def driver_create(chrome_path, chromedriver_path):
     chrome_options = Options()
