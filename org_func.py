@@ -71,7 +71,7 @@ def switch_role(wait):
     role.click()
     print(f"切换角色成功")
 
-
+#切换到党组织信息页面
 def switch_item_org(wait):
     while(1):
         try:
@@ -171,11 +171,28 @@ def init_complete_amount(excel_file_path):
 
 def synchronizing(wait, member_excel, member_excel_path):
     #待完成，递归遍历树状列表完成每一个党组织的信息采集。
+    #点击根组织(//div[@class = "tree_wrapper"]//div[@role = "treeitem"]/div[@class = "fs-tree-node__content"])[1]
+    #采集根组织信息
+    #获取根节点结构体//div[@class = "tree_wrapper"]//div[@role = "treeitem"]/div[@role = "group"]到tree_root
+    #recursion(tree_root)
     pass
 
+def recursion(tree_root):
+    #for 每个元素 in tree_root  
+        # 每个元素.click()
+        # 采集党组织信息
+        # 查看元素下面是否有//span[@class = "is-leaf fs-tree-node__expand-icon fs-icon-caret-right"]
+            #如果有：
+                #next
+            #如果没有：
+                #断言元素下面有//span[@class = "fs-tree-node__expand-icon fs-icon-caret-right"]
+                    #断言异常
+                #点击//span[@class = "fs-tree-node__expand-icon fs-icon-caret-right"]
+                #元素下面的//div[@role = "group"]结构体作为新的根节点结构体new_tree_root
+                #递归recursion(new_tree_root)
+    pass
 
 def downloading(count, file, wait, path):
-    
     count = count + 1
     countx = count + 1
     #填写序号
@@ -264,7 +281,7 @@ def downloading(count, file, wait, path):
     #单位隶属关系
     file.active.cell(row=countx, column=27).value = wait.until(EC.presence_of_element_located((By.XPATH, "(//div[@class = 'row-val'])[6]"))).text
     file.save(path)
-    #单位所在行政区划
+    # 单位所在行政区划
     # 单位名称(全称)
     # 机构类型
     # 法人单位统一社会信用代码
@@ -278,10 +295,26 @@ def downloading(count, file, wait, path):
     # 组织机构代码
     # 上级主管部门名称
     # 采集班子成员信息
+    # table_council()
     # 采集奖励惩戒信息
+    # table_reward_punish()
     print("填写第",count,"名党员",name_temp,"信息成功") 
     exit_member_card = wait.until(EC.element_to_be_clickable((By.XPATH, "(//button[@class = 'fs-button fs-button--default fs-button--small'])[2]")))
     exit_member_card.click()
+
+
+
+def table_council():
+
+    pass
+
+
+def table_reward_punish():
+
+    pass
+
+    
+
 
 
 
