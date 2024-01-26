@@ -9,11 +9,14 @@ from selenium.webdriver.common.keys import Keys
 from openpyxl import load_workbook
 from selenium import webdriver
 from datetime import datetime
+from bs4 import BeautifulSoup
+from openpyxl import load_workbook
 import pandas as pd
 import time 
 import os
 import re
 import inspect
+
 
 amount_that_complete = 0
 
@@ -110,7 +113,6 @@ def new_excel(wait):
         member_excel = load_workbook(excel_file_path)
         rebuild(excel_file_path, wait, member_excel, excel_file_path)
     else:
-        
         #创建目录g:/project/LHSextract/database/database_member
         os.makedirs(directory, exist_ok=True)
         #设计党组织基本信息表头
@@ -176,6 +178,7 @@ def synchronizing(wait, member_excel, member_excel_path):
     #获取根节点结构体//div[@class = "tree_wrapper"]//div[@role = "treeitem"]/div[@role = "group"]到tree_root
     #recursion(tree_root)
     pass
+
 
 def recursion(tree_root):
     #for 每个元素 in tree_root  
@@ -267,7 +270,6 @@ def downloading(count, file, wait, driver, path):
             company_info = wait.until(EC.element_to_be_clickable((By.XPATH, "//div[contains(text(), '党组织单位信息')]")))
 
 
-
     #单位名称（全称）#
     file.active.cell(row=countx, column=19).value = wait.until(EC.presence_of_element_located((By.XPATH, "//label[contains(text(), '单位名称（全称）')]/following-sibling::div"))).text
     file.save(path)
@@ -349,6 +351,7 @@ def downloading(count, file, wait, driver, path):
         file.active.cell(row=countx, column=44).value = wait.until(EC.presence_of_element_located((By.XPATH, "//label[contains(text(), '上级主管部门名称')]/following-sibling::div"))).text
         file.save(path)
 
+
     else:
         file.active.cell(row=countx, column=33).value = "-"
         file.save(path)
@@ -385,10 +388,13 @@ def downloading(count, file, wait, driver, path):
         # 上级主管部门名称
         file.active.cell(row=countx, column=44).value = "-"
         file.save(path)
-        # 采集班子成员信息
-        # table_council()
-        # 采集奖励惩戒信息
-        # table_reward_punish()
+    # 切换选项卡到班子成员
+    councilcard = wait.until(EC.element_to_be_clickable((By.XPATH, "")))
+    # 采集班子成员信息
+    # table_council()
+    # 切换选项卡到惩戒信息
+    # 采集奖励惩戒信息
+    # table_reward_punish()
     
     
     print("填写第",count,"名党员",name_temp,"信息成功") 
@@ -397,7 +403,7 @@ def downloading(count, file, wait, driver, path):
 
 
 
-def table_council(org_name: string):
+def table_council(org_name: str):
     #获取数据存储目录
     global directory
     #获取当天日期
@@ -408,7 +414,32 @@ def table_council(org_name: string):
     excel_file_path = os.path.join(directory, excel_file_name)
     #设计党组织委员会信息表头
     columns_committee_info = ["序号", "党内职务", "姓名", "公民身份证号码", "性别", "出生日期", "学历", "领导职务", "任职日期", "离职日期", "排序", "公司职务"]
-    pass
+    #创建一个dataframe表头为columns_base_info中的元素
+    df = pd.DataFrame(columns = columns_committee_info)
+    #dataframe导出到excel
+    df.to_excel(excel_file_path, index = False)
+    #读取表格容器保存在变量container里
+    container = ...
+    #用beautifulsoup分析container，将表头保存在新的容器container_header里，将表体保存在新的容器container_body里
+    soup = BeautifulSoup(container, 'html.parser')
+    container_header = soup.find_all('thead') 
+    container_body = soup.find_all('tbody')
+    #openpyexcel打开excel_file_path
+    book = load_workbook(excel_file_path)
+    sheet = book.active
+    #将党组织的全称存放在单元格A1
+    sheet['A1'] = org_name
+    #从container_header里提取数据保存在自单元格A2始向右的区域内
+    for header in container_header:
+    # 这里是处理表头数据的代码
+        pass
+    #从container_body里提取数据保存在自单元格A3始向下向右的区域内
+    for body in container_body:
+        # 这里是处理表体数据的代码
+        pass
+    #释放资源
+    book.close()
+    
 
 
 def table_reward_punish():
