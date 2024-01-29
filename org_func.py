@@ -389,12 +389,33 @@ def downloading(count, file, wait, driver, path):
         file.active.cell(row=countx, column=44).value = "-"
         file.save(path)
     # 切换选项卡到班子成员
-    councilcard = wait.until(EC.element_to_be_clickable((By.XPATH, "")))
+    while 1:
+        try:
+            councilcard = wait.until(EC.element_to_be_clickable((By.ID, "tab-class")))
+        except:
+            time.sleep(0.5)
+    while 1:
+        try:
+            councilcard.click()
+        except:
+            councilcard = wait.until(EC.element_to_be_clickable((By.ID, "tab-class")))
+            time.sleep(0.5)
     # 采集班子成员信息
-    # table_council()
+    table_council(name_temp, wait)
     # 切换选项卡到惩戒信息
+    while 1:
+        try:
+            RewaridsAndPunishments = wait.until(EC.element_to_be_clickable((By.ID, "tab-rewardsPunishments")))
+        except:
+            time.sleep(0.5)
+    while 1:
+        try:
+            RewaridsAndPunishments.click()
+        except:
+            RewaridsAndPunishments = wait.until(EC.element_to_be_clickable((By.ID, "tab-rewardsPunishments")))
+            time.sleep(0.5)
     # 采集奖励惩戒信息
-    # table_reward_punish()
+    table_reward_punish(name_temp, wait)
     
     
     print("填写第",count,"名党员",name_temp,"信息成功") 
@@ -403,7 +424,7 @@ def downloading(count, file, wait, driver, path):
 
 
 
-def table_council(org_name: str):
+def table_council(org_name: str, wait):
     #获取数据存储目录
     global directory
     #获取当天日期
@@ -412,40 +433,77 @@ def table_council(org_name: str):
     excel_file_name = f"{today_date}{org_name}班子成员信息库.xlsx"
     #构建完整路径
     excel_file_path = os.path.join(directory, excel_file_name)
-    #设计党组织委员会信息表头
-    columns_committee_info = ["序号", "党内职务", "姓名", "公民身份证号码", "性别", "出生日期", "学历", "领导职务", "任职日期", "离职日期", "排序", "公司职务"]
     #创建一个dataframe表头为columns_base_info中的元素
-    df = pd.DataFrame(columns = columns_committee_info)
+    df = pd.DataFrame()
     #dataframe导出到excel
     df.to_excel(excel_file_path, index = False)
-    #读取表格容器保存在变量container里
-    container = ...
-    #用beautifulsoup分析container，将表头保存在新的容器container_header里，将表体保存在新的容器container_body里
-    soup = BeautifulSoup(container, 'html.parser')
-    container_header = soup.find_all('thead') 
-    container_body = soup.find_all('tbody')
     #openpyexcel打开excel_file_path
     book = load_workbook(excel_file_path)
     sheet = book.active
     #将党组织的全称存放在单元格A1
     sheet['A1'] = org_name
-    #从container_header里提取数据保存在自单元格A2始向右的区域内
-    for header in container_header:
-    # 这里是处理表头数据的代码
-        pass
-    #从container_body里提取数据保存在自单元格A3始向下向右的区域内
-    for body in container_body:
-        # 这里是处理表体数据的代码
-        pass
+    #设计党组织委员会信息表头
+    table_head = ["序号", "党内职务", "姓名", "公民身份证号码", "性别", "出生日期", "学历", "领导职务", "任职日期", "离职日期", "排序", "公司职务"]
+    for i, value in enumerate(table_head, start = 1):
+        sheet.cell(row = 2, column = i, value = value)
+    #读取表格容器保存在变量container里
+    tbody = wait.until(EC.visibility_of_all_elements_located((By.XPATH, "(//div[@class = 'fs-table__header-wrapper']/following-sibling::div[@class = 'fs-table__body-wrapper is-scrolling-left'])[2]//tbody")))
+    #用beautifulsoup分析container，将表头保存在新的容器container_header里，将表体保存在新的容器container_body里
+    soup = BeautifulSoup(tbody, 'html.parser')
+    tr = soup.find_all('tr')
+    #从tr里提取数据保存在自单元格A3始向右的区域内
+    for elm_tr in tr:
+        # 从elm_tr里解析出td, 保存在td数组里
+        td = elm_tr.find_all('td')
+        for i, elm_td in enumerate(td, start=1):
+            #使用css选择器从elm_td里选中第一个span放在变量span里
+            span = elm_td.select_one('span')
+            #将span里的内容存放在
+            sheet.cell(row = 3, column = i, value = span.text)
     #释放资源
     book.close()
     
 
 
-def table_reward_punish():
-    #设计党组织奖惩信息表头
-    columns_rewards_and_punishments_info = ["奖惩名称", "批准机关", "批准日期"]
-    pass
+def table_reward_punish(org_name: str, wait):
+    #获取数据存储目录
+    global directory
+    #获取当天日期
+    today_date = datetime.now().strftime("%Y-%m-%d")
+    #构建文件名称
+    excel_file_name = f"{today_date}{org_name}奖惩信息.xlsx"
+    #构建完整路径
+    excel_file_path = os.path.join(directory, excel_file_name)
+    #创建一个dataframe表头为columns_base_info中的元素
+    df = pd.DataFrame()
+    #dataframe导出到excel
+    df.to_excel(excel_file_path, index = False)
+    #openpyexcel打开excel_file_path
+    book = load_workbook(excel_file_path)
+    sheet = book.active
+    #将党组织的全称存放在单元格A1
+    sheet['A1'] = org_name
+    #设计党组织委员会信息表头
+    table_head = ["奖惩名称", "批准机关", "批准日期", "操作"]
+    for i, value in enumerate(table_head, start = 1):
+        sheet.cell(row = 2, column = i, value = value)
+    
+    #读取表格容器保存在变量container里
+    tbody = wait.until(EC.visibility_of_all_elements_located((By.XPATH, "//div[@class = 'fs-table__body-wrapper is-scrolling-none']//table//tbody")))
+    #用beautifulsoup分析container，将表头保存在新的容器container_header里，将表体保存在新的容器container_body里
+    soup = BeautifulSoup(tbody, 'html.parser')
+    tr = soup.find_all('tr')
+    #从tr里提取数据保存在自单元格A3始向右的区域内
+    for elm_tr in tr:
+        # 从elm_tr里解析出td, 保存在td数组里
+        td = elm_tr.find_all('td')
+        for i, elm_td in enumerate(td, start=1):
+            #使用css选择器从elm_td里选中第一个span放在变量span里
+            span = elm_td.select_one('span')
+            #将span里的内容存放在
+            sheet.cell(row = 3, column = i, value = span.text)
+    #释放资源
+    book.close()
 
 
 def element_exists(driver, by, value):
