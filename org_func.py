@@ -54,8 +54,20 @@ def login(account, password, driver, url, wait):
 
 
 def access_member_database(driver, wait):
-    Databaseofparty = wait.until(EC.element_to_be_clickable((By.XPATH, '(//img[contains(@src, "党组织和党员信息库.png")])[2]')))
-    Databaseofparty.click()
+    while(1):
+        try:
+            Databaseofparty = wait.until(EC.element_to_be_clickable((By.XPATH, '(//img[contains(@src, "党组织和党员信息库.png")])[2]')))
+            break
+        except:
+            time.sleep(0.5)
+    while(1):
+        try:
+            Databaseofparty.click()
+            break
+        except:
+            Databaseofparty = wait.until(EC.element_to_be_clickable((By.XPATH, '(//img[contains(@src, "党组织和党员信息库.png")])[2]')))
+            time.sleep(0.5)
+
     try:
         for handle in driver.window_handles:
             driver.switch_to.window(handle)
@@ -68,12 +80,34 @@ def access_member_database(driver, wait):
 
 
 def switch_role(wait):
-    droplist = wait.until(EC.element_to_be_clickable((By.CSS_SELECTOR, '.avatar-wrapper.fs-dropdown-selfdefine')))
-    droplist.click()
+    while(1):
+        try:
+            droplist = wait.until(EC.element_to_be_clickable((By.CSS_SELECTOR, '.avatar-wrapper.fs-dropdown-selfdefine')))
+            break
+        except:
+            time.sleep(0.5)
+    while(1):
+        try:
+            droplist.click()   
+            break 
+        except:   
+            droplist = wait.until(EC.element_to_be_clickable((By.CSS_SELECTOR, '.avatar-wrapper.fs-dropdown-selfdefine')))
+            time.sleep(0.5)
+    
     print(f"进入角色下拉列表成功")
-    time.sleep(1)
-    role = wait.until(EC.element_to_be_clickable((By.XPATH, '//SPAN[contains(text(), "中国共产党山东汶上经济开发区工作委员会-具有审批预备党员权限的基层党委管理员")]')))
-    role.click()
+    while(1):
+        try:
+            role = wait.until(EC.element_to_be_clickable((By.XPATH, '//SPAN[contains(text(), "中国共产党山东汶上经济开发区工作委员会-具有审批预备党员权限的基层党委管理员")]')))
+            break
+        except:
+            time.sleep(0.5)
+    while(1):
+        try:    
+            role.click()
+            break
+        except:
+            role = wait.until(EC.element_to_be_clickable((By.XPATH, '//SPAN[contains(text(), "中国共产党山东汶上经济开发区工作委员会-具有审批预备党员权限的基层党委管理员")]')))
+            time.sleep(0.5)
     print(f"切换角色成功")
 
 #切换到党组织信息页面
@@ -92,7 +126,7 @@ def switch_item_org(wait):
             item_org = wait.until(EC.element_to_be_clickable((By.XPATH, '//*[contains(text(), "党组织管理")]/..')))
     while(1):
         try:
-            org_info = wait.until(EC.element_to_be_clickable((By.XPATH, '//*[contains(text(), "信息管理")]/..')))
+            org_info = wait.until(EC.element_to_be_clickable((By.XPATH, '(//*[contains(text(), "信息管理")]/..)[2]')))
             break
         except:
             time.sleep(0.1)
@@ -101,10 +135,10 @@ def switch_item_org(wait):
             org_info.click()
             break
         except:
-            org_info = wait.until(EC.element_to_be_clickable((By.XPATH, '//*[contains(text(), "信息管理")]/..')))
+            org_info = wait.until(EC.element_to_be_clickable((By.XPATH, '(//*[contains(text(), "信息管理")]/..)[2]')))
 
 
-def new_excel(wait):
+def new_excel(wait, driver):
     global directory
     today_date = datetime.now().strftime("%Y-%m-%d")
     excel_file_name = f"{today_date}党组织信息库.xlsx"
@@ -132,7 +166,7 @@ def new_excel(wait):
         #打印调试信息
         print(f"文件 '{excel_file_path}' 已成功创建。")
         #启动同步
-        synchronizing(wait, member_excel, excel_file_path)
+        synchronizing(wait, member_excel, excel_file_path, driver)
   
 
 
@@ -225,9 +259,28 @@ def recursion(tree_root, count, file, wait, driver, path):
             #断言元素下面有//span[@class = "fs-tree-node__expand-icon fs-icon-caret-right"]
                 #断言异常
             #点击//span[@class = "fs-tree-node__expand-icon fs-icon-caret-right"]
-
+            while (1):
+                try:
+                    arrow_down = item.wait.until(EC.element_to_be_clickable((By.XPATH,"//span[@class = 'fs-tree-node__expand-icon fs-icon-caret-right']")))
+                    break
+                except:
+                    time.sleep(0.5)
+            while(1):
+                try:
+                    arrow_down.click()
+                    break
+                except:
+                    arrow_down = item.wait.until(EC.element_to_be_clickable((By.XPATH,"//span[@class = 'fs-tree-node__expand-icon fs-icon-caret-right']")))
+                    time.sleep(0.5)
             #元素下面的//div[@role = "group"]结构体作为新的根节点结构体new_tree_root
+            while(1):
+                try:
+                    new_tree_root = item.wait.until(EC.presence_of_element_located((By.XPATH, "//div[@role = 'group']")))
+                    break
+                except:
+                    time.sleep(0.5)
             #递归recursion(new_tree_root)
+            recursion(new_tree_root)
             pass
 
 def downloading(count, file, wait, driver, path):
@@ -241,7 +294,7 @@ def downloading(count, file, wait, driver, path):
     file.active.cell(row=countx, column=2).value = name_temp
     file.save(path)
     #组织树
-    file.active.cell(row=countx, column=3).value = wait.until(EC.presence_of_element_located((By.XPATH, "(//div[@class = 'card-class']//div[@class = 'fs-tabs__content']//div[@class = 'row-val-shot'])[3]"))).text
+    file.active.cell(row=countx, column=3).value = "-" #wait.until(EC.presence_of_element_located((By.XPATH, "(//div[@class = 'card-class']//div[@class = 'fs-tabs__content']//div[@class = 'row-val-shot'])[3]"))).text
     file.save(path)
     #党组织简称#
     file.active.cell(row=countx, column=4).value = wait.until(EC.presence_of_element_located((By.XPATH, "//span[contains(text(), '党组织简称')]/../following-sibling::*/div[1]"))).text
@@ -250,7 +303,7 @@ def downloading(count, file, wait, driver, path):
     file.active.cell(row=countx, column=5).value = wait.until(EC.presence_of_element_located((By.XPATH, "//label[contains(text(),  '党内统计用党组织简称')]/following-sibling::*/div[1]"))).text
     file.save(path)
     #成立日期#
-    file.active.cell(row=countx, column=6).value = wait.until(EC.presence_of_element_located((By.XPATH, "//label[contains(text(),  '成立日期')]/following-sibling::*/div[1]"))).text
+    file.active.cell(row=countx, column=6).value = wait.until(EC.presence_of_element_located((By.XPATH, "//span[contains(text(),  '成立日期')]/../following-sibling::div/div[1]"))).text
     file.save(path)
     #党组织编码#
     file.active.cell(row=countx, column=7).value = wait.until(EC.presence_of_element_located((By.XPATH, "//label[contains(text(),  '党组织编码')]/following-sibling::*/span"))).text
@@ -265,7 +318,7 @@ def downloading(count, file, wait, driver, path):
     file.active.cell(row=countx, column=10).value = wait.until(EC.presence_of_element_located((By.XPATH, "//span[contains(text(), '组织类别')]/../following-sibling::*/div[1]"))).text
     file.save(path)
     #是否具有"审批预备党员权限"#
-    file.active.cell(row=countx, column=11).value = wait.until(EC.presence_of_element_located((By.XPATH, "//label[contains(text(),  '是否具有'审批预备党员权限'')]/following-sibling::*/span"))).text
+    file.active.cell(row=countx, column=11).value = wait.until(EC.presence_of_element_located((By.XPATH, "//label[contains(text(),  '审批预备党员权限')]/following-sibling::div/span"))).text
     file.save(path)
     #功能型党组织#
     file.active.cell(row=countx, column=12).value = wait.until(EC.presence_of_element_located((By.XPATH, "//label[contains(text(),  '功能型党组织')]/following-sibling::*/span"))).text
@@ -277,7 +330,7 @@ def downloading(count, file, wait, driver, path):
     file.active.cell(row=countx, column=14).value = wait.until(EC.presence_of_element_located((By.XPATH, "//span[contains(text(), '党组织所在行政区划')]/../following-sibling::*/div[1]"))).text
     file.save(path)
     #批准成立的上级党组织#
-    file.active.cell(row=countx, column=15).value = wait.until(EC.presence_of_element_located((By.XPATH, "//label[contains(text(),  '批准成立的上级党组织')]/following-sibling::*/div[1]"))).text
+    file.active.cell(row=countx, column=15).value = wait.until(EC.presence_of_element_located((By.XPATH, "//span[contains(text(),  '批准成立的上级党组织')]/../following-sibling::*/div[1]"))).text
     file.save(path)
     #是否为新业态#
     file.active.cell(row=countx, column=16).value = wait.until(EC.presence_of_element_located((By.XPATH, "//label[contains(text(),  '是否为新业态')]/following-sibling::*/div[1]"))).text
@@ -285,7 +338,7 @@ def downloading(count, file, wait, driver, path):
     #驻外情况#
     file.active.cell(row=countx, column=17).value = wait.until(EC.presence_of_element_located((By.XPATH, "//label[contains(text(),  '驻外情况')]/following-sibling::*/div[1]"))).text
     file.save(path)
-    #党组织曾用名，这里需要加try#
+    #党组织曾用名，这里需要用soup判断是否有这一条
     file.active.cell(row=countx, column=18).value = wait.until(EC.presence_of_element_located((By.XPATH, "//div[contains(text(),  '党组织曾用名')]/following-sibling::*//tbody/tr/td[2]/div/div"))).text
     file.save(path)
 

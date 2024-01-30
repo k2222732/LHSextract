@@ -1,4 +1,4 @@
-import member_func
+import org_func
 from selenium.webdriver.support.ui import WebDriverWait
 chrome_path = "C:/Users/Administrator/AppData/Roaming/360se6/Application/360se.exe"
 chromedriver_path = r'g:/project/LHSextract/package/chromedriver.exe'
@@ -12,14 +12,15 @@ def main():
     global account
     global password
     global url
-    driver = member_func.driver_create(chrome_path, chromedriver_path)
+    driver = org_func.driver_create(chrome_path, chromedriver_path)
     wait = WebDriverWait(driver, 10, 0.5)
     org_excel = 0
-    member_func.login(account, password, driver, url, wait)
-    member_func.access_member_database(driver, wait)
-    member_func.switch_role(wait)
+    org_func.login(account, password, driver, url, wait)
+    org_func.access_member_database(driver, wait)
+    org_func.switch_role(wait)
+    org_func.switch_item_org(wait)
     #指定位置创建excel工作簿
-    member_func.new_excel(wait)
+    org_func.new_excel(wait, driver)
 
     input("Press Enter to exit...")
 if __name__ == "__main__":
