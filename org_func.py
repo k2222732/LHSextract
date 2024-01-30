@@ -171,29 +171,64 @@ def init_complete_amount(excel_file_path):
     amount_that_complete = row_count - 1
 
 
-def synchronizing(wait, member_excel, member_excel_path):
+def synchronizing(wait, member_excel, member_excel_path, driver):
+    global amount_that_complete
     #待完成，递归遍历树状列表完成每一个党组织的信息采集。
     #点击根组织(//div[@class = "tree_wrapper"]//div[@role = "treeitem"]/div[@class = "fs-tree-node__content"])[1]
+    while (1):
+        try:
+            root_org = wait.until(EC.element_to_be_clickable((By.XPATH, "(//div[@class = 'tree_wrapper']//div[@role = 'treeitem']/div[@class = 'fs-tree-node__content'])[1]")))
+            break
+        except:
+            time.sleep(0.5)
+    while(1):
+        try:
+            root_org.click()
+            break
+        except:
+            root_org = wait.until(EC.element_to_be_clickable((By.XPATH, "(//div[@class = 'tree_wrapper']//div[@role = 'treeitem']/div[@class = 'fs-tree-node__content'])[1]")))
+            time.sleep(0.5)
     #采集根组织信息
+    downloading(count = amount_that_complete, file = member_excel, wait = wait, driver = driver, path = member_excel_path)
+
     #获取根节点结构体//div[@class = "tree_wrapper"]//div[@role = "treeitem"]/div[@role = "group"]到tree_root
+    while(1):
+        try:
+            tree_root = wait.until(EC.presence_of_all_elements_located((By.XPATH, "//div[@class = 'tree_wrapper']//div[@role = 'treeitem']/div[@role = 'group']")))
+            break
+        except:
+            time.sleep(0.5)
+
     #recursion(tree_root)
-    pass
+    recursion(tree_root = tree_root, count = amount_that_complete, file = member_excel, wait = wait, driver = driver, path = member_excel_path)
 
 
-def recursion(tree_root):
+def recursion(tree_root, count, file, wait, driver, path):
     #for 每个元素 in tree_root  
+    for item in tree_root:
         # 每个元素.click()
+        item.click()
         # 采集党组织信息
+        downloading(count, file, wait, driver, path)
         # 查看元素下面是否有//span[@class = "is-leaf fs-tree-node__expand-icon fs-icon-caret-right"]
-            #如果有：
-                #next
-            #如果没有：
-                #断言元素下面有//span[@class = "fs-tree-node__expand-icon fs-icon-caret-right"]
-                    #断言异常
-                #点击//span[@class = "fs-tree-node__expand-icon fs-icon-caret-right"]
-                #元素下面的//div[@role = "group"]结构体作为新的根节点结构体new_tree_root
-                #递归recursion(new_tree_root)
-    pass
+        item_html = item.get_attribute('outerHTML')
+        soup = BeautifulSoup(item_html, 'html.parser')
+        first_child = soup.find()
+        first_grandchild = first_child.find() if first_child else None
+        leaf = first_grandchild.find('span', class_= "is-leaf fs-tree-node__expand-icon fs-icon-caret-right")
+        #如果有：
+        if leaf:
+            #next
+            next
+        #如果没有：
+        else:
+            #断言元素下面有//span[@class = "fs-tree-node__expand-icon fs-icon-caret-right"]
+                #断言异常
+            #点击//span[@class = "fs-tree-node__expand-icon fs-icon-caret-right"]
+
+            #元素下面的//div[@role = "group"]结构体作为新的根节点结构体new_tree_root
+            #递归recursion(new_tree_root)
+            pass
 
 def downloading(count, file, wait, driver, path):
     count = count + 1
@@ -313,7 +348,17 @@ def downloading(count, file, wait, driver, path):
     file.active.cell(row=countx, column=32).value = wait.until(EC.presence_of_element_located((By.XPATH, "//label[contains(text(), '单位所在行政区划')]/following-sibling::div//input"))).text
     file.save(path)
     # 判断参考信息（省标院等单位）是否存在
-    if element_exists(driver, "xpath", "//label[contains(text(), '单位名称(全称)')]/following-sibling::div") == True:
+    while 1:
+        try:
+            readonly = wait.until(EC.presence_of_all_elements_located((By.XPATH, "(//div[@class = 'read-only'])[1]")))
+            break
+        except:
+            time.sleep(0.5)
+    
+    readonly_html = readonly.get_attribute('outerHTML')
+    soup = BeautifulSoup(readonly_html, 'html.parser')
+    
+    if soup.find_all(string= lambda text: '机构类型' in text):
         # 单位名称(全称)
         file.active.cell(row=countx, column=33).value = wait.until(EC.presence_of_element_located((By.XPATH, "//label[contains(text(), '单位名称(全称)')]/following-sibling::div"))).text
         file.save(path)
@@ -392,11 +437,13 @@ def downloading(count, file, wait, driver, path):
     while 1:
         try:
             councilcard = wait.until(EC.element_to_be_clickable((By.ID, "tab-class")))
+            break
         except:
             time.sleep(0.5)
     while 1:
         try:
             councilcard.click()
+            break
         except:
             councilcard = wait.until(EC.element_to_be_clickable((By.ID, "tab-class")))
             time.sleep(0.5)
@@ -406,11 +453,13 @@ def downloading(count, file, wait, driver, path):
     while 1:
         try:
             RewaridsAndPunishments = wait.until(EC.element_to_be_clickable((By.ID, "tab-rewardsPunishments")))
+            break
         except:
             time.sleep(0.5)
     while 1:
         try:
             RewaridsAndPunishments.click()
+            break
         except:
             RewaridsAndPunishments = wait.until(EC.element_to_be_clickable((By.ID, "tab-rewardsPunishments")))
             time.sleep(0.5)
@@ -485,24 +534,46 @@ def table_reward_punish(org_name: str, wait):
     sheet['A1'] = org_name
     #设计党组织委员会信息表头
     table_head = ["奖惩名称", "批准机关", "批准日期", "操作"]
+
     for i, value in enumerate(table_head, start = 1):
         sheet.cell(row = 2, column = i, value = value)
     
-    #读取表格容器保存在变量container里
-    tbody = wait.until(EC.visibility_of_all_elements_located((By.XPATH, "//div[@class = 'fs-table__body-wrapper is-scrolling-none']//table//tbody")))
-    #用beautifulsoup分析container，将表头保存在新的容器container_header里，将表体保存在新的容器container_body里
-    soup = BeautifulSoup(tbody, 'html.parser')
-    tr = soup.find_all('tr')
-    #从tr里提取数据保存在自单元格A3始向右的区域内
-    for elm_tr in tr:
-        # 从elm_tr里解析出td, 保存在td数组里
-        td = elm_tr.find_all('td')
-        for i, elm_td in enumerate(td, start=1):
-            #使用css选择器从elm_td里选中第一个span放在变量span里
-            span = elm_td.select_one('span')
-            #将span里的内容存放在
-            sheet.cell(row = 3, column = i, value = span.text)
-    #释放资源
+    while 1: 
+        try:
+            box_table = wait.until(EC.visibility_of_all_elements_located((By.ID, "pane-rewardsPunishments")))
+            break        
+        except:
+            time.sleep(0.5)
+
+    table_html = box_table.get_attribute('outerHTML')
+    soup = BeautifulSoup(table_html, 'html.parser')
+
+    if soup.find_all(string = lambda text: '暂无数据' in text):
+        for cell in sheet['A3:D3'][0]:
+            cell.value = '-'
+    
+    else:
+        while 1:
+            try:
+                #读取表格容器保存在变量container里
+                tbody = wait.until(EC.visibility_of_all_elements_located((By.XPATH, "//div[@class = 'fs-table__body-wrapper is-scrolling-none']//table//tbody")))
+                break
+            except:
+                time.sleep(0.5)
+        #用beautifulsoup分析container，将表头保存在新的容器container_header里，将表体保存在新的容器container_body里
+        soup = BeautifulSoup(tbody, 'html.parser')
+        tr = soup.find_all('tr')
+        #从tr里提取数据保存在自单元格A3始向右的区域内
+        for elm_tr in tr:
+            # 从elm_tr里解析出td, 保存在td数组里
+            td = elm_tr.find_all('td')
+            for i, elm_td in enumerate(td, start=1):
+                #使用css选择器从elm_td里选中第一个span放在变量span里
+                span = elm_td.select_one('span')
+                #将span里的内容存放在
+                sheet.cell(row = 3, column = i, value = span.text)
+        #释放资源
+    
     book.close()
 
 
