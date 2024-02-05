@@ -597,12 +597,19 @@ def table_council(org_name: str, wait):
     sheet = book.active
     #将党组织的全称存放在单元格A1
     sheet['A1'] = org_name
+    book.save(excel_file_path)
     #设计党组织委员会信息表头
     table_head = ["序号", "党内职务", "姓名", "公民身份证号码", "性别", "出生日期", "学历", "领导职务", "任职日期", "离职日期", "排序", "公司职务"]
     for i, value in enumerate(table_head, start = 1):
         sheet.cell(row = 2, column = i, value = value)
+        book.save(excel_file_path)
     #读取表格容器保存在变量container里
-    tbody = wait.until(EC.visibility_of_element_located((By.XPATH, "(//div[@class = 'fs-table__header-wrapper']/following-sibling::div[@class = 'fs-table__body-wrapper is-scrolling-left'])[2]//tbody")))
+    while(1):
+        try:
+            tbody = wait.until(EC.visibility_of_element_located((By.XPATH, "//div[@class = 'fs-table fs-table--fit fs-table--border fs-table--enable-row-transition fs-table--mini']/div[@class = 'fs-table__body-wrapper is-scrolling-none']//tbody")))
+            break
+        except:
+            time.sleep(0.5)
     #用beautifulsoup分析container，将表头保存在新的容器container_header里，将表体保存在新的容器container_body里
    # while(1):
         #try:
@@ -614,12 +621,92 @@ def table_council(org_name: str, wait):
     soup = BeautifulSoup(tbody.get_attribute("outerHTML"), 'html.parser')
     tr = soup.find_all('tr')
     #从tr里提取数据保存在自单元格A3始向右的区域内
-    for elm_tr in tr:
+    for j, every_row in enumerate(tr, start = 1):
+
         # 从elm_tr里解析出td, 保存在td数组里
-        td = elm_tr.find_all('td')
-        for i, elm_td in enumerate(td, start=1):
-            #处理
-            pass
+        col = every_row.find_all('td')
+        
+            #将序号i填入第i+2行，第1列
+        sheet.cell(row = j+2, column = 1, value = j)
+        book.save(excel_file_path)
+
+
+        #将党内职务填入第i+2行，第2列
+        position = col[1].find_all('span')[-1]
+        position_content = position.get_text(strip = True)
+        sheet.cell(row = j+2, column = 2, value = position_content)
+        book.save(excel_file_path)
+
+
+        #将姓名填入第i+2行，第3列
+        name = col[2].find_all('span')[-1]
+        name_content = name.get_text(strip = True)
+        sheet.cell(row = j+2, column = 3, value = name_content)
+        book.save(excel_file_path)
+
+
+        #将公民身份证号码职务填入第i+2行，第4列
+        idcard_no = col[3].find_all('div')[-1]
+        idcard_no_content = idcard_no.get_text(strip = True)
+        sheet.cell(row = j+2, column = 4, value = idcard_no_content)
+        book.save(excel_file_path)
+
+
+        #将性别填入第i+2行，第5列
+        gender = col[4].find_all('span')[-1]
+        gender_content = gender.get_text(strip = True)
+        sheet.cell(row = j+2, column = 5, value = gender_content)
+        book.save(excel_file_path)
+
+
+        #将出生日期填入第i+2行，第6列
+        birthday = col[5].find_all('span')[-1]
+        birthday_content = birthday.get_text(strip = True)
+        sheet.cell(row = j+2, column = 6, value = birthday_content)
+        book.save(excel_file_path)
+
+
+        #将学历填入第i+2行，第7列
+        edu_qual = col[6].find_all('span')[-1]
+        edu_qual_content = edu_qual.get_text(strip = True)
+        sheet.cell(row = j+2, column = 7, value = edu_qual_content)
+        book.save(excel_file_path)
+
+
+        #将领导职务填入第i+2行，第8列span
+        leader_position = col[7].find_all('span')[-1]
+        leader_position_content = leader_position.get_text(strip = True)
+        sheet.cell(row = j+2, column = 8, value = leader_position_content)
+        book.save(excel_file_path)
+
+
+        #将任职日期填入第i+2行，第9列span
+        appointmentdate = col[8].find_all('span')[-1]
+        appointmentdate_content = appointmentdate.get_text(strip = True)
+        sheet.cell(row = j+2, column = 9, value = appointmentdate_content)
+        book.save(excel_file_path)
+
+
+        #将离职日期填入第i+2行，第10列span
+        resignationdate = col[9].find_all('span')[-1]
+        resignationdate_content = resignationdate.get_text(strip = True)
+        sheet.cell(row = j+2, column = 10, value = resignationdate_content)
+        book.save(excel_file_path)
+
+
+        #将排序填入第i+2行，第11列div
+        sort = col[10].find_all('div')[-1]
+        sort_content = sort.get_text(strip = True)
+        sheet.cell(row = j+2, column = 11, value = sort_content)
+        book.save(excel_file_path)
+
+
+        #将公司职务填入第i+2行，第12列div
+        companyposition = col[11].find_all('div')[-1]
+        companyposition_content = companyposition.get_text(strip = True)
+        sheet.cell(row = j+2, column = 12, value = companyposition_content)
+        book.save(excel_file_path)
+
     #释放资源
     book.close()
     
