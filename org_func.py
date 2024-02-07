@@ -14,6 +14,7 @@ from openpyxl import load_workbook
 import pandas as pd
 import time 
 import os
+import requests
 import re
 import inspect
 
@@ -36,24 +37,41 @@ def driver_create(chrome_path, chromedriver_path):
 
 
 def login(account, password, driver, url, wait):
-    # 打开网址
-    driver.get(url)
-    username_box = wait.until(EC.visibility_of_element_located((By.ID, 'username')))
-    password_box = wait.until(EC.visibility_of_element_located((By.ID, 'password')))
-    validatecode = wait.until(EC.visibility_of_element_located((By.ID, 'validateCode')))
-    login_button = wait.until(EC.element_to_be_clickable((By.CSS_SELECTOR, '.js-submit.tianze-loginbtn')))
-    username_box.send_keys(account)
-    password_box.send_keys(password)
-    # 等待手动输入验证码
-    temp = input ("Please enter the captcha and hit enter in the browser")
-    validatecode.send_keys(temp)
-    # 点击登录按钮
-    login_button.click()
-    # 之后可以添加额外的代码来处理登录后的页面或关闭浏览器
+    while(1):
+        # 打开网址
+        driver.get(url)
+        username_box = wait.until(EC.visibility_of_element_located((By.ID, 'username')))
+        password_box = wait.until(EC.visibility_of_element_located((By.ID, 'password')))
+        validatecode = wait.until(EC.visibility_of_element_located((By.ID, 'validateCode')))
+        login_button = wait.until(EC.element_to_be_clickable((By.CSS_SELECTOR, '.js-submit.tianze-loginbtn')))
+        username_box.send_keys(Keys.CONTROL + "a")
+        username_box.send_keys(Keys.BACKSPACE)
+        username_box.send_keys(account)
+        password_box.send_keys(Keys.CONTROL + "a")
+        password_box.send_keys(Keys.BACKSPACE)
+        password_box.send_keys(password)
+        # 等待手动输入验证码
+        temp = input ("Please enter the captcha and hit enter in the browser")
+        validatecode.send_keys(Keys.CONTROL + "a")
+        validatecode.send_keys(Keys.BACKSPACE)
+        validatecode.send_keys(temp)
+        # 点击登录按钮
+        login_button.click()
+        #等待1秒
+        time.sleep(2)
+        #获取当前网页的doom
+        response = driver.page_source
+        #检查doom里是否有"您上次登录是"字样
+        if "您上次登录是" in response:
+        #如果有打印登录成功，跳出循环
+            break
+        #如果没有继续本函数上面代码
+        else:
+            continue
     print(f"登录成功")
 
 
-def access_member_database(driver, wait):
+def access_org_database(driver, wait):
     while(1):
         try:
             Databaseofparty = wait.until(EC.element_to_be_clickable((By.XPATH, '(//img[contains(@src, "党组织和党员信息库.png")])[2]')))
@@ -65,6 +83,7 @@ def access_member_database(driver, wait):
             Databaseofparty.click()
             break
         except:
+
             Databaseofparty = wait.until(EC.element_to_be_clickable((By.XPATH, '(//img[contains(@src, "党组织和党员信息库.png")])[2]')))
             time.sleep(0.5)
 
@@ -144,10 +163,10 @@ def new_excel(wait, driver):
     excel_file_name = f"{today_date}党组织信息库.xlsx"
     excel_file_path = os.path.join(directory, excel_file_name)
     if os.path.isfile(excel_file_path):
-        member_excel = load_workbook(excel_file_path)
-        rebuild(excel_file_path, wait, member_excel, excel_file_path)
+        org_excel = load_workbook(excel_file_path)
+        rebuild(excel_file_path, wait, org_excel, excel_file_path)
     else:
-        #创建目录g:/project/LHSextract/database/database_member
+        #创建目录g:/project/LHSextract/database/database_org
         os.makedirs(directory, exist_ok=True)
         #设计党组织基本信息表头
         columns_base_info = ["序号","党组织全称", "组织树", "党组织简称", "党内统计用党组织简称", "成立日期", "党组织编码", "党组织联系人", "联系电话", "组织类别", 
@@ -162,11 +181,11 @@ def new_excel(wait, driver):
         #dataframe导出到excel
         df.to_excel(excel_file_path, index = False)
         #使用openpyxl库来加载一个已存在的Excel工作簿
-        member_excel = load_workbook(excel_file_path)
+        org_excel = load_workbook(excel_file_path)
         #打印调试信息
         print(f"文件 '{excel_file_path}' 已成功创建。")
         #启动同步
-        synchronizing(wait, member_excel, excel_file_path, driver)
+        synchronizing(wait, org_excel, excel_file_path, driver)
   
 
 
@@ -174,28 +193,28 @@ def access_info_page(wait, row):
     xpath = f"(//table[@class='fs-table__body'])[3]/tbody/tr[{row}]/td[3]"
     while 1:
         try:
-            member = wait.until(EC.element_to_be_clickable((By.XPATH, xpath)))
+            org = wait.until(EC.element_to_be_clickable((By.XPATH, xpath)))
             break
         except:
             time.sleep(0.1)
     while 1:
         try:
-            member.click()
+            org.click()
             break
         except:
                 while 1:
                     try:
-                        member = wait.until(EC.element_to_be_clickable((By.XPATH, xpath)))
+                        org = wait.until(EC.element_to_be_clickable((By.XPATH, xpath)))
                         break
                     except:
                         time.sleep(0.1)
     print(f"进入党员个人页面成功") 
 
 
-def rebuild(excel_file_path, wait, member_total_amount, member_excel, member_excel_path):
+def rebuild(excel_file_path, wait, org_total_amount, org_excel, org_excel_path):
     #先改变全局变量
     init_complete_amount(excel_file_path)
-    synchronizing(wait, member_excel, member_excel_path)
+    synchronizing(wait, org_excel, org_excel_path)
 
 
 def init_complete_amount(excel_file_path):
@@ -205,9 +224,8 @@ def init_complete_amount(excel_file_path):
     amount_that_complete = row_count - 1
 
 
-def synchronizing(wait, member_excel, member_excel_path, driver):
-    global amount_that_complete
-    #待完成，递归遍历树状列表完成每一个党组织的信息采集。
+def synchronizing(wait, org_excel, org_excel_path, driver):
+    #递归遍历树状列表完成每一个党组织的信息采集。
     #点击根组织(//div[@class = "tree_wrapper"]//div[@role = "treeitem"]/div[@class = "fs-tree-node__content"])[1]
     while (1):
         try:
@@ -223,29 +241,42 @@ def synchronizing(wait, member_excel, member_excel_path, driver):
             root_org = wait.until(EC.element_to_be_clickable((By.XPATH, "(//div[@class = 'tree_wrapper']//div[@role = 'treeitem']/div[@class = 'fs-tree-node__content'])[1]")))
             time.sleep(0.5)
     #采集根组织信息
-    downloading(count = amount_that_complete, file = member_excel, wait = wait, driver = driver, path = member_excel_path)
+    downloading(file = org_excel, wait = wait, driver = driver, path = org_excel_path)
 
     #获取根节点结构体//div[@class = "tree_wrapper"]//div[@role = "treeitem"]/div[@role = "group"]到tree_root
     while(1):
         try:
-            tree_root = wait.until(EC.presence_of_all_elements_located((By.XPATH, "//div[@class = 'tree_wrapper']//div[@role = 'treeitem']/div[@role = 'group']")))
+            tree_root = wait.until(EC.visibility_of_element_located((By.XPATH, "//div[@class = 'tree_wrapper']//div[@role = 'treeitem']/div[@role = 'group']")))
             break
         except:
             time.sleep(0.5)
 
+
+    item_html = tree_root.get_attribute('outerHTML')
+    with open('item_html.txt', 'w', encoding = 'utf-8') as file0:
+        file0.write(item_html)
+
     #recursion(tree_root)
-    recursion(tree_root = tree_root, count = amount_that_complete, file = member_excel, wait = wait, driver = driver, path = member_excel_path)
+    recursion(tree_root = tree_root, file = org_excel, wait = wait, driver = driver, path = org_excel_path)
 
 
-def recursion(tree_root, count, file, wait, driver, path):
-    #for 每个元素 in tree_root  
-    for item in tree_root:
+def recursion(tree_root, file, wait, driver, path):
+    org_items = []
+    org_items = tree_root.find_elements(By.XPATH, ".//div[@role = 'treeitem']")
+    
+    #item_html0 = org_items[0].get_attribute('outerHTML')
+    #with open('item_html0.txt', 'w', encoding = 'utf-8') as file0:
+        #file0.write(item_html0)
+
+    #for 每个元素 in tree_root
+    for item in org_items:
         # 每个元素.click()
         item.click()
         # 采集党组织信息
-        downloading(count, file, wait, driver, path)
+        downloading(file, wait, driver, path)
         # 查看元素下面是否有//span[@class = "is-leaf fs-tree-node__expand-icon fs-icon-caret-right"]
-        item_html = item.get_attribute('outerHTML')
+
+        item_html = tree_root.get_attribute('outerHTML')
         soup = BeautifulSoup(item_html, 'html.parser')
         first_child = soup.find()
         first_grandchild = first_child.find() if first_child else None
@@ -283,7 +314,9 @@ def recursion(tree_root, count, file, wait, driver, path):
             recursion(new_tree_root)
             pass
 
-def downloading(count, file, wait, driver, path):
+def downloading(file, wait, driver, path):
+    global amount_that_complete
+    count = amount_that_complete
     count = count + 1
     countx = count + 1
     #填写序号#
@@ -326,11 +359,18 @@ def downloading(count, file, wait, driver, path):
     file.active.cell(row=countx, column=9).value = wait.until(EC.presence_of_element_located((By.XPATH, "//span[contains(text(), '联系电话')]/../following-sibling::*/div[1]"))).text
     file.save(path)
     #组织类别#
-    file.active.cell(row=countx, column=10).value = wait.until(EC.presence_of_element_located((By.XPATH, "//span[contains(text(), '组织类别')]/../following-sibling::*/div[1]"))).text
+    org_type0 = file.active.cell(row=countx, column=10).value = wait.until(EC.presence_of_element_located((By.XPATH, "//span[contains(text(), '组织类别')]/../following-sibling::*/div[1]"))).text
     file.save(path)
     #是否具有"审批预备党员权限"#
-    file.active.cell(row=countx, column=11).value = wait.until(EC.presence_of_element_located((By.XPATH, "//label[contains(text(),  '审批预备党员权限')]/following-sibling::div/span"))).text
-    file.save(path)
+    if "委员会" in org_type0:
+        file.active.cell(row=countx, column=11).value = wait.until(EC.presence_of_element_located((By.XPATH, "//label[contains(text(),  '审批预备党员权限')]/following-sibling::div/span"))).text
+        file.save(path)
+    elif "总支" in org_type0:
+        file.active.cell(row=countx, column=11).value = "-"
+        file.save(path)
+    else:
+        file.active.cell(row=countx, column=11).value = "-"
+        file.save(path)
     #功能型党组织#
     file.active.cell(row=countx, column=12).value = wait.until(EC.presence_of_element_located((By.XPATH, "//label[contains(text(),  '功能型党组织')]/following-sibling::*/span"))).text
     file.save(path)
@@ -350,8 +390,15 @@ def downloading(count, file, wait, driver, path):
     file.active.cell(row=countx, column=17).value = wait.until(EC.presence_of_element_located((By.XPATH, "//label[contains(text(),  '驻外情况')]/following-sibling::*/div[1]"))).text
     file.save(path)
     #党组织曾用名，这里需要用soup判断是否有这一条
-    file.active.cell(row=countx, column=18).value = wait.until(EC.presence_of_element_located((By.XPATH, "//div[contains(text(),  '党组织曾用名')]/following-sibling::*//tbody/tr/td[2]/div/div"))).text
-    file.save(path)
+    html0 = driver.find_element(By.XPATH, '//div[contains(text(), "党组织曾用名")]/../..')
+    _html0 = html0.get_attribute("style")
+    if "display: none;" in _html0:
+    #党组织曾用名，这里需要用soup判断是否有这一条
+        file.active.cell(row=countx, column=18).value = "无"
+        file.save(path)
+    else:
+        file.active.cell(row=countx, column=18).value = wait.until(EC.presence_of_element_located((By.XPATH, "//div[contains(text(),  '党组织曾用名')]/following-sibling::*//tbody/tr/td[2]/div/div"))).text
+        file.save(path)
 
 
     #切换选项卡
@@ -554,7 +601,7 @@ def downloading(count, file, wait, driver, path):
             councilcard = wait.until(EC.element_to_be_clickable((By.ID, "tab-class")))
             time.sleep(0.5)
     # 采集班子成员信息
-    table_council(name_temp, wait)
+    table_council(name_temp, wait, driver)
     # 切换选项卡到惩戒信息
     while 1:
         try:
@@ -573,13 +620,12 @@ def downloading(count, file, wait, driver, path):
     table_reward_punish(name_temp, wait)
     
     
-    print("填写第",count,"名党员",name_temp,"信息成功") 
-    exit_member_card = wait.until(EC.element_to_be_clickable((By.XPATH, "(//button[@class = 'fs-button fs-button--default fs-button--small'])[2]")))
-    exit_member_card.click()
+    print("填写第",count,"个党组织",name_temp,"信息成功") 
+    amount_that_complete = amount_that_complete + 1
 
 
 
-def table_council(org_name: str, wait):
+def table_council(org_name: str, wait, driver):
     #获取数据存储目录
     global directory
     #获取当天日期
@@ -606,10 +652,30 @@ def table_council(org_name: str, wait):
     #读取表格容器保存在变量container里
     while(1):
         try:
-            tbody = wait.until(EC.visibility_of_element_located((By.XPATH, "//div[@class = 'fs-table fs-table--fit fs-table--border fs-table--enable-row-transition fs-table--mini']/div[@class = 'fs-table__body-wrapper is-scrolling-none']//tbody")))
+            tbody = wait.until(EC.visibility_of_element_located((By.XPATH, "(//span[contains(text(), '班子信息集')]/../../../div[3]//tbody)[1]")))
+                                                                           #(//div[@class = 'fs-table__fixed-body-wrapper'])[3]//tbody
+                                                                           #//div[@class = 'fs-table fs-table--fit fs-table--border fs-table--enable-row-transition fs-table--mini']/div[@class = 'fs-table__body-wrapper is-scrolling-none']//tbody
+                                                                           #(//div[@class = 'fs-table__body-wrapper is-scrolling-left'])[5]//tbody
             break
         except:
-            time.sleep(0.5)
+            while 1:
+                try:
+                    councilcard = wait.until(EC.element_to_be_clickable((By.ID, "tab-class")))
+                    break
+                except:
+                    time.sleep(0.5)
+            while 1:
+                try:
+                    councilcard.click()
+                    break
+                except:
+                    councilcard = wait.until(EC.element_to_be_clickable((By.ID, "tab-class")))
+                    time.sleep(0.5)
+            erro_html = driver.execute_script("return document.documentElement.outerHTML")
+            with open('erro.txt', 'w', encoding = "utf-8") as file1:
+                file1.write(erro_html)
+            break
+
     #用beautifulsoup分析container，将表头保存在新的容器container_header里，将表体保存在新的容器container_body里
    # while(1):
         #try:
@@ -626,82 +692,82 @@ def table_council(org_name: str, wait):
         # 从elm_tr里解析出td, 保存在td数组里
         col = every_row.find_all('td')
         
-            #将序号i填入第i+2行，第1列
+        #将序号i填入第j+2行，第1列
         sheet.cell(row = j+2, column = 1, value = j)
         book.save(excel_file_path)
 
 
-        #将党内职务填入第i+2行，第2列
+        #将党内职务填入第j+2行，第2列
         position = col[1].find_all('span')[-1]
         position_content = position.get_text(strip = True)
         sheet.cell(row = j+2, column = 2, value = position_content)
         book.save(excel_file_path)
 
 
-        #将姓名填入第i+2行，第3列
+        #将姓名填入第j+2行，第3列
         name = col[2].find_all('span')[-1]
         name_content = name.get_text(strip = True)
         sheet.cell(row = j+2, column = 3, value = name_content)
         book.save(excel_file_path)
 
 
-        #将公民身份证号码职务填入第i+2行，第4列
+        #将公民身份证号码职务填入第j+2行，第4列
         idcard_no = col[3].find_all('div')[-1]
         idcard_no_content = idcard_no.get_text(strip = True)
         sheet.cell(row = j+2, column = 4, value = idcard_no_content)
         book.save(excel_file_path)
 
 
-        #将性别填入第i+2行，第5列
+        #将性别填入第j+2行，第5列
         gender = col[4].find_all('span')[-1]
         gender_content = gender.get_text(strip = True)
         sheet.cell(row = j+2, column = 5, value = gender_content)
         book.save(excel_file_path)
 
 
-        #将出生日期填入第i+2行，第6列
+        #将出生日期填入第j+2行，第6列
         birthday = col[5].find_all('span')[-1]
         birthday_content = birthday.get_text(strip = True)
         sheet.cell(row = j+2, column = 6, value = birthday_content)
         book.save(excel_file_path)
 
 
-        #将学历填入第i+2行，第7列
+        #将学历填入第j+2行，第7列
         edu_qual = col[6].find_all('span')[-1]
         edu_qual_content = edu_qual.get_text(strip = True)
         sheet.cell(row = j+2, column = 7, value = edu_qual_content)
         book.save(excel_file_path)
 
 
-        #将领导职务填入第i+2行，第8列span
+        #将领导职务填入第j+2行，第8列span
         leader_position = col[7].find_all('span')[-1]
         leader_position_content = leader_position.get_text(strip = True)
         sheet.cell(row = j+2, column = 8, value = leader_position_content)
         book.save(excel_file_path)
 
 
-        #将任职日期填入第i+2行，第9列span
+        #将任职日期填入第j+2行，第9列span
         appointmentdate = col[8].find_all('span')[-1]
         appointmentdate_content = appointmentdate.get_text(strip = True)
         sheet.cell(row = j+2, column = 9, value = appointmentdate_content)
         book.save(excel_file_path)
 
 
-        #将离职日期填入第i+2行，第10列span
+        #将离职日期填入第j+2行，第10列span
         resignationdate = col[9].find_all('span')[-1]
         resignationdate_content = resignationdate.get_text(strip = True)
         sheet.cell(row = j+2, column = 10, value = resignationdate_content)
         book.save(excel_file_path)
 
 
-        #将排序填入第i+2行，第11列div
+        #将排序填入第j+2行，第11列div
         sort = col[10].find_all('div')[-1]
         sort_content = sort.get_text(strip = True)
         sheet.cell(row = j+2, column = 11, value = sort_content)
         book.save(excel_file_path)
 
 
-        #将公司职务填入第i+2行，第12列div
+        #将公司职务填入第j+2行，第12列div
         companyposition = col[11].find_all('div')[-1]
         companyposition_content = companyposition.get_text(strip = True)
         sheet.cell(row = j+2, column = 12, value = companyposition_content)
@@ -730,48 +796,80 @@ def table_reward_punish(org_name: str, wait):
     sheet = book.active
     #将党组织的全称存放在单元格A1
     sheet['A1'] = org_name
+    book.save(excel_file_path)
     #设计党组织委员会信息表头
-    table_head = ["奖惩名称", "批准机关", "批准日期", "操作"]
-
+    table_head = ["序号", "奖惩名称", "批准机关", "批准日期"]
+    #将设计好的表头填入excel
     for i, value in enumerate(table_head, start = 1):
         sheet.cell(row = 2, column = i, value = value)
-    
+        book.save(excel_file_path)
+    #寻找奖惩块
     while 1: 
         try:
             box_table = wait.until(EC.visibility_of_element_located((By.ID, "pane-rewardsPunishments")))
             break        
         except:
             time.sleep(0.5)
-
+    #soup分析奖惩块
     table_html = box_table.get_attribute('outerHTML')
     soup = BeautifulSoup(table_html, 'html.parser')
-
+    #检查是否有数据，如果没有则全填-
     if soup.find_all(string = lambda text: '暂无数据' in text):
         for cell in sheet['A3:D3'][0]:
             cell.value = '-'
-    
+            book.save(excel_file_path)
+    #如果有数据则填表
     else:
+        #寻找表体tbody
         while 1:
             try:
-                #读取表格容器保存在变量container里
-                tbody = wait.until(EC.visibility_of_element_located((By.XPATH, "//div[@class = 'fs-table__body-wrapper is-scrolling-none']//table//tbody")))
+                tbody = wait.until(EC.visibility_of_element_located((By.XPATH, "//div[@class = 'fs-table__body-wrapper is-scrolling-none']//tbody")))
                 break
             except:
                 time.sleep(0.5)
-        #用beautifulsoup分析container，将表头保存在新的容器container_header里，将表体保存在新的容器container_body里
-        soup = BeautifulSoup(tbody, 'html.parser')
-        tr = soup.find_all('tr')
-        #从tr里提取数据保存在自单元格A3始向右的区域内
-        for elm_tr in tr:
-            # 从elm_tr里解析出td, 保存在td数组里
-            td = elm_tr.find_all('td')
-            for i, elm_td in enumerate(td, start=1):
-                #使用css选择器从elm_td里选中第一个span放在变量span里
-                span = elm_td.select_one('span')
-                #将span里的内容存放在
-                sheet.cell(row = 3, column = i, value = span.text)
-        #释放资源
-    
+        #soup分析tbody
+        tbody_html = tbody.get_attribute("outerHTML")
+        soup = BeautifulSoup(tbody_html, 'html.parser')
+        #soup提取所有行
+        rows= soup.find_all('tr')
+        #对于每一行
+        for j, each_row in enumerate(rows, start = 1):
+            #soup提取所有列
+            col = each_row.find_all('td')
+
+            #将序号j填入第j+2行，第1列
+            sheet.cell(row = j+2, column = 1, value = j)
+            book.save(excel_file_path)
+
+            #将奖惩名称填入第j+2行，第2列
+            try:
+                name = col[0].find_all('div')[-1]
+            except:
+                name = col[0].find_all('span')[-1]
+            name_content = name.get_text(strip = True)
+            sheet.cell(row = j+2, column = 2, value = name_content)
+            book.save(excel_file_path)
+
+            #将批准机关填入第j+2行，第3列
+            try:
+                justice = col[1].find_all('span')[-1]
+            except:
+                justice = col[1].find_all('div')[-1]
+            justice_content = justice.get_text(strip = True)
+            sheet.cell(row = j+2, column = 3, value = justice_content)
+            book.save(excel_file_path)
+
+            #将批准日期填入第j+2行，第4列
+            try:
+                passdate = col[2].find_all('span')[-1]
+            except:
+                passdate = col[2].find_all('div')[-1]
+            passdate_content = passdate.get_text(strip = True)
+            sheet.cell(row = j+2, column = 4, value = passdate_content)
+            book.save(excel_file_path)
+
+
+    #释放资源
     book.close()
 
 

@@ -12,6 +12,7 @@ import time
 import os
 import re
 import inspect
+import requests
 
 amount_that_complete = 0
 directory = "G:/project/LHSextract/database/database_member"
@@ -30,20 +31,38 @@ def driver_create(chrome_path, chromedriver_path):
 
 
 def login(account, password, driver, url, wait):
-    # 打开网址
-    driver.get(url)
-    username_box = wait.until(EC.visibility_of_element_located((By.ID, 'username')))
-    password_box = wait.until(EC.visibility_of_element_located((By.ID, 'password')))
-    validatecode = wait.until(EC.visibility_of_element_located((By.ID, 'validateCode')))
-    login_button = wait.until(EC.element_to_be_clickable((By.CSS_SELECTOR, '.js-submit.tianze-loginbtn')))
-    username_box.send_keys(account)
-    password_box.send_keys(password)
-    # 等待手动输入验证码
-    temp = input ("Please enter the captcha and hit enter in the browser")
-    validatecode.send_keys(temp)
-    # 点击登录按钮
-    login_button.click()
-    # 之后可以添加额外的代码来处理登录后的页面或关闭浏览器
+    while(1):
+        # 打开网址
+        driver.get(url)
+        username_box = wait.until(EC.visibility_of_element_located((By.ID, 'username')))
+        password_box = wait.until(EC.visibility_of_element_located((By.ID, 'password')))
+        validatecode = wait.until(EC.visibility_of_element_located((By.ID, 'validateCode')))
+        login_button = wait.until(EC.element_to_be_clickable((By.CSS_SELECTOR, '.js-submit.tianze-loginbtn')))
+        username_box.send_keys(Keys.CONTROL + "a")
+        username_box.send_keys(Keys.BACKSPACE)
+        username_box.send_keys(account)
+        password_box.send_keys(Keys.CONTROL + "a")
+        password_box.send_keys(Keys.BACKSPACE)
+        password_box.send_keys(password)
+        # 等待手动输入验证码
+        temp = input ("Please enter the captcha and hit enter in the browser")
+        validatecode.send_keys(Keys.CONTROL + "a")
+        validatecode.send_keys(Keys.BACKSPACE)
+        validatecode.send_keys(temp)
+        # 点击登录按钮
+        login_button.click()
+        #等待1秒
+        time.sleep(2)
+        #获取当前网页的doom
+        response = requests.get(url)
+        #检查doom里是否有"您上次登录是"字样
+        if "您上次登录是" in response.text:
+        #如果有打印登录成功，跳出循环
+            break
+        #如果没有继续本函数上面代码
+        else:
+            continue
+
     print(f"登录成功")
 
 

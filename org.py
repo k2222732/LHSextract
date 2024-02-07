@@ -16,7 +16,7 @@ def main():
     wait = WebDriverWait(driver, 10, 0.5)
     org_excel = 0
     org_func.login(account, password, driver, url, wait)
-    org_func.access_member_database(driver, wait)
+    org_func.access_org_database(driver, wait)
     org_func.switch_role(wait)
     org_func.switch_item_org(wait)
     #指定位置创建excel工作簿
