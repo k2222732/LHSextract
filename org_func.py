@@ -832,6 +832,7 @@ def table_reward_punish(org_name: str, wait):
         soup = BeautifulSoup(tbody_html, 'html.parser')
         #soup提取所有行
         rows= soup.find_all('tr')
+        
         #对于每一行
         for j, each_row in enumerate(rows, start = 1):
             #soup提取所有列
@@ -867,7 +868,6 @@ def table_reward_punish(org_name: str, wait):
             passdate_content = passdate.get_text(strip = True)
             sheet.cell(row = j+2, column = 4, value = passdate_content)
             book.save(excel_file_path)
-
 
     #释放资源
     book.close()
