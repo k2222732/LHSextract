@@ -98,36 +98,6 @@ def access_org_database(driver, wait):
 
 
 
-def switch_role(wait):
-    while(1):
-        try:
-            droplist = wait.until(EC.element_to_be_clickable((By.CSS_SELECTOR, '.avatar-wrapper.fs-dropdown-selfdefine')))
-            break
-        except:
-            time.sleep(0.5)
-    while(1):
-        try:
-            droplist.click()   
-            break 
-        except:   
-            droplist = wait.until(EC.element_to_be_clickable((By.CSS_SELECTOR, '.avatar-wrapper.fs-dropdown-selfdefine')))
-            time.sleep(0.5)
-    
-    print(f"进入角色下拉列表成功")
-    while(1):
-        try:
-            role = wait.until(EC.element_to_be_clickable((By.XPATH, '//SPAN[contains(text(), "中国共产党山东汶上经济开发区工作委员会-具有审批预备党员权限的基层党委管理员")]')))
-            break
-        except:
-            time.sleep(0.5)
-    while(1):
-        try:    
-            role.click()
-            break
-        except:
-            role = wait.until(EC.element_to_be_clickable((By.XPATH, '//SPAN[contains(text(), "中国共产党山东汶上经济开发区工作委员会-具有审批预备党员权限的基层党委管理员")]')))
-            time.sleep(0.5)
-    print(f"切换角色成功")
 
 #切换到党组织信息页面
 def switch_item_org(wait):
@@ -163,8 +133,30 @@ def new_excel(wait, driver):
     excel_file_name = f"{today_date}党组织信息库.xlsx"
     excel_file_path = os.path.join(directory, excel_file_name)
     if os.path.isfile(excel_file_path):
+        #org_excel = load_workbook(excel_file_path)
+        #rebuild(excel_file_path, wait, org_excel, excel_file_path)
+
+
+        #创建目录g:/project/LHSextract/database/database_org
+        os.makedirs(directory, exist_ok=True)
+        #设计党组织基本信息表头
+        columns_base_info = ["序号","党组织全称", "组织树", "党组织简称", "党内统计用党组织简称", "成立日期", "党组织编码", "党组织联系人", "联系电话", "组织类别", 
+            '是否具有"审批预备党员权限"', "功能型党组织", "党组织所在单位情况", "党组织所在行政区划", "批准成立的上级党组织", "是否为新业态", "驻外情况", 
+            "党组织曾用名", "单位名称（全称）", "UUID", "有无统一社会信用代码", "法人单位统一社会信用代码", "单位性质类别", 
+            "法人单位标识", "建立党组情况", "法人单位建立党组织情况", "在岗职工人数", "企业控制（控股）情况", "企业规模", "单位所在目录", "单位隶属关系", "单位所在行政区划", "单位名称(全称)", "机构类型", "法人单位统一社会信用代码"
+            , "新经济行业", "经济行业", "经济类型", "新经济类型", "成立日期", "注册地行政区划", "注册地址", "组织机构代码", "上级主管部门名称", "单位隶属关系"]
+
+
+        #创建一个dataframe表头为columns_base_info中的元素
+        df = pd.DataFrame(columns = columns_base_info)
+        #dataframe导出到excel
+        df.to_excel(excel_file_path, index = False)
+        #使用openpyxl库来加载一个已存在的Excel工作簿
         org_excel = load_workbook(excel_file_path)
-        rebuild(excel_file_path, wait, org_excel, excel_file_path)
+        #打印调试信息
+        print(f"文件 '{excel_file_path}' 已成功创建。")
+        #启动同步
+        synchronizing(wait, org_excel, excel_file_path, driver)
     else:
         #创建目录g:/project/LHSextract/database/database_org
         os.makedirs(directory, exist_ok=True)
@@ -276,7 +268,7 @@ def recursion(tree_root, file, wait, driver, path):
         downloading(file, wait, driver, path)
         # 查看元素下面是否有//span[@class = "is-leaf fs-tree-node__expand-icon fs-icon-caret-right"]
 
-        item_html = tree_root.get_attribute('outerHTML')
+        item_html = item.get_attribute('outerHTML')
         soup = BeautifulSoup(item_html, 'html.parser')
         first_child = soup.find()
         first_grandchild = first_child.find() if first_child else None
@@ -292,7 +284,7 @@ def recursion(tree_root, file, wait, driver, path):
             #点击//span[@class = "fs-tree-node__expand-icon fs-icon-caret-right"]
             while (1):
                 try:
-                    arrow_down = item.wait.until(EC.element_to_be_clickable((By.XPATH,"//span[@class = 'fs-tree-node__expand-icon fs-icon-caret-right']")))
+                    arrow_down = item.find_element(By.XPATH, "./div[@class='fs-tree-node__content']/span[@class='fs-tree-node__expand-icon fs-icon-caret-right']")
                     break
                 except:
                     time.sleep(0.5)
@@ -301,18 +293,17 @@ def recursion(tree_root, file, wait, driver, path):
                     arrow_down.click()
                     break
                 except:
-                    arrow_down = item.wait.until(EC.element_to_be_clickable((By.XPATH,"//span[@class = 'fs-tree-node__expand-icon fs-icon-caret-right']")))
                     time.sleep(0.5)
+                    arrow_down = item.find_element(By.XPATH, "./div[@class='fs-tree-node__content']/span[@class='fs-tree-node__expand-icon fs-icon-caret-right']")
             #元素下面的//div[@role = "group"]结构体作为新的根节点结构体new_tree_root
             while(1):
                 try:
-                    new_tree_root = item.wait.until(EC.presence_of_element_located((By.XPATH, "//div[@role = 'group']")))
+                    new_tree_root = item.find_element(By.XPATH, ".//div[@role = 'group']")
                     break
                 except:
                     time.sleep(0.5)
             #递归recursion(new_tree_root)
-            recursion(new_tree_root)
-            pass
+            recursion(new_tree_root, file, wait, driver, path)
 
 def downloading(file, wait, driver, path):
     global amount_that_complete
@@ -335,7 +326,7 @@ def downloading(file, wait, driver, path):
             break
         except AssertionError:
             time.sleep(0.5)
-            file.active.cell(row=countx, column=19).value = wait.until(EC.presence_of_element_located((By.XPATH, "//label[contains(text(), '单位名称（全称）')]/following-sibling::div"))).text
+            file.active.cell(row=countx, column=2).value = wait.until(EC.presence_of_element_located((By.XPATH, "//span[contains(text(), '党组织全称')]/../following-sibling::*/div[1]"))).text
             file.save(path)
     #组织树
     file.active.cell(row=countx, column=3).value = "-" #wait.until(EC.presence_of_element_located((By.XPATH, "(//div[@class = 'card-class']//div[@class = 'fs-tabs__content']//div[@class = 'row-val-shot'])[3]"))).text
@@ -421,8 +412,8 @@ def downloading(file, wait, driver, path):
 
     file.active.cell(row=countx, column=19).value = wait.until(EC.presence_of_element_located((By.XPATH, "//label[contains(text(), '单位名称（全称）')]/following-sibling::div"))).text
     file.save(path)
-
-    while(1):
+    i_1 = 0
+    while(i_1 < 15):
         try:
             df = file.active.cell(row=countx, column=19).value
             file.save(path)
@@ -433,6 +424,7 @@ def downloading(file, wait, driver, path):
             time.sleep(0.5)
             file.active.cell(row=countx, column=19).value = wait.until(EC.presence_of_element_located((By.XPATH, "//label[contains(text(), '单位名称（全称）')]/following-sibling::div"))).text
             file.save(path)
+            i_1 = i_1 + 1
 
 
     #UUID#
@@ -450,12 +442,22 @@ def downloading(file, wait, driver, path):
     #法人单位标识#
     file.active.cell(row=countx, column=24).value = wait.until(EC.presence_of_element_located((By.XPATH, "//label[contains(text(), '法人单位标识')]/following-sibling::div"))).text
     file.save(path)
-    #建立党组情况
-    file.active.cell(row=countx, column=25).value = wait.until(EC.presence_of_element_located((By.XPATH, "//label[contains(text(), '建立党组情况')]/following-sibling::div"))).text
-    file.save(path)
-    #法人单位建立党组织情况
-    file.active.cell(row=countx, column=26).value = wait.until(EC.presence_of_element_located((By.XPATH, "//label[contains(text(), '法人单位建立党组织情况')]/following-sibling::div"))).text
-    file.save(path)
+    #建立党组情况!
+    temp_1 = wait.until(EC.presence_of_element_located((By.XPATH, "(//div[@class = 'info-content-view'])[2]")))
+    temp_1_html = temp_1.get_attribute("outerHTML")
+    if '建立党组情况' in temp_1_html:
+        file.active.cell(row=countx, column=25).value = wait.until(EC.presence_of_element_located((By.XPATH, "//label[contains(text(), '建立党组情况')]/following-sibling::div"))).text
+        file.save(path)
+    else:
+        file.active.cell(row=countx, column=25).value = "-"
+        file.save(path)
+    #法人单位建立党组织情况!
+    if '法人单位建立党组织情况' in temp_1_html:
+        file.active.cell(row=countx, column=26).value = wait.until(EC.presence_of_element_located((By.XPATH, "//label[contains(text(), '法人单位建立党组织情况')]/following-sibling::div"))).text
+        file.save(path)
+    else:
+        file.active.cell(row=countx, column=26).value = "-"
+        file.save(path)
     #在岗职工数#
     #如果字符串org_type里面包含字眼"公司"则执行下面两行代码
     if "公司" in org_type:
