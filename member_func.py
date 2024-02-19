@@ -183,7 +183,6 @@ def synchronizing(wait, member_total_amount, member_excel, member_excel_path):
         input_page.send_keys(Keys.CONTROL + "a")
         input_page.send_keys(Keys.BACKSPACE)
         input_page.send_keys(page_number)
-        
         input_page.send_keys(Keys.RETURN)
         access_info_page(wait, row_number)
         while 1:

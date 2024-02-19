@@ -169,11 +169,14 @@ def new_excel(wait, member_total_amount):
     synchronizing(wait, member_total_amount, member_excel, excel_file_path, control=5)
 
 def synchronizing(wait, member_total_amount, member_excel, member_excel_path, control):
-    global amount_that_complete
-    global amount_that_complete
-    global amount_that_complete
-    global amount_that_complete
-    global amount_that_complete
+
+    global amount_mem_complete
+    global amount_infomem_complete
+    global amount_activist_complete
+    global amount_devtar_complete
+    global amount_applicant_complete
+
+    
     while amount_that_complete < member_total_amount:
         page_number = int(amount_that_complete / 100 + 1)
         row_number = int(amount_that_complete % 100 + 1)
