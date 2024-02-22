@@ -258,7 +258,7 @@ def downloading(file, wait, driver, path, control):
     file.active.cell(row=countx, column=1).value = count
     file.save(path)
     ##########################################################################
-    #填写党组织全称#
+    #姓名
     name_temp = wait.until(EC.visibility_of_element_located((By.XPATH, "//span[contains(text(), '党组织全称')]/../following-sibling::*/div[1]"))).text
     file.active.cell(row=countx, column=2).value = name_temp
     file.save(path)
@@ -272,69 +272,50 @@ def downloading(file, wait, driver, path, control):
             time.sleep(0.5)
             file.active.cell(row=countx, column=2).value = wait.until(EC.presence_of_element_located((By.XPATH, "//span[contains(text(), '党组织全称')]/../following-sibling::*/div[1]"))).text
             file.save(path)
-    #组织树
+    #性别
     file.active.cell(row=countx, column=3).value = "-" #wait.until(EC.presence_of_element_located((By.XPATH, "(//div[@class = 'card-class']//div[@class = 'fs-tabs__content']//div[@class = 'row-val-shot'])[3]"))).text
     file.save(path)
-    #党组织简称#
+    #公民身份证号码
     file.active.cell(row=countx, column=4).value = wait.until(EC.presence_of_element_located((By.XPATH, "//span[contains(text(), '党组织简称')]/../following-sibling::*/div[1]"))).text
     file.save(path)
-    #党内统计用党组织简称#
+    #民族
     file.active.cell(row=countx, column=5).value = wait.until(EC.presence_of_element_located((By.XPATH, "//label[contains(text(),  '党内统计用党组织简称')]/following-sibling::*/div[1]"))).text
     file.save(path)
-    #成立日期#
+    #性别
     file.active.cell(row=countx, column=6).value = wait.until(EC.presence_of_element_located((By.XPATH, "//span[contains(text(),  '成立日期')]/../following-sibling::div/div[1]"))).text
     file.save(path)
-    #党组织编码#
+    #出生日期
     file.active.cell(row=countx, column=7).value = wait.until(EC.presence_of_element_located((By.XPATH, "//label[contains(text(),  '党组织编码')]/following-sibling::*/span"))).text
     file.save(path)
-    #党组织联系人#
+    #学历
     file.active.cell(row=countx, column=8).value = wait.until(EC.presence_of_element_located((By.XPATH, "//label[contains(text(),  '党组织联系人')]/following-sibling::*/div[1]"))).text
     file.save(path)
-    #联系电话#
+    #申请入党日期
     file.active.cell(row=countx, column=9).value = wait.until(EC.presence_of_element_located((By.XPATH, "//span[contains(text(), '联系电话')]/../following-sibling::*/div[1]"))).text
     file.save(path)
-    #组织类别#
+    #手机号码
     org_type0 = file.active.cell(row=countx, column=10).value = wait.until(EC.presence_of_element_located((By.XPATH, "//span[contains(text(), '组织类别')]/../following-sibling::*/div[1]"))).text
     file.save(path)
-    #是否具有"审批预备党员权限"#
-    if "委员会" in org_type0:
-        file.active.cell(row=countx, column=11).value = wait.until(EC.presence_of_element_located((By.XPATH, "//label[contains(text(),  '审批预备党员权限')]/following-sibling::div/span"))).text
-        file.save(path)
-    elif "总支" in org_type0:
-        file.active.cell(row=countx, column=11).value = "-"
-        file.save(path)
-    else:
-        file.active.cell(row=countx, column=11).value = "-"
-        file.save(path)
-    #功能型党组织#
+   
+    #背景信息
     file.active.cell(row=countx, column=12).value = wait.until(EC.presence_of_element_located((By.XPATH, "//label[contains(text(),  '功能型党组织')]/following-sibling::*/span"))).text
     file.save(path)
-    #党组织所在单位情况#
+    #工作岗位
     file.active.cell(row=countx, column=13).value = wait.until(EC.presence_of_element_located((By.XPATH, "//span[contains(text(), '党组织所在单位情况')]/../following-sibling::*/div[1]"))).text
     file.save(path)
-    #党组织所在行政区划#
+    #政治面貌
     file.active.cell(row=countx, column=14).value = wait.until(EC.presence_of_element_located((By.XPATH, "//span[contains(text(), '党组织所在行政区划')]/../following-sibling::*/div[1]"))).text
     file.save(path)
-    #批准成立的上级党组织#
+    #接受申请党组织
     file.active.cell(row=countx, column=15).value = wait.until(EC.presence_of_element_located((By.XPATH, "//span[contains(text(),  '批准成立的上级党组织')]/../following-sibling::*/div[1]"))).text
     file.save(path)
-    #是否为新业态#
+    #籍贯
     file.active.cell(row=countx, column=16).value = wait.until(EC.presence_of_element_located((By.XPATH, "//label[contains(text(),  '是否为新业态')]/following-sibling::*/div[1]"))).text
     file.save(path)
-    #驻外情况#
+    #入团日期
     file.active.cell(row=countx, column=17).value = wait.until(EC.presence_of_element_located((By.XPATH, "//label[contains(text(),  '驻外情况')]/following-sibling::*/div[1]"))).text
     file.save(path)
-    #党组织曾用名，这里需要用soup判断是否有这一条
-    html0 = driver.find_element(By.XPATH, '//div[contains(text(), "党组织曾用名")]/../..')
-    _html0 = html0.get_attribute("style")
-    if "display: none;" in _html0:
-    #党组织曾用名，这里需要用soup判断是否有这一条
-        file.active.cell(row=countx, column=18).value = "无"
-        file.save(path)
-    else:
-        file.active.cell(row=countx, column=18).value = wait.until(EC.presence_of_element_located((By.XPATH, "//div[contains(text(),  '党组织曾用名')]/following-sibling::*//tbody/tr/td[2]/div/div"))).text
-        file.save(path)
-
+    
 
     #切换选项卡
     while(1):
@@ -351,220 +332,42 @@ def downloading(file, wait, driver, path, control):
             company_info = wait.until(EC.element_to_be_clickable((By.XPATH, "//div[contains(text(), '党组织单位信息')]")))
 
 
-    #单位名称（全称）#
-
-
-    file.active.cell(row=countx, column=19).value = wait.until(EC.presence_of_element_located((By.XPATH, "//label[contains(text(), '单位名称（全称）')]/following-sibling::div"))).text
-    file.save(path)
-    i_1 = 0
-    while(i_1 < 15):
-        try:
-            df = file.active.cell(row=countx, column=19).value
-            file.save(path)
-            print("df:",df)
-            assert df != ""
-            break
-        except AssertionError:
-            time.sleep(0.5)
-            file.active.cell(row=countx, column=19).value = wait.until(EC.presence_of_element_located((By.XPATH, "//label[contains(text(), '单位名称（全称）')]/following-sibling::div"))).text
-            file.save(path)
-            i_1 = i_1 + 1
-
-
-    #UUID#
+    
+    #参加工作日期
     file.active.cell(row=countx, column=20).value = wait.until(EC.presence_of_element_located((By.XPATH, "//label[contains(text(), 'UUID')]/following-sibling::div"))).text
     file.save(path)
-    #有无统一社会信用代码#
+    #申请入党日期
     file.active.cell(row=countx, column=21).value = wait.until(EC.presence_of_element_located((By.XPATH, "//label[contains(text(), '有无统一社会信用代码')]/following-sibling::div"))).text
     file.save(path)
-    #法人单位统一社会信用代码#
+    #确定入党积极分子日期
     file.active.cell(row=countx, column=22).value = wait.until(EC.presence_of_element_located((By.XPATH, "//label[contains(text(), '法人单位统一社会信用代码')]/following-sibling::div"))).text
     file.save(path)
-    #单位性质类别#
+    #工作单位及职务
     org_type = file.active.cell(row=countx, column=23).value = wait.until(EC.presence_of_element_located((By.XPATH, "//label[contains(text(), '单位性质类别')]/following-sibling::div"))).text
     file.save(path)
-    #法人单位标识#
+    #家庭住址
     file.active.cell(row=countx, column=24).value = wait.until(EC.presence_of_element_located((By.XPATH, "//label[contains(text(), '法人单位标识')]/following-sibling::div"))).text
     file.save(path)
-    #建立党组情况!
-    temp_1 = wait.until(EC.presence_of_element_located((By.XPATH, "(//div[@class = 'info-content-view'])[2]")))
-    temp_1_html = temp_1.get_attribute("outerHTML")
-    if '建立党组情况' in temp_1_html:
-        file.active.cell(row=countx, column=25).value = wait.until(EC.presence_of_element_located((By.XPATH, "//label[contains(text(), '建立党组情况')]/following-sibling::div"))).text
-        file.save(path)
-    else:
-        file.active.cell(row=countx, column=25).value = "-"
-        file.save(path)
-    #法人单位建立党组织情况!
-    if '法人单位建立党组织情况' in temp_1_html:
-        file.active.cell(row=countx, column=26).value = wait.until(EC.presence_of_element_located((By.XPATH, "//label[contains(text(), '法人单位建立党组织情况')]/following-sibling::div"))).text
-        file.save(path)
-    else:
-        file.active.cell(row=countx, column=26).value = "-"
-        file.save(path)
-    #在岗职工数#
-    #如果字符串org_type里面包含字眼"公司"则执行下面两行代码
-    if "公司" in org_type:
-        file.active.cell(row=countx, column=27).value = wait.until(EC.presence_of_element_located((By.XPATH, "//label[contains(text(), '在岗职工数')]/following-sibling::div"))).text
-        file.save(path)
-    #否则执行
-    else:
-        file.active.cell(row=countx, column=27).value = "-"
-        file.save(path)
-    #在企业控制（控股）情况
-    if "公司" in org_type:
-        file.active.cell(row=countx, column=28).value = wait.until(EC.presence_of_element_located((By.XPATH, "//label[contains(text(), '企业控制（控股）情况')]/following-sibling::div"))).text
-        file.save(path)
-    else:
-        file.active.cell(row=countx, column=28).value = "-"
-        file.save(path)
-    #企业规模
-    if "公司" in org_type:
-        file.active.cell(row=countx, column=29).value = wait.until(EC.presence_of_element_located((By.XPATH, "//label[contains(text(), '企业规模')]/following-sibling::div"))).text
-        file.save(path)
-    else:
-        file.active.cell(row=countx, column=29).value = "-"
-        file.save(path)
-    #单位所在目录
-    file.active.cell(row=countx, column=30).value = wait.until(EC.presence_of_element_located((By.XPATH, "//label[contains(text(), '单位所在目录')]/following-sibling::div"))).text
+
+    # 加入党组织日期
+    file.active.cell(row=countx, column=33).value = wait.until(EC.presence_of_element_located((By.XPATH, "//label[contains(text(), '单位名称(全称)')]/following-sibling::div"))).text
     file.save(path)
-    #如果单位性质类别位行政机关，则补充单位隶属关系
-    if "机关" in org_type:
-        file.active.cell(row=countx, column=45).value = wait.until(EC.presence_of_element_located((By.XPATH, "//label[contains(text(), '隶属关系')]/following-sibling::div/div/span"))).text
-        file.save(path)
-    else:
-        file.active.cell(row=countx, column=45).value = "-"
-        file.save(path)
-
-    #民营科技企业标识
-    if "公司" in org_type:
-        file.active.cell(row=countx, column=31).value = wait.until(EC.presence_of_element_located((By.XPATH, "//label[contains(text(), '民营科技企业标识')]/following-sibling::div"))).text
-        file.save(path)
-    else:
-        file.active.cell(row=countx, column=31).value = "-"
-        file.save(path)
-    # 单位所在行政区划
-    file.active.cell(row=countx, column=32).value = wait.until(EC.presence_of_element_located((By.XPATH, "//label[contains(text(), '单位所在行政区划')]/following-sibling::div//input"))).text
+    # 转为正式党员日期
+    file.active.cell(row=countx, column=34).value = wait.until(EC.presence_of_element_located((By.XPATH, "//label[contains(text(), '机构类型')]/following-sibling::div//span[@style = 'margin-top: auto; margin-bottom: auto;']"))).text
+    file.save(path)        
+    # 人员类别
+    file.active.cell(row=countx, column=35).value = wait.until(EC.presence_of_element_located((By.XPATH, "(//label[contains(text(), '法人单位统一社会信用代码')])[2]/following-sibling::div"))).text
+    file.save(path)        
+    # 党籍状态
+    file.active.cell(row=countx, column=36).value = wait.until(EC.presence_of_element_located((By.XPATH, "//label[contains(text(), '新经济行业')]/following-sibling::div"))).text
+    file.save(path)       
+    # 入党类型
+    file.active.cell(row=countx, column=37).value = wait.until(EC.presence_of_element_located((By.XPATH, "(//label[contains(text(), '经济行业')]/following-sibling::div)[2]"))).text
     file.save(path)
-    # 判断参考信息（省标院等单位）是否存在
-    while 1:
-        try:
-            readonly = wait.until(EC.presence_of_element_located((By.XPATH, "(//div[@class = 'read-only'])[1]")))
-            break
-        except:
-            time.sleep(0.5)
-    
-    readonly_html = readonly.get_attribute('outerHTML')
-    soup = BeautifulSoup(readonly_html, 'html.parser')
-    
-    if soup.find_all(string= lambda text: '机构类型' in text):
-        # 单位名称(全称)
-        file.active.cell(row=countx, column=33).value = wait.until(EC.presence_of_element_located((By.XPATH, "//label[contains(text(), '单位名称(全称)')]/following-sibling::div"))).text
-        file.save(path)
-        # 机构类型
-        file.active.cell(row=countx, column=34).value = wait.until(EC.presence_of_element_located((By.XPATH, "//label[contains(text(), '机构类型')]/following-sibling::div//span[@style = 'margin-top: auto; margin-bottom: auto;']"))).text
-        file.save(path)        
-        # 法人单位统一社会信用代码
-        file.active.cell(row=countx, column=35).value = wait.until(EC.presence_of_element_located((By.XPATH, "(//label[contains(text(), '法人单位统一社会信用代码')])[2]/following-sibling::div"))).text
-        file.save(path)        
-        # 新经济行业
-        file.active.cell(row=countx, column=36).value = wait.until(EC.presence_of_element_located((By.XPATH, "//label[contains(text(), '新经济行业')]/following-sibling::div"))).text
-        file.save(path)       
-        # 经济行业
-        file.active.cell(row=countx, column=37).value = wait.until(EC.presence_of_element_located((By.XPATH, "(//label[contains(text(), '经济行业')]/following-sibling::div)[2]"))).text
-        file.save(path)
-        # 经济类型
-        file.active.cell(row=countx, column=38).value = wait.until(EC.presence_of_element_located((By.XPATH, "(//label[contains(text(), '经济类型')]/following-sibling::div)[1]//span[@style = 'margin-top: auto; margin-bottom: auto;']"))).text
-        file.save(path)
-        # 新经济类型
-        file.active.cell(row=countx, column=39).value = wait.until(EC.presence_of_element_located((By.XPATH, "//label[contains(text(), '新经济类型')]/following-sibling::div//span[@style = 'margin-top: auto; margin-bottom: auto;']"))).text
-        file.save(path)
-        # 成立日期
-        file.active.cell(row=countx, column=40).value = wait.until(EC.presence_of_element_located((By.XPATH, "//label[contains(text(), '成立日期')]/following-sibling::div"))).text
-        file.save(path)
-        # 注册地行政区划
-        file.active.cell(row=countx, column=41).value = wait.until(EC.presence_of_element_located((By.XPATH, "//label[contains(text(), '注册地行政区划')]/following-sibling::div"))).text
-        file.save(path)
-        # 注册地址
-        file.active.cell(row=countx, column=42).value = wait.until(EC.presence_of_element_located((By.XPATH, "//label[contains(text(), '注册地址')]/following-sibling::div"))).text
-        file.save(path)
-        # 组织机构代码
-        file.active.cell(row=countx, column=43).value = wait.until(EC.presence_of_element_located((By.XPATH, "//label[contains(text(), '组织机构代码')]/following-sibling::div"))).text
-        file.save(path)
-        # 上级主管部门名称
-        file.active.cell(row=countx, column=44).value = wait.until(EC.presence_of_element_located((By.XPATH, "//label[contains(text(), '上级主管部门名称')]/following-sibling::div"))).text
-        file.save(path)
+    # 所在党支部
+    file.active.cell(row=countx, column=38).value = wait.until(EC.presence_of_element_located((By.XPATH, "(//label[contains(text(), '经济类型')]/following-sibling::div)[1]//span[@style = 'margin-top: auto; margin-bottom: auto;']"))).text
+    file.save(path)
 
-
-    else:
-        file.active.cell(row=countx, column=33).value = "-"
-        file.save(path)
-        # 机构类型
-        file.active.cell(row=countx, column=34).value = "-"
-        file.save(path)        
-        # 法人单位统一社会信用代码
-        file.active.cell(row=countx, column=35).value = "-"
-        file.save(path)        
-        # 新经济行业
-        file.active.cell(row=countx, column=36).value = "-"
-        file.save(path)       
-        # 经济行业
-        file.active.cell(row=countx, column=37).value = "-"
-        file.save(path)
-        # 经济类型
-        file.active.cell(row=countx, column=38).value = "-"
-        file.save(path)
-        # 新经济类型
-        file.active.cell(row=countx, column=39).value = "-"
-        file.save(path)
-        # 成立日期
-        file.active.cell(row=countx, column=40).value = "-"
-        file.save(path)
-        # 注册地行政区划
-        file.active.cell(row=countx, column=41).value = "-"
-        file.save(path)
-        # 注册地址
-        file.active.cell(row=countx, column=42).value = "-"
-        file.save(path)
-        # 组织机构代码
-        file.active.cell(row=countx, column=43).value = "-"
-        file.save(path)
-        # 上级主管部门名称
-        file.active.cell(row=countx, column=44).value = "-"
-        file.save(path)
-    # 切换选项卡到班子成员
-    while 1:
-        try:
-            councilcard = wait.until(EC.element_to_be_clickable((By.ID, "tab-class")))
-            break
-        except:
-            time.sleep(0.5)
-    while 1:
-        try:
-            councilcard.click()
-            break
-        except:
-            councilcard = wait.until(EC.element_to_be_clickable((By.ID, "tab-class")))
-            time.sleep(0.5)
-    # 采集班子成员信息
-    table_council(name_temp, wait, driver)
-    # 切换选项卡到惩戒信息
-    while 1:
-        try:
-            RewaridsAndPunishments = wait.until(EC.element_to_be_clickable((By.ID, "tab-rewardsPunishments")))
-            break
-        except:
-            time.sleep(0.5)
-    while 1:
-        try:
-            RewaridsAndPunishments.click()
-            break
-        except:
-            RewaridsAndPunishments = wait.until(EC.element_to_be_clickable((By.ID, "tab-rewardsPunishments")))
-            time.sleep(0.5)
-    # 采集奖励惩戒信息
-    table_reward_punish(name_temp, wait)
-    
     
     print("填写第",count,"个党组织",name_temp,"信息成功") 
     amount_that_complete = amount_that_complete + 1
