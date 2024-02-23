@@ -15,11 +15,10 @@ def main():
     driver = dev_func.driver_create(chrome_path, chromedriver_path)
     wait = WebDriverWait(driver, 10, 0.5)
     dev_func.login(account, password, driver, url, wait)
-    dev_func.access_org_database(driver, wait)
-    dev_func.switch_role(wait)
-    dev_func.switch_item_org(wait)
+    dev_func.access_dev_database(driver, wait)
+    dev_func.switch_role(wait, driver)
     #指定位置创建excel工作簿
-    dev_func.new_excel(wait, driver)
+    dev_func.new_excel(wait)
 
     input("Press Enter to exit...")
 if __name__ == "__main__":
