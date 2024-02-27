@@ -849,6 +849,7 @@ def downloading(file, wait, path, control):
         file.active.cell(row=countx, column=13).value = wait.until(EC.presence_of_element_located((By.XPATH, "(//tbody)[1]/tr[5]/td[2]//span[1]"))).text
         file.save(path)
         #切换到积极分子信息
+
         while(1):
             try:
                 company_info = wait.until(EC.element_to_be_clickable((By.XPATH, "//div[contains(text(), '入党积极分子基本信息')]")))
@@ -960,63 +961,108 @@ def downloading(file, wait, path, control):
         #接受申请党组织
         file.active.cell(row=countx, column=13).value = wait.until(EC.presence_of_element_located((By.XPATH, "(//tbody)[1]/tr[5]/td[2]//span[1]"))).text
         file.save(path)
-        #切换到积极分子信息
-        while(1):
-            try:
-                company_info = wait.until(EC.element_to_be_clickable((By.XPATH, "//div[contains(text(), '入党积极分子基本信息')]")))
-                break
-            except:
-                time.sleep(0.1)
-        while(1):
-            try:
-                company_info.click()
-                break
-            except:
-                company_info = wait.until(EC.element_to_be_clickable((By.XPATH, "//div[contains(text(), '入党积极分子基本信息')]")))
-        #籍贯
-        file.active.cell(row=countx, column=14).value = wait.until(EC.presence_of_element_located((By.XPATH, "(//tbody)[2]/tr[3]/td[4]//span[1]"))).text
-        file.save(path)
-        #入团日期
-        file.active.cell(row=countx, column=15).value = wait.until(EC.presence_of_element_located((By.XPATH, "((//tbody)[2]/tr[4]/td[4]//span)[1]"))).text
-        file.save(path)
-        #参加工作日期
-        file.active.cell(row=countx, column=16).value = wait.until(EC.presence_of_element_located((By.XPATH, "((//tbody)[2]/tr[4]/td[6]//span)[1]"))).text
-        file.save(path)
-        #申请入党日期
-        file.active.cell(row=countx, column=17).value = wait.until(EC.presence_of_element_located((By.XPATH, "((//tbody)[2]/tr[5]/td[2]//span)[1]"))).text
-        file.save(path)
-        #确定入党积极分子日期
-        file.active.cell(row=countx, column=18).value = wait.until(EC.presence_of_element_located((By.XPATH, "((//tbody)[2]/tr[5]/td[4]//span)[1]"))).text
-        file.save(path)
-        #工作单位及职务
-        file.active.cell(row=countx, column=19).value = wait.until(EC.presence_of_element_located((By.XPATH, "((//tbody)[2]/tr[6]/td[4]//span)[1]"))).text
-        file.save(path)
-        #家庭住址
-        file.active.cell(row=countx, column=20).value = wait.until(EC.presence_of_element_located((By.XPATH, "((//tbody)[2]/tr[7]/td[2]//span)[1]"))).text
-        file.save(path)
-        # 加入党组织日期
-        file.active.cell(row=countx, column=21).value = "-"
-        file.save(path)
-        # 转为正式党员日期
-        file.active.cell(row=countx, column=22).value = "-"
-        file.save(path)        
-        # 人员类别
-        file.active.cell(row=countx, column=23).value = "-"
-        file.save(path)        
-        # 党籍状态
-        file.active.cell(row=countx, column=24).value = "-"
-        file.save(path)       
-        # 入党类型
-        file.active.cell(row=countx, column=25).value = "-"
-        file.save(path)
-        # 所在党支部
-        file.active.cell(row=countx, column=26).value = "-"
-        file.save(path)
-        # 人员类型
-        file.active.cell(row=countx, column=27).value = "入党申请人"
-        print("填写第",count,"个入党申请人",name_temp,"信息成功") 
-        amount_applicant_complete = amount_applicant_complete + 1
-        
+        if "入党积极分子基本信息" in driver0.page_source:
+            #切换到积极分子信息
+            while(1):
+                try:
+                    company_info = wait.until(EC.element_to_be_clickable((By.XPATH, "//div[contains(text(), '入党积极分子基本信息')]")))
+                    break
+                except:
+                    time.sleep(0.1)
+            while(1):
+                try:
+                    company_info.click()
+                    break
+                except:
+                    company_info = wait.until(EC.element_to_be_clickable((By.XPATH, "//div[contains(text(), '入党积极分子基本信息')]")))
+            #籍贯
+            file.active.cell(row=countx, column=14).value = wait.until(EC.presence_of_element_located((By.XPATH, "(//tbody)[2]/tr[3]/td[4]//span[1]"))).text
+            file.save(path)
+            #入团日期
+            file.active.cell(row=countx, column=15).value = wait.until(EC.presence_of_element_located((By.XPATH, "((//tbody)[2]/tr[4]/td[4]//span)[1]"))).text
+            file.save(path)
+            #参加工作日期
+            file.active.cell(row=countx, column=16).value = wait.until(EC.presence_of_element_located((By.XPATH, "((//tbody)[2]/tr[4]/td[6]//span)[1]"))).text
+            file.save(path)
+            #申请入党日期
+            file.active.cell(row=countx, column=17).value = wait.until(EC.presence_of_element_located((By.XPATH, "((//tbody)[2]/tr[5]/td[2]//span)[1]"))).text
+            file.save(path)
+            #确定入党积极分子日期
+            file.active.cell(row=countx, column=18).value = wait.until(EC.presence_of_element_located((By.XPATH, "((//tbody)[2]/tr[5]/td[4]//span)[1]"))).text
+            file.save(path)
+            #工作单位及职务
+            file.active.cell(row=countx, column=19).value = wait.until(EC.presence_of_element_located((By.XPATH, "((//tbody)[2]/tr[6]/td[4]//span)[1]"))).text
+            file.save(path)
+            #家庭住址
+            file.active.cell(row=countx, column=20).value = wait.until(EC.presence_of_element_located((By.XPATH, "((//tbody)[2]/tr[7]/td[2]//span)[1]"))).text
+            file.save(path)
+            # 加入党组织日期
+            file.active.cell(row=countx, column=21).value = "-"
+            file.save(path)
+            # 转为正式党员日期
+            file.active.cell(row=countx, column=22).value = "-"
+            file.save(path)        
+            # 人员类别
+            file.active.cell(row=countx, column=23).value = "-"
+            file.save(path)        
+            # 党籍状态
+            file.active.cell(row=countx, column=24).value = "-"
+            file.save(path)       
+            # 入党类型
+            file.active.cell(row=countx, column=25).value = "-"
+            file.save(path)
+            # 所在党支部
+            file.active.cell(row=countx, column=26).value = "-"
+            file.save(path)
+            # 人员类型
+            file.active.cell(row=countx, column=27).value = "入党申请人"
+            print("填写第",count,"个入党申请人",name_temp,"信息成功") 
+            amount_applicant_complete = amount_applicant_complete + 1
+        else:
+            #籍贯
+            file.active.cell(row=countx, column=14).value = "-"
+            file.save(path)
+            #入团日期
+            file.active.cell(row=countx, column=15).value = "-"
+            file.save(path)
+            #参加工作日期
+            file.active.cell(row=countx, column=16).value = "-"
+            file.save(path)
+            #申请入党日期
+            file.active.cell(row=countx, column=17).value = "-"
+            file.save(path)
+            #确定入党积极分子日期
+            file.active.cell(row=countx, column=18).value = "-"
+            file.save(path)
+            #工作单位及职务
+            file.active.cell(row=countx, column=19).value = "-"
+            file.save(path)
+            #家庭住址
+            file.active.cell(row=countx, column=20).value = "-"
+            file.save(path)
+            # 加入党组织日期
+            file.active.cell(row=countx, column=21).value = "-"
+            file.save(path)
+            # 转为正式党员日期
+            file.active.cell(row=countx, column=22).value = "-"
+            file.save(path)        
+            # 人员类别
+            file.active.cell(row=countx, column=23).value = "-"
+            file.save(path)        
+            # 党籍状态
+            file.active.cell(row=countx, column=24).value = "-"
+            file.save(path)       
+            # 入党类型
+            file.active.cell(row=countx, column=25).value = "-"
+            file.save(path)
+            # 所在党支部
+            file.active.cell(row=countx, column=26).value = "-"
+            file.save(path)
+            # 人员类型
+            file.active.cell(row=countx, column=27).value = "入党申请人"
+            print("填写第",count,"个入党申请人",name_temp,"信息成功") 
+            amount_applicant_complete = amount_applicant_complete + 1
+
 
 
 
