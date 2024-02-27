@@ -246,7 +246,8 @@ def rebuild(excel_file_path, wait, member_excel):
         switch_applicant(wait)
         synchronizing(wait, member_excel, excel_file_path, control=5)
     elif a>mem_total_amount and a <= mem_total_amount + infomem_total_amount:
-        amount_mem_complete = a - mem_total_amount
+        amount_mem_complete = mem_total_amount
+        amount_infomem_complete = a - mem_total_amount
         synchronizing(wait, member_excel, excel_file_path, control = 2)
         switch_devtarg(wait)
         temp = wait.until(EC.presence_of_element_located((By.ID, "tabls")))
@@ -261,19 +262,28 @@ def rebuild(excel_file_path, wait, member_excel):
         switch_applicant(wait)
         synchronizing(wait, member_excel, excel_file_path, control=5)
     elif a>mem_total_amount + infomem_total_amount and a <= mem_total_amount + infomem_total_amount + devtar_total_amount:
-        amount_mem_complete = a - (mem_total_amount + infomem_total_amount)
+        amount_mem_complete = mem_total_amount
+        amount_infomem_complete = infomem_total_amount
+        amount_devtar_complete = a - (mem_total_amount + infomem_total_amount)
         synchronizing(wait, member_excel, excel_file_path, control = 3)
         switch_activist(wait)
         synchronizing(wait, member_excel, excel_file_path, control=4)
         switch_applicant(wait)
         synchronizing(wait, member_excel, excel_file_path, control=5)
     elif a>mem_total_amount + infomem_total_amount + devtar_total_amount and a <= mem_total_amount + infomem_total_amount + devtar_total_amount + activist_total_amount:
-        amount_mem_complete = a - (mem_total_amount + infomem_total_amount + devtar_total_amount)
+        amount_mem_complete = mem_total_amount
+        amount_infomem_complete = infomem_total_amount
+        amount_devtar_complete = devtar_total_amount
+        amount_activist_complete = a - (mem_total_amount + infomem_total_amount + devtar_total_amount)
         synchronizing(wait, member_excel, excel_file_path, control = 4)
         switch_applicant(wait)
         synchronizing(wait, member_excel, excel_file_path, control=5)
     elif a>mem_total_amount + infomem_total_amount + devtar_total_amount + activist_total_amount and a <= mem_total_amount + infomem_total_amount + devtar_total_amount + activist_total_amount + applicant_total_amount :
-        amount_mem_complete = a - (mem_total_amount + infomem_total_amount + devtar_total_amount + activist_total_amount)
+        amount_mem_complete = mem_total_amount
+        amount_infomem_complete = infomem_total_amount
+        amount_devtar_complete = devtar_total_amount
+        amount_activist_complete = activist_total_amount
+        amount_applicant_complete = a - (mem_total_amount + infomem_total_amount + devtar_total_amount + activist_total_amount)
         synchronizing(wait, member_excel, excel_file_path, control = 5)
 
 def init_complete_amount(excel_file_path):
@@ -408,13 +418,13 @@ def downloading(file, wait, path, control):
     if control == 1:
         count = amount_mem_complete
     elif control == 2:
-        count = amount_infomem_complete
+        count = amount_infomem_complete + amount_mem_complete
     elif control == 3:
-        count = amount_activist_complete
+        count = amount_activist_complete + amount_infomem_complete + amount_mem_complete
     elif control == 4:
-        count = amount_devtar_complete
+        count = amount_devtar_complete + amount_activist_complete + amount_infomem_complete + amount_mem_complete
     elif control == 5:
-        count = amount_applicant_complete
+        count = amount_applicant_complete + amount_devtar_complete + amount_activist_complete + amount_infomem_complete + amount_mem_complete
 
     if control == 1:
         count = count + 1
@@ -893,7 +903,7 @@ def downloading(file, wait, path, control):
         # 人员类型
         file.active.cell(row=countx, column=27).value = "积极分子"
         print("填写第",count,"个积极分子",name_temp,"信息成功") 
-        amount_devtar_complete = amount_devtar_complete + 1
+        amount_activist_complete = amount_activist_complete + 1
 
 
 
@@ -1005,7 +1015,7 @@ def downloading(file, wait, path, control):
         # 人员类型
         file.active.cell(row=countx, column=27).value = "入党申请人"
         print("填写第",count,"个入党申请人",name_temp,"信息成功") 
-        amount_devtar_complete = amount_devtar_complete + 1
+        amount_applicant_complete = amount_applicant_complete + 1
         
 
 
