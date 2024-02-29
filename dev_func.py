@@ -9,14 +9,12 @@ from selenium.webdriver.common.keys import Keys
 from openpyxl import load_workbook
 from selenium import webdriver
 from datetime import datetime
-from bs4 import BeautifulSoup
 from openpyxl import load_workbook
 import pandas as pd
 import time 
 import os
-import requests
 import re
-import inspect
+
 
 
 

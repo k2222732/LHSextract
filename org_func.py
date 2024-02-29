@@ -14,9 +14,7 @@ from openpyxl import load_workbook
 import pandas as pd
 import time 
 import os
-import requests
-import re
-import inspect
+
 
 
 amount_that_complete = 0
@@ -96,6 +94,15 @@ def access_org_database(driver, wait):
     except:
         time.sleep(1)
 
+
+def switch_role(wait):
+    droplist = wait.until(EC.element_to_be_clickable((By.CSS_SELECTOR, '.avatar-wrapper.fs-dropdown-selfdefine')))
+    droplist.click()
+    print(f"进入角色下拉列表成功")
+    time.sleep(1)
+    role = wait.until(EC.element_to_be_clickable((By.XPATH, '//SPAN[contains(text(), "中国共产党山东汶上经济开发区工作委员会-具有审批预备党员权限的基层党委管理员")]')))
+    role.click()
+    print(f"切换角色成功")
 
 
 
@@ -326,7 +333,8 @@ def downloading(file, wait, driver, path):
             break
         except AssertionError:
             time.sleep(0.5)
-            file.active.cell(row=countx, column=2).value = wait.until(EC.presence_of_element_located((By.XPATH, "//span[contains(text(), '党组织全称')]/../following-sibling::*/div[1]"))).text
+            name_temp = wait.until(EC.presence_of_element_located((By.XPATH, "//span[contains(text(), '党组织全称')]/../following-sibling::*/div[1]"))).text
+            file.active.cell(row=countx, column=2).value = name_temp
             file.save(path)
     #组织树
     file.active.cell(row=countx, column=3).value = "-" #wait.until(EC.presence_of_element_located((By.XPATH, "(//div[@class = 'card-class']//div[@class = 'fs-tabs__content']//div[@class = 'row-val-shot'])[3]"))).text
