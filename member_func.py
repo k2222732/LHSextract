@@ -54,9 +54,9 @@ def login(account, password, driver, url, wait):
         #等待1秒
         time.sleep(2)
         #获取当前网页的doom
-        response = requests.get(url)
+        response = driver.page_source
         #检查doom里是否有"您上次登录是"字样
-        if "您上次登录是" in response.text:
+        if "您上次登录是" in response:
         #如果有打印登录成功，跳出循环
             break
         #如果没有继续本函数上面代码

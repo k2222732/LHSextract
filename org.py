@@ -14,7 +14,6 @@ def main():
     global url
     driver = org_func.driver_create(chrome_path, chromedriver_path)
     wait = WebDriverWait(driver, 10, 0.5)
-    org_excel = 0
     org_func.login(account, password, driver, url, wait)
     org_func.access_org_database(driver, wait)
     org_func.switch_role(wait)
