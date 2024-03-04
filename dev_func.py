@@ -31,7 +31,7 @@ devtar_total_amount = 0
 applicant_total_amount = 0
 
 
-directory = "g:/project/LHSextract/database/database_dev"
+directory = "c:/project/LHSextract/database/database_dev"
 
 driver0 = ""
 
