@@ -3,7 +3,7 @@ from tkinter import messagebox
 import subprocess
 import json
 import socket
-import time
+
 
 class ClientApp:
     def __init__(self, root):
@@ -95,7 +95,7 @@ class ClientApp:
             if response['status'] == 'success':
                 messagebox.showinfo("登录成功", response['message'])
                 self.open_ui()
-                self.root.destroy()
+                self.root.withdraw()
             else:
                 messagebox.showerror("登录失败", response['message'])
 
