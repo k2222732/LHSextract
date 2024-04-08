@@ -15,7 +15,7 @@ import inspect
 import requests
 
 amount_that_complete = 0
-directory = "G:/project/LHSextract/database/database_member"
+from globalv import mem_directory
 
 def driver_create(chrome_path, chromedriver_path):
     chrome_options = Options()
@@ -91,16 +91,16 @@ def switch_role(wait):
 
 
 def new_excel(wait, member_total_amount):
-    global directory
+    global mem_directory
     today_date = datetime.now().strftime("%Y-%m-%d")
     excel_file_name = f"{today_date}党员信息库.xlsx"
-    excel_file_path = os.path.join(directory, excel_file_name)
+    excel_file_path = os.path.join(mem_directory, excel_file_name)
     if os.path.isfile(excel_file_path):
         member_excel = load_workbook(excel_file_path)
         rebuild(excel_file_path, wait, member_total_amount, member_excel, excel_file_path)
     else:
         #在当前文件夹新建一个文件夹命名为"database"在里面新建一个文件夹名为"database_member"
-        os.makedirs(directory, exist_ok=True)
+        os.makedirs(mem_directory, exist_ok=True)
         #在database_member文件夹里新建一个excel文件命名为"今天的日期"&"党员信息库"
 
         #在excel里的第一行建立表头，分别是"姓名、性别、公民身份号码、民族、出生日期、学历、人员类别、学位、所在党支部、手机号码、入党日期

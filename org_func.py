@@ -16,10 +16,9 @@ import time
 import os
 
 
-
 amount_that_complete = 0
+from globalv import org_directory
 
-directory = "g:/project/LHSextract/database/database_org"
 
 def driver_create(chrome_path, chromedriver_path):
     chrome_options = Options()
@@ -135,17 +134,17 @@ def switch_item_org(wait):
 
 
 def new_excel(wait, driver):
-    global directory
+    global org_directory
     today_date = datetime.now().strftime("%Y-%m-%d")
     excel_file_name = f"{today_date}党组织信息库.xlsx"
-    excel_file_path = os.path.join(directory, excel_file_name)
+    excel_file_path = os.path.join(org_directory, excel_file_name)
     if os.path.isfile(excel_file_path):
         #org_excel = load_workbook(excel_file_path)
         #rebuild(excel_file_path, wait, org_excel, excel_file_path)
 
 
         #创建目录g:/project/LHSextract/database/database_org
-        os.makedirs(directory, exist_ok=True)
+        os.makedirs(org_directory, exist_ok=True)
         #设计党组织基本信息表头
         columns_base_info = ["序号","党组织全称", "组织树", "党组织简称", "党内统计用党组织简称", "成立日期", "党组织编码", "党组织联系人", "联系电话", "组织类别", 
             '是否具有"审批预备党员权限"', "功能型党组织", "党组织所在单位情况", "党组织所在行政区划", "批准成立的上级党组织", "是否为新业态", "驻外情况", 
@@ -166,7 +165,7 @@ def new_excel(wait, driver):
         synchronizing(wait, org_excel, excel_file_path, driver)
     else:
         #创建目录g:/project/LHSextract/database/database_org
-        os.makedirs(directory, exist_ok=True)
+        os.makedirs(org_directory, exist_ok=True)
         #设计党组织基本信息表头
         columns_base_info = ["序号","党组织全称", "组织树", "党组织简称", "党内统计用党组织简称", "成立日期", "党组织编码", "党组织联系人", "联系电话", "组织类别", 
             '是否具有"审批预备党员权限"', "功能型党组织", "党组织所在单位情况", "党组织所在行政区划", "批准成立的上级党组织", "是否为新业态", "驻外情况", 
@@ -637,13 +636,13 @@ def downloading(file, wait, driver, path):
 
 def table_council(org_name: str, wait, driver):
     #获取数据存储目录
-    global directory
+    global org_directory
     #获取当天日期
     today_date = datetime.now().strftime("%Y-%m-%d")
     #构建文件名称
     excel_file_name = f"{today_date}{org_name}班子成员信息库.xlsx"
     #构建完整路径
-    excel_file_path = os.path.join(directory, excel_file_name)
+    excel_file_path = os.path.join(org_directory, excel_file_name)
     #创建一个dataframe表头为columns_base_info中的元素
     df = pd.DataFrame()
     #dataframe导出到excel
@@ -790,13 +789,13 @@ def table_council(org_name: str, wait, driver):
 
 def table_reward_punish(org_name: str, wait):
     #获取数据存储目录
-    global directory
+    global org_directory
     #获取当天日期
     today_date = datetime.now().strftime("%Y-%m-%d")
     #构建文件名称
     excel_file_name = f"{today_date}{org_name}奖惩信息.xlsx"
     #构建完整路径
-    excel_file_path = os.path.join(directory, excel_file_name)
+    excel_file_path = os.path.join(org_directory, excel_file_name)
     #创建一个dataframe表头为columns_base_info中的元素
     df = pd.DataFrame()
     #dataframe导出到excel

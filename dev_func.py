@@ -30,8 +30,7 @@ activist_total_amount = 0
 devtar_total_amount = 0
 applicant_total_amount = 0
 
-
-directory = "c:/project/LHSextract/database/database_dev"
+from globalv import dev_directory
 
 driver0 = ""
 
@@ -146,16 +145,16 @@ def new_excel(wait):
     global devtar_total_amount
     global activist_total_amount
     global applicant_total_amount
-    global directory
+    global dev_directory
     today_date = datetime.now().strftime("%Y-%m-%d")
     excel_file_name = f"{today_date}党员发展纪实信息库.xlsx"
-    excel_file_path = os.path.join(directory, excel_file_name)
+    excel_file_path = os.path.join(dev_directory, excel_file_name)
     #if os.path.isfile(excel_file_path):
         #member_excel = load_workbook(excel_file_path)
         #rebuild(excel_file_path, wait, member_total_amount, member_excel, excel_file_path)
     #else:
         #在当前文件夹新建一个文件夹命名为"database"在里面新建一个文件夹名为"database_member"
-        #os.makedirs(directory, exist_ok=True)
+        #os.makedirs(dev_directory, exist_ok=True)
         #在database_member文件夹里新建一个excel文件命名为"今天的日期"&"党员信息库"
 
         #在excel里的第一行建立表头，分别是"姓名、性别、公民身份号码、民族、出生日期、学历、人员类别、学位、所在党支部、手机号码、入党日期
@@ -165,7 +164,7 @@ def new_excel(wait):
         member_excel = load_workbook(excel_file_path)
         rebuild(excel_file_path, wait, member_excel)
     else:
-        os.makedirs(directory, exist_ok=True)
+        os.makedirs(dev_directory, exist_ok=True)
         columns = ["序号", "姓名","性别","公民身份证号码","民族","出生日期","学历","申请入党日期","手机号码","背景信息","工作岗位",
                 "政治面貌","接受申请党组织","籍贯","入团日期","参加工作日期","申请入党日期","确定入党积极分子日期",
                 "工作单位及职务","家庭住址","加入党组织日期","转为正式党员日期","人员类别","党籍状态","入党类型","所在党支部", "人员类型"]
