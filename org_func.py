@@ -19,6 +19,10 @@ import os
 amount_that_complete = 0
 from globalv import org_directory
 
+def load_config(self):
+        if os.path.exists(self.config_file):
+            self.config.read(self.config_file)
+            self.explore_driver_path.insert(0, self.config.get('Paths', 'explore_driver_path', fallback=''))
 
 def driver_create(chrome_path, chromedriver_path):
     chrome_options = Options()
