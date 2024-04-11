@@ -5,9 +5,10 @@ import os
 import subprocess
 import configparser
 import globalv
-
+#########
 class MainApp:
     def __init__(self, root):
+        self.config_file = 'config.ini'
         self.config_file = 'config.ini'
         self.config = configparser.ConfigParser()
         
