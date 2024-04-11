@@ -10,6 +10,7 @@ class MainApp:
     def __init__(self, root):
         self.config_file = 'config.ini'
         self.config = configparser.ConfigParser()
+        
 
         self.root = root
         self.root.title("灯塔填表小助手")
@@ -57,12 +58,18 @@ class MainApp:
 
         self.tabControl.pack(expand=1, fill="both")
 
+        self.load_config()
     
 
     def load_config(self):
         if os.path.exists(self.config_file):
             self.config.read(self.config_file)
-            self.explore_driver_path.insert(0, self.config.get('Paths', 'explore_driver_path', fallback=''))
+            self.explore_driver_path.insert(0, self.config.get('Paths_driver', 'explore_driver_path', fallback=''))
+            self.explore_path.insert(0, self.config.get('Paths_explore', 'explore_path', fallback=''))
+            self.lhaccount.insert(0, self.config.get('Account', 'account', fallback=''))
+            self.lhpassword.insert(0, self.config.get('Password', 'password', fallback=''))
+        else:
+            pass
 
 
     def setup_tab1(self):
