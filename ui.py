@@ -4,11 +4,10 @@ import tkinter.filedialog
 import os
 import subprocess
 import configparser
-import globalv
+
 #########
 class MainApp:
     def __init__(self, root):
-        self.config_file = 'config.ini'
         self.config_file = 'config.ini'
         self.config = configparser.ConfigParser()
         
@@ -105,9 +104,12 @@ class MainApp:
 
 
     def setup_tab3(self):
-        ttk.Button(self.tab3, text="同步党员信息", command=self.sync_member_info).pack(pady=10)
-        ttk.Button(self.tab3, text="同步党组织信息", command=self.sync_organization_info).pack(pady=10)
-        ttk.Button(self.tab3, text="同步发展纪实信息", command=self.sync_development_info).pack(pady=10)
+        ttk.Button(self.tab3, text="同步党员信息", command=self.sync_member_info).grid(row=0, column=1, pady=5, padx=(10, 5))
+        ttk.Button(self.tab3, text="选择目录", command=self.choose_mem_info_path).grid(row=0, column=2, pady=5, padx=(10, 5))
+        ttk.Button(self.tab3, text="同步党组织信息", command=self.sync_organization_info).grid(row=1, column=1, pady=5, padx=(10, 5))
+        ttk.Button(self.tab3, text="选择目录", command=self.choose_org_info_path).grid(row=1, column=2, pady=5, padx=(10, 5))
+        ttk.Button(self.tab3, text="同步发展纪实信息", command=self.sync_development_info).grid(row=2, column=1, pady=5, padx=(10, 5))
+        ttk.Button(self.tab3, text="选择目录", command=self.choose_dev_info_path).grid(row=2, column=2, pady=5, padx=(10, 5))
         
 
 
@@ -178,6 +180,14 @@ class MainApp:
         with open(self.config_file, 'w') as configfile:
             self.config.write(configfile)
 
+    def choose_mem_info_path(self):
+        pass
+
+    def choose_org_info_path(self):
+        pass
+
+    def choose_dev_info_path(self):
+        pass
 
     def sync_member_info(self):
         self.run_script("member.py")
@@ -193,8 +203,9 @@ class MainApp:
         return path
 
     def run_script(self, script_name):
+        python_executable = os.path.join(os.getcwd(), 'Scripts', 'python')
         script_path = os.path.join(os.getcwd(), script_name)
-        subprocess.Popen(['python', script_path])
+        subprocess.Popen([python_executable, script_path])
 
 if __name__ == "__main__":
     root = tk.Tk()

@@ -13,10 +13,12 @@ from openpyxl import load_workbook
 import pandas as pd
 import time 
 import os
-
+import tkinter as tk
 
 amount_that_complete = 0
 from globalv import org_directory
+
+captcha = ""
 
 def load_config(self):
         if os.path.exists(self.config_file):
@@ -51,10 +53,10 @@ def login(account, password, driver, url, wait):
         password_box.send_keys(Keys.BACKSPACE)
         password_box.send_keys(password)
         # 等待手动输入验证码
-        temp = input ("Please enter the captcha and hit enter in the browser")
+        get_captcha()
         validatecode.send_keys(Keys.CONTROL + "a")
         validatecode.send_keys(Keys.BACKSPACE)
-        validatecode.send_keys(temp)
+        validatecode.send_keys(captcha)
         # 点击登录按钮
         login_button.click()
         #等待1秒
@@ -69,6 +71,33 @@ def login(account, password, driver, url, wait):
         else:
             continue
     print(f"登录成功")
+
+
+def get_captcha():
+    window = tk.Tk()
+    window.title("请输入验证码")
+    window.geometry("300x100")
+
+    # 创建标签
+    label = tk.Label(window, text="请输入验证码(不区分大小写):")
+    label.pack()
+
+    # 创建输入框
+    entry = tk.Entry(window)
+    entry.pack()
+
+    # 定义获取输入值的函数
+    def submit():
+        global captcha
+        captcha = entry.get()
+        window.destroy()
+ 
+    # 创建按钮
+    button = tk.Button(window, text="确定", command=submit)
+    button.pack()
+
+    # 运行窗口
+    window.mainloop()
 
 
 def access_org_database(driver, wait):
