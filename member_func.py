@@ -12,13 +12,13 @@ import time
 import os
 import re
 import inspect
-import requests
+import configparser
 import tkinter as tk
 
 captcha = ""
 
 amount_that_complete = 0
-from globalv import mem_directory
+mem_directory = ""
 
 def driver_create(chrome_path, chromedriver_path):
     chrome_options = Options()
@@ -122,6 +122,9 @@ def switch_role(wait):
 
 def new_excel(wait, member_total_amount):
     global mem_directory
+    config = configparser.ConfigParser()
+    config.read('config.ini')
+    mem_directory = config.get('Paths_mem_info', 'mem_info_path')
     today_date = datetime.now().strftime("%Y-%m-%d")
     excel_file_name = f"{today_date}党员信息库.xlsx"
     excel_file_path = os.path.join(mem_directory, excel_file_name)

@@ -15,6 +15,7 @@ import time
 import os
 import re
 import tkinter as tk
+import configparser
 
 
 
@@ -31,7 +32,7 @@ activist_total_amount = 0
 devtar_total_amount = 0
 applicant_total_amount = 0
 
-from globalv import dev_directory
+dev_directory = ""
 
 driver0 = ""
 
@@ -172,6 +173,9 @@ def new_excel(wait):
     global activist_total_amount
     global applicant_total_amount
     global dev_directory
+    config = configparser.ConfigParser()
+    config.read('config.ini')
+    dev_directory = config.get('Paths_dev_info', 'dev_info_path')
     today_date = datetime.now().strftime("%Y-%m-%d")
     excel_file_name = f"{today_date}党员发展纪实信息库.xlsx"
     excel_file_path = os.path.join(dev_directory, excel_file_name)

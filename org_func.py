@@ -14,9 +14,10 @@ import pandas as pd
 import time 
 import os
 import tkinter as tk
+import configparser
 
 amount_that_complete = 0
-from globalv import org_directory
+org_directory = ""
 
 captcha = ""
 
@@ -167,6 +168,9 @@ def switch_item_org(wait):
 
 def new_excel(wait, driver):
     global org_directory
+    config = configparser.ConfigParser()
+    config.read('config.ini')
+    org_directory = config.get('Paths_org_info', 'org_info_path')
     today_date = datetime.now().strftime("%Y-%m-%d")
     excel_file_name = f"{today_date}党组织信息库.xlsx"
     excel_file_path = os.path.join(org_directory, excel_file_name)

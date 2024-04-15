@@ -1,6 +1,6 @@
 import tkinter as tk
 from tkinter import ttk
-import tkinter.filedialog
+from tkinter import filedialog
 import os
 import subprocess
 import configparser
@@ -181,13 +181,31 @@ class MainApp:
             self.config.write(configfile)
 
     def choose_mem_info_path(self):
-        pass
+        contain_mem_info = filedialog.askdirectory()
+        self.config['Paths_mem_info'] = {
+            'mem_info_path': contain_mem_info
+        }
+        with open(self.config_file, 'w') as configfile:
+            self.config.write(configfile)
+
+
+
 
     def choose_org_info_path(self):
-        pass
+        contain_org_info = filedialog.askdirectory()
+        self.config['Paths_org_info'] = {
+            'org_info_path': contain_org_info 
+        }
+        with open(self.config_file, 'w') as configfile:
+            self.config.write(configfile)
 
     def choose_dev_info_path(self):
-        pass
+        contain_dev_info = filedialog.askdirectory()
+        self.config['Paths_dev_info'] = {
+            'dev_info_path': contain_dev_info
+        }
+        with open(self.config_file, 'w') as configfile:
+            self.config.write(configfile)
 
     def sync_member_info(self):
         self.run_script("member.py")
@@ -199,7 +217,7 @@ class MainApp:
         self.run_script("dev.py")
 
     def choose_directory(self):
-        path = tkinter.filedialog.askopenfilename()
+        path = filedialog.askopenfilename()
         return path
 
     def run_script(self, script_name):
