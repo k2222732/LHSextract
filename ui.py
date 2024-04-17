@@ -5,6 +5,8 @@ import os
 import subprocess
 import configparser
 
+temp = 0
+
 #########
 class MainApp:
     def __init__(self, root):
@@ -14,6 +16,7 @@ class MainApp:
 
         self.root = root
         self.root.title("灯塔填表小助手")
+        
         self.tabControl = ttk.Notebook(root)
 
 

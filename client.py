@@ -3,6 +3,7 @@ from tkinter import messagebox
 import subprocess
 import json
 import socket
+import ui
 
 
 class ClientApp:
@@ -114,6 +115,7 @@ class ClientApp:
         subprocess.Popen(['python', 'ui.py'])
 
 if __name__ == "__main__":
+    temp = ui.temp
     root = tk.Tk()
     app = ClientApp(root)
     root.mainloop()
