@@ -36,5 +36,6 @@ def main():
     #指定位置创建excel工作簿
     org_func.new_excel(wait, driver)
     input("Press Enter to exit...")
-if __name__ == "__main__":
-    main()
+
+
+main()

@@ -11,7 +11,7 @@ from datetime import datetime
 from bs4 import BeautifulSoup
 from openpyxl import load_workbook
 import pandas as pd
-import time 
+import time
 import os
 import tkinter as tk
 import configparser
@@ -128,14 +128,18 @@ def access_org_database(driver, wait):
 
 
 def switch_role(wait):
-    droplist = wait.until(EC.element_to_be_clickable((By.CSS_SELECTOR, '.avatar-wrapper.fs-dropdown-selfdefine')))
-    droplist.click()
-    print(f"进入角色下拉列表成功")
-    time.sleep(1)
-    role = wait.until(EC.element_to_be_clickable((By.XPATH, '//SPAN[contains(text(), "中国共产党山东汶上经济开发区工作委员会-具有审批预备党员权限的基层党委管理员")]')))
-    role.click()
-    print(f"切换角色成功")
-
+    while 1:
+        try:
+            droplist = wait.until(EC.element_to_be_clickable((By.CSS_SELECTOR, '.avatar-wrapper.fs-dropdown-selfdefine')))
+            droplist.click()
+            print(f"进入角色下拉列表成功")
+            time.sleep(1)
+            role = wait.until(EC.element_to_be_clickable((By.XPATH, '//SPAN[contains(text(), "中国共产党山东汶上经济开发区工作委员会-具有审批预备党员权限的基层党委管理员")]')))
+            role.click()
+            print(f"切换角色成功")
+            break
+        except:
+            time.sleep(2)
 
 
 #切换到党组织信息页面

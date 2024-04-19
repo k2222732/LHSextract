@@ -1,13 +1,13 @@
 import tkinter as tk
 from tkinter import messagebox
-import subprocess
 import json
 import socket
-import ui
+import threading
 
 
 class ClientApp:
     def __init__(self, root):
+        self.ui_thread = None
         self.root = root
         self.root.title("组工填表神器")
 
@@ -86,36 +86,47 @@ class ClientApp:
         self.root.deiconify()
 
     def send_request(self, request):
-        client_socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-        client_socket.connect(('82.157.124.132', 8888))
-        client_socket.sendall(json.dumps(request).encode('utf-8'))
-        response_data = client_socket.recv(1024)
-        response = json.loads(response_data.decode('utf-8'))
-        if request['action'] == 'login':
+        try:
+            client_socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+            client_socket.connect(('82.157.124.132', 8888))
+            client_socket.sendall(json.dumps(request).encode('utf-8'))
+            response_data = client_socket.recv(1024)
+            response = json.loads(response_data.decode('utf-8'))
+            if request['action'] == 'login':
 
-            if response['status'] == 'success':
-                messagebox.showinfo("登录成功", response['message'])
-                self.open_ui()
-                self.root.withdraw()
-            else:
-                messagebox.showerror("登录失败", response['message'])
+                if response['status'] == 'success':
+                    messagebox.showinfo("登录成功", response['message'])
+                    self.open_ui_thread()
+                    self.root.withdraw()
+                else:
+                    messagebox.showerror("登录失败", response['message'])
 
-        elif request['action'] == 'register':
+            elif request['action'] == 'register':
 
-            if response['status'] == 'success':
-                messagebox.showinfo("注册成功", response['message'])
-            else:
-                messagebox.showerror("注册失败", response['message'])
+                if response['status'] == 'success':
+                    messagebox.showinfo("注册成功", response['message'])
+                else:
+                    messagebox.showerror("注册失败", response['message'])
+        finally:
+            if client_socket:
+                client_socket.close()
 
 
-        client_socket.close()
+    
 
+    def open_ui_thread(self):
+        if self.ui_thread is None or not self.ui_thread.is_alive():
+            self.ui_thread = threading.Thread(target=self.open_ui)
+            self.ui_thread.start()
+            print("UI界面启动成功！")
+        else:
+            print("UI线程正在工作。")
 
+        
     def open_ui(self):
-        subprocess.Popen(['python', 'ui.py'])
+        import ui
 
 if __name__ == "__main__":
-    temp = ui.temp
     root = tk.Tk()
     app = ClientApp(root)
     root.mainloop()

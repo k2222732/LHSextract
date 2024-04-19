@@ -2,6 +2,8 @@ import member_func
 from selenium.webdriver.support.ui import WebDriverWait
 from globalv import chrome_path, chromedriver_path, account, password, url
 
+
+
 def main():
     global member_excel
     global chrome_path
@@ -22,7 +24,6 @@ def main():
     member_func.set_amount_perpage(wait)
     #指定位置创建excel工作簿
     member_func.new_excel(wait, member_total_amount)
-
     input("Press Enter to exit...")
-if __name__ == "__main__":
-    main()
+
+main()

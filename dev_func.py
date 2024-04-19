@@ -124,10 +124,15 @@ def access_dev_database(driver, wait):
 
 
 def switch_role(wait, driver):
-    wait_click_xpath(wait, time_w = 0.5, xpath = '//span[@class = "el-dropdown-link el-dropdown-selfdefine"]')
-    print(f"进入角色下拉列表成功")
-    wait_click_xpath_action(driver, wait, time_w = 0.5, xpath = '//li[contains(text(), "中国共产党山东汶上经济开发区工作委员会")]')
-    print(f"切换角色成功")
+    while 1:
+        try:
+            wait_click_xpath(wait, time_w = 0.5, xpath = '//span[@class = "el-dropdown-link el-dropdown-selfdefine"]')
+            print(f"进入角色下拉列表成功")
+            wait_click_xpath_action(driver, wait, time_w = 0.5, xpath = '//li[contains(text(), "中国共产党山东汶上经济开发区工作委员会")]')
+            print(f"切换角色成功")
+            break
+        except:
+            time.sleep(2)
 
 
 #切换到正式党员信息页面

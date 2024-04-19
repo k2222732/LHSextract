@@ -16,7 +16,6 @@ def main():
     dev_func.switch_role(wait, driver)
     #指定位置创建excel工作簿
     dev_func.new_excel(wait)
-
     input("Press Enter to exit...")
-if __name__ == "__main__":
-    main()
+
+main()

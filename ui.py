@@ -1,24 +1,29 @@
 import tkinter as tk
 from tkinter import ttk
 from tkinter import filedialog
+from tkinter import messagebox
 import os
 import subprocess
 import configparser
+import threading
 
-temp = 0
+role_name_mem = ""
+role_name_org = ""
+role_name_dev = ""
 
-#########
+##############
 class MainApp:
     def __init__(self, root):
+        self.mem_thread = None
+        self.org_thread = None
+        self.dev_thread = None
         self.config_file = 'config.ini'
         self.config = configparser.ConfigParser()
-        
+
 
         self.root = root
         self.root.title("灯塔填表小助手")
-        
         self.tabControl = ttk.Notebook(root)
-
 
 
         # 选项卡1
@@ -53,6 +58,7 @@ class MainApp:
         self.tabControl.add(self.tab6, text="自动填表")
         self.setup_tab6()
 
+
         # 选项卡7
         self.tab6 = ttk.Frame(self.tabControl)
         self.tabControl.add(self.tab6, text="账号信息")
@@ -60,7 +66,6 @@ class MainApp:
 
 
         self.tabControl.pack(expand=1, fill="both")
-
         self.load_config()
     
 
@@ -107,12 +112,21 @@ class MainApp:
 
 
     def setup_tab3(self):
-        ttk.Button(self.tab3, text="同步党员信息", command=self.sync_member_info).grid(row=0, column=1, pady=5, padx=(10, 5))
+        ttk.Button(self.tab3, text="同步党员信息", command=self.open_mem_thread).grid(row=0, column=1, pady=5, padx=(10, 5))
         ttk.Button(self.tab3, text="选择目录", command=self.choose_mem_info_path).grid(row=0, column=2, pady=5, padx=(10, 5))
-        ttk.Button(self.tab3, text="同步党组织信息", command=self.sync_organization_info).grid(row=1, column=1, pady=5, padx=(10, 5))
+        self.role_mem = ttk.Entry(self.tab3, state="normal")
+        self.role_mem.grid(row=0, column=3, columnspan=2, sticky="ew", pady=5, padx=(10, 0))
+        self.role_mem.insert(0, "请输入需下载党员信息的角色(要求名称严格一致)")
+        ttk.Button(self.tab3, text="同步党组织信息", command=self.open_org_thread).grid(row=1, column=1, pady=5, padx=(10, 5))
         ttk.Button(self.tab3, text="选择目录", command=self.choose_org_info_path).grid(row=1, column=2, pady=5, padx=(10, 5))
-        ttk.Button(self.tab3, text="同步发展纪实信息", command=self.sync_development_info).grid(row=2, column=1, pady=5, padx=(10, 5))
+        self.role_org = ttk.Entry(self.tab3, state="normal")
+        self.role_org.grid(row=1, column=3, columnspan=2, sticky="ew", pady=5, padx=(10, 0))
+        self.role_org.insert(0, "请输入需下载党组织信息的角色(要求名称严格一致)")
+        ttk.Button(self.tab3, text="同步发展纪实信息", command=self.open_dev_thread).grid(row=2, column=1, pady=5, padx=(10, 5))
         ttk.Button(self.tab3, text="选择目录", command=self.choose_dev_info_path).grid(row=2, column=2, pady=5, padx=(10, 5))
+        self.role_dev = ttk.Entry(self.tab3, state="normal")
+        self.role_dev.grid(row=2, column=3, columnspan=2, sticky="ew", pady=5, padx=(10, 0))
+        self.role_dev.insert(0, "请输入需下载党员发展信息的角色(要求名称严格一致)")
         
 
 
@@ -155,6 +169,7 @@ class MainApp:
 
     def save_explore_path(self):
         self.save_explore_path_config()
+
 
     def save_explore_path_config(self):
         self.config['Paths_explore'] = {
@@ -210,14 +225,6 @@ class MainApp:
         with open(self.config_file, 'w') as configfile:
             self.config.write(configfile)
 
-    def sync_member_info(self):
-        self.run_script("member.py")
-
-    def sync_organization_info(self):
-        self.run_script("org.py")
-
-    def sync_development_info(self):
-        self.run_script("dev.py")
 
     def choose_directory(self):
         path = filedialog.askopenfilename()
@@ -227,6 +234,60 @@ class MainApp:
         python_executable = os.path.join(os.getcwd(), 'Scripts', 'python')
         script_path = os.path.join(os.getcwd(), script_name)
         subprocess.Popen([python_executable, script_path])
+
+    def open_mem_thread(self):
+        if self.mem_thread is None or not self.mem_thread.is_alive():
+            if self.role_mem.get() == "请输入需下载党员信息的角色(要求名称严格一致)" or None:
+                messagebox.showwarning("提示", "同步数据前请先输入角色名称！")
+            else:
+                global role_name_mem
+                role_name_mem = self.role_mem.get()
+                self.mem_thread = threading.Thread(target=self.open_mem)
+                self.mem_thread.start()
+                print("启动党员信息同步子程序成功！")
+        else:
+            print("党员信息同步子程序正在运行。")
+
+    def open_mem(self):
+        import member
+
+
+
+    def open_org_thread(self):
+        if self.org_thread is None or not self.org_thread.is_alive():
+            if self.role_org.get() == "请输入需下载党组织信息的角色(要求名称严格一致)" or None:
+                messagebox.showwarning("提示", "同步数据前请先输入角色名称！")
+            else:
+                global role_name_org
+                role_name_org = self.role_mem.get()
+                self.org_thread = threading.Thread(target=self.open_org)
+                self.org_thread.start()
+                print("启动党组织信息同步子程序成功！")
+        else:
+            print("党组织信息同步子程序正在运行。")
+
+        
+    def open_org(self):
+        import org
+    
+
+
+    def open_dev_thread(self):
+        if self.dev_thread is None or not self.dev_thread.is_alive():
+            if self.role_dev.get() == "请输入需下载党员发展信息的角色(要求名称严格一致)" or None:
+                messagebox.showwarning("提示", "同步数据前请先输入角色名称！")
+            else:
+                global role_name_dev
+                role_name_dev = self.role_dev.get()
+                self.dev_thread = threading.Thread(target=self.open_dev)
+                self.dev_thread.start()
+                print("启动党员发展信息同步子程序成功！")
+        else:
+            print("党员发展信息同步子程序正在运行。")
+
+        
+    def open_dev(self):
+        import dev
 
 if __name__ == "__main__":
     root = tk.Tk()
