@@ -15,11 +15,16 @@ import time
 import os
 import tkinter as tk
 import configparser
+import threading
 
+stop_event = threading.Event()
 amount_that_complete = 0
 org_directory = ""
 
 captcha = ""
+
+def stop_org_thread():
+    stop_event.set()
 
 def load_config(self):
         if os.path.exists(self.config_file):
@@ -134,10 +139,18 @@ def switch_role(wait):
             droplist.click()
             print(f"进入角色下拉列表成功")
             time.sleep(1)
-            role = wait.until(EC.element_to_be_clickable((By.XPATH, '//SPAN[contains(text(), "中国共产党山东汶上经济开发区工作委员会-具有审批预备党员权限的基层党委管理员")]')))
+            config_file = 'config.ini'
+            config = configparser.ConfigParser()
+            config.read(config_file)
+            role_name_org = config.get('role_org_name', 'name_role_org', fallback='')
+            #print(f'//SPAN[contains(text(), "{role_name_org}")]')
+            role = wait.until(EC.element_to_be_clickable((By.XPATH, f'//SPAN[contains(text(), "{role_name_org}")]')))
             role.click()
-            print(f"切换角色成功")
-            break
+            if wait.until(EC.visibility_of_element_located((By.CSS_SELECTOR, '.avatar-wrapper.fs-dropdown-selfdefine'))).text == f"{role_name_org}":
+                print(f"切换角色成功")
+                break
+            else:
+                pass
         except:
             time.sleep(2)
 
@@ -281,6 +294,7 @@ def synchronizing(wait, org_excel, org_excel_path, driver):
     #采集根组织信息
     downloading(file = org_excel, wait = wait, driver = driver, path = org_excel_path)
 
+
     #获取根节点结构体//div[@class = "tree_wrapper"]//div[@role = "treeitem"]/div[@role = "group"]到tree_root
     while(1):
         try:
@@ -291,8 +305,8 @@ def synchronizing(wait, org_excel, org_excel_path, driver):
 
 
     item_html = tree_root.get_attribute('outerHTML')
-    with open('item_html.txt', 'w', encoding = 'utf-8') as file0:
-        file0.write(item_html)
+    #with open('item_html.txt', 'w', encoding = 'utf-8') as file0:
+        #file0.write(item_html)
 
     #recursion(tree_root)
     recursion(tree_root = tree_root, file = org_excel, wait = wait, driver = driver, path = org_excel_path)
@@ -313,6 +327,11 @@ def recursion(tree_root, file, wait, driver, path):
         # 采集党组织信息
         downloading(file, wait, driver, path)
         # 查看元素下面是否有//span[@class = "is-leaf fs-tree-node__expand-icon fs-icon-caret-right"]
+
+        ##在这里检查线程关闭信号
+
+        if stop_event.is_set():
+            break
 
         item_html = item.get_attribute('outerHTML')
         soup = BeautifulSoup(item_html, 'html.parser')
@@ -438,7 +457,6 @@ def downloading(file, wait, driver, path):
         file.active.cell(row=countx, column=18).value = wait.until(EC.presence_of_element_located((By.XPATH, "//div[contains(text(),  '党组织曾用名')]/following-sibling::*//tbody/tr/td[2]/div/div"))).text
         file.save(path)
 
-
     #切换选项卡
     while(1):
         try:
@@ -453,9 +471,7 @@ def downloading(file, wait, driver, path):
         except:
             company_info = wait.until(EC.element_to_be_clickable((By.XPATH, "//div[contains(text(), '党组织单位信息')]")))
 
-
     #单位名称（全称）#
-
 
     file.active.cell(row=countx, column=19).value = wait.until(EC.presence_of_element_located((By.XPATH, "//label[contains(text(), '单位名称（全称）')]/following-sibling::div"))).text
     file.save(path)
@@ -472,7 +488,6 @@ def downloading(file, wait, driver, path):
             file.active.cell(row=countx, column=19).value = wait.until(EC.presence_of_element_located((By.XPATH, "//label[contains(text(), '单位名称（全称）')]/following-sibling::div"))).text
             file.save(path)
             i_1 = i_1 + 1
-
 
     #UUID#
     file.active.cell(row=countx, column=20).value = wait.until(EC.presence_of_element_located((By.XPATH, "//label[contains(text(), 'UUID')]/following-sibling::div"))).text
@@ -598,7 +613,6 @@ def downloading(file, wait, driver, path):
         file.active.cell(row=countx, column=44).value = wait.until(EC.presence_of_element_located((By.XPATH, "//label[contains(text(), '上级主管部门名称')]/following-sibling::div"))).text
         file.save(path)
 
-
     else:
         file.active.cell(row=countx, column=33).value = "-"
         file.save(path)
@@ -668,7 +682,6 @@ def downloading(file, wait, driver, path):
     # 采集奖励惩戒信息
     table_reward_punish(name_temp, wait)
     
-    
     print("填写第",count,"个党组织",name_temp,"信息成功") 
     amount_that_complete = amount_that_complete + 1
 
@@ -735,16 +748,15 @@ def table_council(org_name: str, wait, driver):
             #tbody = wait.until(EC.visibility_of_element_located((By.XPATH, "(//div[@class = 'fs-table__header-wrapper']/following-sibling::div[@class = 'fs-table__body-wrapper is-scrolling-left'])[2]//tbody")))
     soup = BeautifulSoup(tbody.get_attribute("outerHTML"), 'html.parser')
     tr = soup.find_all('tr')
+
+
     #从tr里提取数据保存在自单元格A3始向右的区域内
     for j, every_row in enumerate(tr, start = 1):
-
         # 从elm_tr里解析出td, 保存在td数组里
-        col = every_row.find_all('td')
-        
+        col = every_row.find_all('td')     
         #将序号i填入第j+2行，第1列
         sheet.cell(row = j+2, column = 1, value = j)
         book.save(excel_file_path)
-
 
         #将党内职务填入第j+2行，第2列
         position = col[1].find_all('span')[-1]
@@ -752,13 +764,11 @@ def table_council(org_name: str, wait, driver):
         sheet.cell(row = j+2, column = 2, value = position_content)
         book.save(excel_file_path)
 
-
         #将姓名填入第j+2行，第3列
         name = col[2].find_all('span')[-1]
         name_content = name.get_text(strip = True)
         sheet.cell(row = j+2, column = 3, value = name_content)
         book.save(excel_file_path)
-
 
         #将公民身份证号码职务填入第j+2行，第4列
         idcard_no = col[3].find_all('div')[-1]
@@ -766,13 +776,11 @@ def table_council(org_name: str, wait, driver):
         sheet.cell(row = j+2, column = 4, value = idcard_no_content)
         book.save(excel_file_path)
 
-
         #将性别填入第j+2行，第5列
         gender = col[4].find_all('span')[-1]
         gender_content = gender.get_text(strip = True)
         sheet.cell(row = j+2, column = 5, value = gender_content)
         book.save(excel_file_path)
-
 
         #将出生日期填入第j+2行，第6列
         birthday = col[5].find_all('span')[-1]
@@ -780,13 +788,11 @@ def table_council(org_name: str, wait, driver):
         sheet.cell(row = j+2, column = 6, value = birthday_content)
         book.save(excel_file_path)
 
-
         #将学历填入第j+2行，第7列
         edu_qual = col[6].find_all('span')[-1]
         edu_qual_content = edu_qual.get_text(strip = True)
         sheet.cell(row = j+2, column = 7, value = edu_qual_content)
         book.save(excel_file_path)
-
 
         #将领导职务填入第j+2行，第8列span
         leader_position = col[7].find_all('span')[-1]
@@ -794,13 +800,11 @@ def table_council(org_name: str, wait, driver):
         sheet.cell(row = j+2, column = 8, value = leader_position_content)
         book.save(excel_file_path)
 
-
         #将任职日期填入第j+2行，第9列span
         appointmentdate = col[8].find_all('span')[-1]
         appointmentdate_content = appointmentdate.get_text(strip = True)
         sheet.cell(row = j+2, column = 9, value = appointmentdate_content)
         book.save(excel_file_path)
-
 
         #将离职日期填入第j+2行，第10列span
         resignationdate = col[9].find_all('span')[-1]
@@ -808,20 +812,17 @@ def table_council(org_name: str, wait, driver):
         sheet.cell(row = j+2, column = 10, value = resignationdate_content)
         book.save(excel_file_path)
 
-
         #将排序填入第j+2行，第11列div
         sort = col[10].find_all('div')[-1]
         sort_content = sort.get_text(strip = True)
         sheet.cell(row = j+2, column = 11, value = sort_content)
         book.save(excel_file_path)
 
-
         #将公司职务填入第j+2行，第12列div
         companyposition = col[11].find_all('div')[-1]
         companyposition_content = companyposition.get_text(strip = True)
         sheet.cell(row = j+2, column = 12, value = companyposition_content)
         book.save(excel_file_path)
-
     #释放资源
     book.close()
     

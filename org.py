@@ -1,4 +1,3 @@
-
 import org_func
 from selenium.webdriver.support.ui import WebDriverWait
 from globalv import url
@@ -35,7 +34,8 @@ def main():
     org_func.switch_item_org(wait)
     #指定位置创建excel工作簿
     org_func.new_excel(wait, driver)
+    org_func.stop_event.clear()
     input("Press Enter to exit...")
 
-
-main()
+if __name__ == "__main__":
+    main()

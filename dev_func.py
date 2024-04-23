@@ -16,6 +16,12 @@ import os
 import re
 import tkinter as tk
 import configparser
+import threading
+stop_event = threading.Event()
+
+def stop_dev_thread():
+    stop_event.set()
+
 
 
 
@@ -128,7 +134,11 @@ def switch_role(wait, driver):
         try:
             wait_click_xpath(wait, time_w = 0.5, xpath = '//span[@class = "el-dropdown-link el-dropdown-selfdefine"]')
             print(f"进入角色下拉列表成功")
-            wait_click_xpath_action(driver, wait, time_w = 0.5, xpath = '//li[contains(text(), "中国共产党山东汶上经济开发区工作委员会")]')
+            config_file = 'config.ini'
+            config = configparser.ConfigParser()
+            config.read(config_file)
+            role_name_dev = config.get('role_dev_name', 'name_role_dev', fallback='')
+            wait_click_xpath_action(driver, wait, time_w = 0.5, xpath = f'//li[contains(text(), "{role_name_dev}")]')
             print(f"切换角色成功")
             break
         except:
@@ -211,9 +221,13 @@ def new_excel(wait):
         switch_formal_mem(wait)
         mem_total_amount = get_total_amount(wait, xpath = "//span[@class = 'el-pagination__total']")
         synchronizing(wait, member_excel, excel_file_path, control=1)
+        if stop_event.is_set():
+            return
         switch_informal_mem(wait)
         infomem_total_amount = get_total_amount(wait, xpath = "//span[@class = 'el-pagination__total']")
         synchronizing(wait, member_excel, excel_file_path, control=2)
+        if stop_event.is_set():
+            return
         switch_devtarg(wait)
         temp = wait.until(EC.presence_of_element_located((By.ID, "tabls")))
         temp_html = temp.get_attribute("outerHTML")
@@ -222,12 +236,18 @@ def new_excel(wait):
         else:
             devtar_total_amount = get_total_amount(wait, xpath = "//span[@class = 'el-pagination__total']")
             synchronizing(wait, member_excel, excel_file_path, control=3)
+        if stop_event.is_set():
+            return
         switch_activist(wait)
         activist_total_amount = get_total_amount(wait, xpath = "//span[@class = 'el-pagination__total']")
         synchronizing(wait, member_excel, excel_file_path, control=4)
+        if stop_event.is_set():
+            return
         switch_applicant(wait)
         applicant_total_amount = get_total_amount(wait, xpath = "//span[@class = 'el-pagination__total']")
         synchronizing(wait, member_excel, excel_file_path, control=5)
+        if stop_event.is_set():
+            return
 
 
 def rebuild(excel_file_path, wait, member_excel):
@@ -263,8 +283,12 @@ def rebuild(excel_file_path, wait, member_excel):
     if a <= mem_total_amount:
         amount_mem_complete = a
         synchronizing(wait, member_excel, excel_file_path, control = 1)
+        if stop_event.is_set():
+            return
         switch_informal_mem(wait)
         synchronizing(wait, member_excel, excel_file_path, control=2)
+        if stop_event.is_set():
+            return
         switch_devtarg(wait)
         temp = wait.until(EC.presence_of_element_located((By.ID, "tabls")))
         temp_html = temp.get_attribute("outerHTML")
@@ -273,14 +297,22 @@ def rebuild(excel_file_path, wait, member_excel):
         else:
             devtar_total_amount = get_total_amount(wait, xpath = "//span[@class = 'el-pagination__total']")
         synchronizing(wait, member_excel, excel_file_path, control=3)
+        if stop_event.is_set():
+            return
         switch_activist(wait)
         synchronizing(wait, member_excel, excel_file_path, control=4)
+        if stop_event.is_set():
+            return
         switch_applicant(wait)
         synchronizing(wait, member_excel, excel_file_path, control=5)
+        if stop_event.is_set():
+            return
     elif a>mem_total_amount and a <= mem_total_amount + infomem_total_amount:
         amount_mem_complete = mem_total_amount
         amount_infomem_complete = a - mem_total_amount
         synchronizing(wait, member_excel, excel_file_path, control = 2)
+        if stop_event.is_set():
+            return
         switch_devtarg(wait)
         temp = wait.until(EC.presence_of_element_located((By.ID, "tabls")))
         temp_html = temp.get_attribute("outerHTML")
@@ -289,27 +321,43 @@ def rebuild(excel_file_path, wait, member_excel):
         else:
             devtar_total_amount = get_total_amount(wait, xpath = "//span[@class = 'el-pagination__total']")
         synchronizing(wait, member_excel, excel_file_path, control=3)
+        if stop_event.is_set():
+            return
         switch_activist(wait)
         synchronizing(wait, member_excel, excel_file_path, control=4)
+        if stop_event.is_set():
+            return
         switch_applicant(wait)
         synchronizing(wait, member_excel, excel_file_path, control=5)
+        if stop_event.is_set():
+            return
     elif a>mem_total_amount + infomem_total_amount and a <= mem_total_amount + infomem_total_amount + devtar_total_amount:
         amount_mem_complete = mem_total_amount
         amount_infomem_complete = infomem_total_amount
         amount_devtar_complete = a - (mem_total_amount + infomem_total_amount)
         synchronizing(wait, member_excel, excel_file_path, control = 3)
+        if stop_event.is_set():
+            return
         switch_activist(wait)
         synchronizing(wait, member_excel, excel_file_path, control=4)
+        if stop_event.is_set():
+            return
         switch_applicant(wait)
         synchronizing(wait, member_excel, excel_file_path, control=5)
+        if stop_event.is_set():
+            return
     elif a>mem_total_amount + infomem_total_amount + devtar_total_amount and a <= mem_total_amount + infomem_total_amount + devtar_total_amount + activist_total_amount:
         amount_mem_complete = mem_total_amount
         amount_infomem_complete = infomem_total_amount
         amount_devtar_complete = devtar_total_amount
         amount_activist_complete = a - (mem_total_amount + infomem_total_amount + devtar_total_amount)
         synchronizing(wait, member_excel, excel_file_path, control = 4)
+        if stop_event.is_set():
+            return
         switch_applicant(wait)
         synchronizing(wait, member_excel, excel_file_path, control=5)
+        if stop_event.is_set():
+            return
     elif a>mem_total_amount + infomem_total_amount + devtar_total_amount + activist_total_amount and a <= mem_total_amount + infomem_total_amount + devtar_total_amount + activist_total_amount + applicant_total_amount :
         amount_mem_complete = mem_total_amount
         amount_infomem_complete = infomem_total_amount
@@ -317,6 +365,8 @@ def rebuild(excel_file_path, wait, member_excel):
         amount_activist_complete = activist_total_amount
         amount_applicant_complete = a - (mem_total_amount + infomem_total_amount + devtar_total_amount + activist_total_amount)
         synchronizing(wait, member_excel, excel_file_path, control = 5)
+        if stop_event.is_set():
+            return
 
 def init_complete_amount(excel_file_path):
     df = pd.read_excel(excel_file_path, sheet_name=0)
@@ -407,9 +457,8 @@ def schedule(complete, total, xpath, wait, member_excel, member_excel_path, cont
                 if '入党申请人基本信息' in driver0.page_source:
                     break
         except:
-            time.sleep(1)
+            time.sleep(0.3)
         print(f"进入入党申请人基本信息页面成功")
-
         downloading(file = member_excel, wait = wait, path = member_excel_path, control = control)
         driver0.close()
         try:
@@ -418,7 +467,11 @@ def schedule(complete, total, xpath, wait, member_excel, member_excel_path, cont
                 if '发展党员纪实' in driver0.title:
                     break
         except:
-            time.sleep(1)
+            time.sleep(0.3)
+
+        ##在这里检查线程关闭信号
+        if stop_event.is_set():
+            break
 
         if control == 1:
             complete = amount_mem_complete
@@ -530,8 +583,14 @@ def downloading(file, wait, path, control):
             except:
                 company_info = wait.until(EC.element_to_be_clickable((By.XPATH, "//div[contains(text(), '入党积极分子基本信息')]")))
         #籍贯
-        file.active.cell(row=countx, column=14).value = wait.until(EC.presence_of_element_located((By.XPATH, "(//tbody)[2]/tr[3]/td[4]//span[1]"))).text
-        file.save(path)
+        while 1:
+            jiguan = wait.until(EC.presence_of_element_located((By.XPATH, "(//tbody)[2]/tr[3]/td[4]//span[1]"))).text
+            if jiguan == "":
+                pass
+            else:
+                file.active.cell(row=countx, column=14).value = jiguan
+                file.save(path)
+                break
         #入团日期
         file.active.cell(row=countx, column=15).value = wait.until(EC.presence_of_element_located((By.XPATH, "((//tbody)[2]/tr[4]/td[4]//span)[1]"))).text
         file.save(path)
@@ -1094,7 +1153,6 @@ def downloading(file, wait, path, control):
             file.active.cell(row=countx, column=27).value = "入党申请人"
             print("填写第",count,"个入党申请人",name_temp,"信息成功") 
             amount_applicant_complete = amount_applicant_complete + 1
-
 
 
 

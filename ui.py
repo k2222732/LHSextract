@@ -6,6 +6,12 @@ import os
 import subprocess
 import configparser
 import threading
+import member
+import org
+import dev
+import member_func
+import org_func
+import dev_func
 
 role_name_mem = ""
 role_name_org = ""
@@ -19,6 +25,7 @@ class MainApp:
         self.dev_thread = None
         self.config_file = 'config.ini'
         self.config = configparser.ConfigParser()
+        self.config.read(self.config_file)
 
 
         self.root = root
@@ -71,7 +78,6 @@ class MainApp:
 
     def load_config(self):
         if os.path.exists(self.config_file):
-            self.config.read(self.config_file)
             self.explore_driver_path.insert(0, self.config.get('Paths_driver', 'explore_driver_path', fallback=''))
             self.explore_path.insert(0, self.config.get('Paths_explore', 'explore_path', fallback=''))
             self.lhaccount.insert(0, self.config.get('Account', 'account', fallback=''))
@@ -116,17 +122,23 @@ class MainApp:
         ttk.Button(self.tab3, text="选择目录", command=self.choose_mem_info_path).grid(row=0, column=2, pady=5, padx=(10, 5))
         self.role_mem = ttk.Entry(self.tab3, state="normal")
         self.role_mem.grid(row=0, column=3, columnspan=2, sticky="ew", pady=5, padx=(10, 0))
-        self.role_mem.insert(0, "请输入需下载党员信息的角色(要求名称严格一致)")
+        self.role_mem.insert(0, self.config.get('role_mem_name', 'name_role_mem', fallback=''))
+        ttk.Button(self.tab3, text="停止", command=self.close_thread_mem).grid(row=0, column=5, pady=5, padx=(10, 5))
+
         ttk.Button(self.tab3, text="同步党组织信息", command=self.open_org_thread).grid(row=1, column=1, pady=5, padx=(10, 5))
         ttk.Button(self.tab3, text="选择目录", command=self.choose_org_info_path).grid(row=1, column=2, pady=5, padx=(10, 5))
         self.role_org = ttk.Entry(self.tab3, state="normal")
         self.role_org.grid(row=1, column=3, columnspan=2, sticky="ew", pady=5, padx=(10, 0))
-        self.role_org.insert(0, "请输入需下载党组织信息的角色(要求名称严格一致)")
+        self.role_org.insert(0, self.config.get('role_org_name', 'name_role_org', fallback=''))
+        ttk.Button(self.tab3, text="停止", command=self.close_thread_org).grid(row=1, column=5, pady=5, padx=(10, 5))
+
         ttk.Button(self.tab3, text="同步发展纪实信息", command=self.open_dev_thread).grid(row=2, column=1, pady=5, padx=(10, 5))
         ttk.Button(self.tab3, text="选择目录", command=self.choose_dev_info_path).grid(row=2, column=2, pady=5, padx=(10, 5))
         self.role_dev = ttk.Entry(self.tab3, state="normal")
         self.role_dev.grid(row=2, column=3, columnspan=2, sticky="ew", pady=5, padx=(10, 0))
-        self.role_dev.insert(0, "请输入需下载党员发展信息的角色(要求名称严格一致)")
+        self.role_dev.insert(0, self.config.get('role_dev_name', 'name_role_dev', fallback=''))
+        ttk.Button(self.tab3, text="停止", command=self.close_thread_dev).grid(row=2, column=5, pady=5, padx=(10, 5))
+        
         
 
 
@@ -236,60 +248,79 @@ class MainApp:
         subprocess.Popen([python_executable, script_path])
 
     def open_mem_thread(self):
+        self.config['role_mem_name'] = {
+        'name_role_mem': self.role_mem.get()
+        }
+        with open(self.config_file, 'w') as configfile:
+            self.config.write(configfile)
+        temp_mem_role_name = self.config.get('role_mem_name', 'name_role_mem', fallback='')#
         if self.mem_thread is None or not self.mem_thread.is_alive():
-            if self.role_mem.get() == "请输入需下载党员信息的角色(要求名称严格一致)" or None:
-                messagebox.showwarning("提示", "同步数据前请先输入角色名称！")
+            
+            if temp_mem_role_name == "":
+                messagebox.showwarning("提示", "同步数据前请先输入角色名称！要求一字不差！")
             else:
-                global role_name_mem
-                role_name_mem = self.role_mem.get()
-                self.mem_thread = threading.Thread(target=self.open_mem)
+                self.mem_thread = threading.Thread(target=member.main)
                 self.mem_thread.start()
                 print("启动党员信息同步子程序成功！")
         else:
             print("党员信息同步子程序正在运行。")
 
-    def open_mem(self):
-        import member
+
+    def close_thread_mem(self):
+        member_func.stop_member_thread()
+        self.mem_thread = None
+
 
 
 
     def open_org_thread(self):
+        self.config['role_org_name'] = {
+        'name_role_org': self.role_mem.get()
+        }
+        with open(self.config_file, 'w') as configfile:
+            self.config.write(configfile)
+        temp_org_role_name = self.config.get('role_org_name', 'name_role_org', fallback='')#
         if self.org_thread is None or not self.org_thread.is_alive():
-            if self.role_org.get() == "请输入需下载党组织信息的角色(要求名称严格一致)" or None:
-                messagebox.showwarning("提示", "同步数据前请先输入角色名称！")
+            if temp_org_role_name == "":
+                messagebox.showwarning("提示", "同步数据前请先输入角色名称！要求一字不差！")
             else:
-                global role_name_org
-                role_name_org = self.role_mem.get()
-                self.org_thread = threading.Thread(target=self.open_org)
+                self.org_thread = threading.Thread(target=org.main)
                 self.org_thread.start()
                 print("启动党组织信息同步子程序成功！")
         else:
             print("党组织信息同步子程序正在运行。")
 
         
-    def open_org(self):
-        import org
-    
+    def close_thread_org(self):
+        org_func.stop_org_thread()
+        #self.org_thread.join()
+        self.org_thread = None
+        
 
 
     def open_dev_thread(self):
+        self.config['role_dev_name'] = {
+        'name_role_dev': self.role_dev.get()
+        }
+        with open(self.config_file, 'w') as configfile:
+            self.config.write(configfile)
+        temp_dev_role_name = self.config.get('role_dev_name', 'name_role_dev', fallback='')#
         if self.dev_thread is None or not self.dev_thread.is_alive():
-            if self.role_dev.get() == "请输入需下载党员发展信息的角色(要求名称严格一致)" or None:
-                messagebox.showwarning("提示", "同步数据前请先输入角色名称！")
+            if temp_dev_role_name == "":
+                messagebox.showwarning("提示", "同步数据前请先输入角色名称！要求一字不差！")
             else:
-                global role_name_dev
-                role_name_dev = self.role_dev.get()
-                self.dev_thread = threading.Thread(target=self.open_dev)
+                self.dev_thread = threading.Thread(target=dev.main)
                 self.dev_thread.start()
                 print("启动党员发展信息同步子程序成功！")
         else:
             print("党员发展信息同步子程序正在运行。")
 
-        
-    def open_dev(self):
-        import dev
 
-if __name__ == "__main__":
-    root = tk.Tk()
-    app = MainApp(root)
-    root.mainloop()
+    def close_thread_dev(self):
+        dev_func.stop_dev_thread()
+        self.dev_thread = None
+
+
+root = tk.Tk()
+app = MainApp(root)
+root.mainloop()

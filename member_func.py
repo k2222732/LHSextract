@@ -8,19 +8,24 @@ from openpyxl import load_workbook
 from selenium import webdriver
 from datetime import datetime
 import pandas as pd
-import time 
+import time
 import os
 import re
 import inspect
 import configparser
 import tkinter as tk
-from ui import role_name_mem
-
-
+from tkinter import messagebox
+import sys
+import threading
+stop_event = threading.Event()
 captcha = ""
 
 amount_that_complete = 0
 mem_directory = ""
+
+def stop_member_thread():
+    stop_event.set()
+
 
 def driver_create(chrome_path, chromedriver_path):
     chrome_options = Options()
@@ -38,7 +43,12 @@ def driver_create(chrome_path, chromedriver_path):
 def login(account, password, driver, url, wait):
     while(1):
         # 打开网址
-        driver.get(url)
+        try:
+            driver.get(url)
+        except:
+            messagebox.showwarning("提示", "请确保零信任系统已经开启重启再试")
+            sys.exit()
+        
         username_box = wait.until(EC.visibility_of_element_located((By.ID, 'username')))
         password_box = wait.until(EC.visibility_of_element_located((By.ID, 'password')))
         validatecode = wait.until(EC.visibility_of_element_located((By.ID, 'validateCode')))
@@ -113,7 +123,7 @@ def access_member_database(driver, wait):
 
 
 def switch_role(wait):
-    global role_name_mem
+    
     while 1:
         try:
             droplist = wait.until(EC.element_to_be_clickable((By.CSS_SELECTOR, '.avatar-wrapper.fs-dropdown-selfdefine')))
@@ -121,11 +131,17 @@ def switch_role(wait):
             print(f"进入角色下拉列表成功")
             time.sleep(1)
             #role = wait.until(EC.element_to_be_clickable((By.XPATH, '//SPAN[contains(text(), "中国共产党山东汶上经济开发区工作委员会-具有审批预备党员权限的基层党委管理员")]')))
-            print(f"//SPAN[contains(text(), '{role_name_mem}')]")
+            config_file = 'config.ini'
+            config = configparser.ConfigParser()
+            config.read(config_file)
+            role_name_mem = config.get('role_mem_name', 'name_role_mem', fallback='')
             role = wait.until(EC.element_to_be_clickable((By.XPATH, f"//SPAN[contains(text(), '{role_name_mem}')]")))
             role.click()
-            print(f"切换角色成功")
-            break
+            if wait.until(EC.visibility_of_element_located((By.CSS_SELECTOR, '.avatar-wrapper.fs-dropdown-selfdefine'))).text == f"{role_name_mem}":
+                print(f"切换角色成功")
+                break
+            else:
+                pass
         except:
             time.sleep(2)
 
@@ -235,18 +251,25 @@ def synchronizing(wait, member_total_amount, member_excel, member_excel_path):
             except:
                 access_info_page(wait, row_number)
         amount_that_complete = amount_that_complete + 1
+        ##在这里检查线程关闭信号
+        if stop_event.is_set():
+            break
+    
 
 
 def downloading(count, file, wait, path):
     print("Current line number:", os.path.basename(__file__), inspect.currentframe().f_back.f_lineno)
-    time.sleep(0.1)
-    rylb = wait.until(EC.presence_of_element_located((By.XPATH, "(//div[@class = 'card-class']//div[@class = 'fs-tabs__content']//div[@class = 'row-val-shot'])[7]"))).text
-    if rylb == '正式党员':
-        downloading_formal(count, file, wait, path)
-    elif rylb == '预备党员':
-        downloading_informal(count, file, wait, path)
-    else:
-        print('既不是正式党员也不是预备党员')
+    while 1:
+            rylb = wait.until(EC.presence_of_element_located((By.XPATH, "(//div[@class = 'card-class']//div[@class = 'fs-tabs__content']//div[@class = 'row-val-shot'])[7]"))).text
+            if rylb == '正式党员':
+                downloading_formal(count, file, wait, path)
+                break
+            elif rylb == '预备党员':
+                downloading_informal(count, file, wait, path)
+                break
+            else:
+                print('既不是正式党员也不是预备党员')
+        
 
 
 def downloading_informal(count, file, wait, path):
@@ -302,7 +325,13 @@ def downloading_informal(count, file, wait, path):
     file.active.cell(row=countx, column=17).value = wait.until(EC.presence_of_element_located((By.XPATH, "(//div[@class = 'card-class']//div[@class = 'fs-tabs__content']//div[@class = 'row-val-big'])[2]"))).text
     file.save(path)
     #工作岗位
-    file.active.cell(row=countx, column=16).value = wait.until(EC.presence_of_element_located((By.XPATH, "(//div[@class = 'card-class']//div[@class = 'fs-tabs__content']//div[@class = 'row-val-big'])[1]"))).text
+    temp_job = wait.until(EC.presence_of_element_located((By.XPATH, "(//div[@class = 'card-class']//div[@class = 'fs-tabs__content']//div[@class = 'row-val-big'])[1]"))).text
+    while 1:
+        if temp_job == "":
+            temp_job = wait.until(EC.presence_of_element_located((By.XPATH, "(//div[@class = 'card-class']//div[@class = 'fs-tabs__content']//div[@class = 'row-val-big'])[1]"))).text
+        else:
+            break
+    file.active.cell(row=countx, column=16).value = temp_job
     file.save(path)
     #从事专业技术职务
     file.active.cell(row=countx, column=19).value = wait.until(EC.presence_of_element_located((By.XPATH, "((//div[@class = 'table-row'])[8]//div[@class= 'select-dict'])[1]"))).text

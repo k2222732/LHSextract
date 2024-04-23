@@ -24,6 +24,8 @@ def main():
     member_func.set_amount_perpage(wait)
     #指定位置创建excel工作簿
     member_func.new_excel(wait, member_total_amount)
+    member_func.stop_event.clear()
     input("Press Enter to exit...")
 
-main()
+if __name__ == "__main__":
+    main()
