@@ -97,7 +97,7 @@ class ClientApp:
                 if response['status'] == 'success':
                     messagebox.showinfo("登录成功", response['message'])
                     self.open_ui_thread()
-                    self.root.withdraw()
+                    self.root.destroy()
                 else:
                     messagebox.showerror("登录失败", response['message'])
 

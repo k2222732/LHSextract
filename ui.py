@@ -12,6 +12,7 @@ import dev
 import member_func
 import org_func
 import dev_func
+import login
 
 role_name_mem = ""
 role_name_org = ""
@@ -113,7 +114,7 @@ class MainApp:
 
 
     def setup_tab2(self):
-        pass
+        ttk.Button(self.tab2, text="一键登录", command=self.open_login).grid(row=0, column=1, pady=5, padx=(10, 5))
         
 
 
@@ -155,6 +156,10 @@ class MainApp:
 
     def setup_tab7(self):
         pass
+
+    def open_login(self):
+        start = threading.Thread(target=login.main)
+        start.start()
 
 
     def choose_explore_path(self):
@@ -268,7 +273,8 @@ class MainApp:
 
     def close_thread_mem(self):
         member_func.stop_member_thread()
-        self.mem_thread = None
+        self.mem_thread.join()
+        
 
 
 
@@ -293,10 +299,9 @@ class MainApp:
         
     def close_thread_org(self):
         org_func.stop_org_thread()
-        #self.org_thread.join()
-        self.org_thread = None
+        self.org_thread.join()
         
-
+        
 
     def open_dev_thread(self):
         self.config['role_dev_name'] = {
@@ -318,9 +323,20 @@ class MainApp:
 
     def close_thread_dev(self):
         dev_func.stop_dev_thread()
-        self.dev_thread = None
+        self.dev_thread.join()
+        
+    def on_closing(self):
+        if self.mem_thread is not None and self.mem_thread.is_alive():
+            self.close_thread_mem()
+        if self.org_thread is not None and self.org_thread.is_alive():
+            self.close_thread_org()
+        if self.dev_thread is not None and self.dev_thread.is_alive():
+            self.close_thread_dev()
+        self.root.destroy()
 
 
 root = tk.Tk()
 app = MainApp(root)
+root.protocol("WM_DELETE_WINDOW", app.on_closing)
 root.mainloop()
+

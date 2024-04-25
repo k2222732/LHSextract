@@ -1,19 +1,12 @@
 from selenium.webdriver.support import expected_conditions as EC
-from selenium.webdriver.chrome.options import Options
-from selenium.webdriver.chrome.service import Service
 from selenium.common.exceptions import NoSuchElementException
 from selenium.webdriver.common.by import By
-from selenium.webdriver.common.keys import Keys
-#import xlwings as xw
 from openpyxl import load_workbook
-from selenium import webdriver
 from datetime import datetime
 from bs4 import BeautifulSoup
-from openpyxl import load_workbook
 import pandas as pd
 import time
 import os
-import tkinter as tk
 import configparser
 import threading
 
@@ -31,79 +24,6 @@ def load_config(self):
             self.config.read(self.config_file)
             self.explore_driver_path.insert(0, self.config.get('Paths', 'explore_driver_path', fallback=''))
 
-def driver_create(chrome_path, chromedriver_path):
-    chrome_options = Options()
-    # 替换为你的 Chrome 浏览器的实际安装路径
-    chrome_options.binary_location = chrome_path  
-    # 创建 Service 对象并指定 ChromeDriver 的路径
-    service = Service(executable_path=chromedriver_path)
-    # 启动 WebDriver
-    driver = webdriver.Chrome(service=service, options=chrome_options)
-    #返回driver
-    print(f"浏览器驱动创建成功")
-    return driver
-
-
-def login(account, password, driver, url, wait):
-    while(1):
-        # 打开网址
-        driver.get(url)
-        username_box = wait.until(EC.visibility_of_element_located((By.ID, 'username')))
-        password_box = wait.until(EC.visibility_of_element_located((By.ID, 'password')))
-        validatecode = wait.until(EC.visibility_of_element_located((By.ID, 'validateCode')))
-        login_button = wait.until(EC.element_to_be_clickable((By.CSS_SELECTOR, '.js-submit.tianze-loginbtn')))
-        username_box.send_keys(Keys.CONTROL + "a")
-        username_box.send_keys(Keys.BACKSPACE)
-        username_box.send_keys(account)
-        password_box.send_keys(Keys.CONTROL + "a")
-        password_box.send_keys(Keys.BACKSPACE)
-        password_box.send_keys(password)
-        # 等待手动输入验证码
-        get_captcha()
-        validatecode.send_keys(Keys.CONTROL + "a")
-        validatecode.send_keys(Keys.BACKSPACE)
-        validatecode.send_keys(captcha)
-        # 点击登录按钮
-        login_button.click()
-        #等待1秒
-        time.sleep(2)
-        #获取当前网页的doom
-        response = driver.page_source
-        #检查doom里是否有"您上次登录是"字样
-        if "您上次登录是" in response:
-        #如果有打印登录成功，跳出循环
-            break
-        #如果没有继续本函数上面代码
-        else:
-            continue
-    print(f"登录成功")
-
-
-def get_captcha():
-    window = tk.Tk()
-    window.title("请输入验证码")
-    window.geometry("300x100")
-
-    # 创建标签
-    label = tk.Label(window, text="请输入验证码(不区分大小写):")
-    label.pack()
-
-    # 创建输入框
-    entry = tk.Entry(window)
-    entry.pack()
-
-    # 定义获取输入值的函数
-    def submit():
-        global captcha
-        captcha = entry.get()
-        window.destroy()
- 
-    # 创建按钮
-    button = tk.Button(window, text="确定", command=submit)
-    button.pack()
-
-    # 运行窗口
-    window.mainloop()
 
 
 def access_org_database(driver, wait):
@@ -304,7 +224,7 @@ def synchronizing(wait, org_excel, org_excel_path, driver):
             time.sleep(0.5)
 
 
-    item_html = tree_root.get_attribute('outerHTML')
+    #item_html = tree_root.get_attribute('outerHTML')
     #with open('item_html.txt', 'w', encoding = 'utf-8') as file0:
         #file0.write(item_html)
 
@@ -480,7 +400,7 @@ def downloading(file, wait, driver, path):
         try:
             df = file.active.cell(row=countx, column=19).value
             file.save(path)
-            print("df:",df)
+            #print("df:",df)
             assert df != ""
             break
         except AssertionError:
