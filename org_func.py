@@ -838,7 +838,6 @@ def table_reward_punish(org_name: str, wait):
             passdate_content = passdate.get_text(strip = True)
             sheet.cell(row = j+2, column = 4, value = passdate_content)
             book.save(excel_file_path)
-
     #释放资源
     book.close()
 
@@ -849,8 +848,3 @@ def element_exists(driver, by, value):
         return True
     except NoSuchElementException:
         return False
-    
-
-
-
-
