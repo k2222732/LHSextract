@@ -34,7 +34,7 @@ applicant_total_amount = 0
 dev_directory = ""
 
 driver0 = ""
-
+temp_countx = 0
 
 def access_dev_database(driver, wait):
     global driver0
@@ -133,7 +133,7 @@ def new_excel(wait):
         os.makedirs(dev_directory, exist_ok=True)
         columns = ["序号", "姓名","性别","公民身份证号码","民族","出生日期","学历","申请入党日期","手机号码","背景信息","工作岗位",
                 "政治面貌","接受申请党组织","籍贯","入团日期","参加工作日期","申请入党日期","确定入党积极分子日期",
-                "工作单位及职务","家庭住址","加入党组织日期","转为正式党员日期","人员类别","党籍状态","入党类型","所在党支部", "人员类型"]
+                "工作单位及职务","家庭住址","加入党组织日期","转为正式党员日期","人员类别","党籍状态","入党类型","所在党支部", "人员类型", "隶属党组织"]
             
         df = pd.DataFrame(columns=columns)
         df.to_excel(excel_file_path, index=False)
@@ -371,7 +371,7 @@ def schedule(complete, total, xpath, wait, member_excel, member_excel_path, cont
         input_page.send_keys(Keys.BACKSPACE)
         input_page.send_keys(page_number)
         input_page.send_keys(Keys.RETURN)
-        access_info_page(wait, row_number)
+        access_info_page(wait, row_number, file = member_excel, path = member_excel_path)
         try:
             for handle in driver0.window_handles:
                 driver0.switch_to.window(handle)
@@ -407,9 +407,15 @@ def schedule(complete, total, xpath, wait, member_excel, member_excel_path, cont
 
 
 
-def access_info_page(wait, row):
-
-    wait_click_xpath(wait, time_w = 0.5, xpath = f"//table[@class = 'el-table__body']/tbody/tr[{row}]/td[1]//a")
+def access_info_page(wait, rowx, file, path):
+    global temp_countx
+    lishudangzuzhi = wait.until(EC.visibility_of_element_located((By.XPATH, f"//table[@class = 'el-table__body']/tbody/tr[{rowx}]/td[5]//a"))).text
+    file.active.cell(row=temp_countx+2, column=28).value = lishudangzuzhi
+    file.save(path)
+    wait_click_xpath(wait, time_w = 0.5, xpath = f"//table[@class = 'el-table__body']/tbody/tr[{rowx}]/td[1]//a")
+    
+    
+    
 
 
 def bitian_located(file, path, row, column, wait, str):
@@ -435,6 +441,7 @@ def downloading(file, wait, path, control):
     global amount_activist_complete
     global amount_devtar_complete
     global amount_applicant_complete
+    global temp_countx
     if control == 1:
         count = amount_mem_complete
     elif control == 2:
@@ -449,6 +456,7 @@ def downloading(file, wait, path, control):
     if control == 1:
         count = count + 1
         countx = count + 1
+        temp_countx = count
         #填写序号
         file.active.cell(row=countx, column=1).value = count
         file.save(path)
@@ -592,6 +600,7 @@ def downloading(file, wait, path, control):
     elif control == 2:
         count = count + 1
         countx = count + 1
+        temp_countx = count
         #填写序号
         file.active.cell(row=countx, column=1).value = count
         
@@ -719,6 +728,7 @@ def downloading(file, wait, path, control):
     elif control == 3:
         count = count + 1
         countx = count + 1
+        temp_countx = count
         #填写序号
         file.active.cell(row=countx, column=1).value = count
         
@@ -832,6 +842,7 @@ def downloading(file, wait, path, control):
     elif control == 4:
         count = count + 1
         countx = count + 1
+        temp_countx = count
         #填写序号
         file.active.cell(row=countx, column=1).value = count
         
@@ -946,6 +957,7 @@ def downloading(file, wait, path, control):
     elif control == 5:
         count = count + 1
         countx = count + 1
+        temp_countx = count
         #填写序号
         file.active.cell(row=countx, column=1).value = count
        
@@ -1052,6 +1064,7 @@ def downloading(file, wait, path, control):
             file.save(path)
             # 人员类型
             file.active.cell(row=countx, column=27).value = "入党申请人"
+            file.save(path)
             print("填写第",count,"个入党申请人",name_temp,"信息成功") 
             amount_applicant_complete = amount_applicant_complete + 1
         else:
@@ -1096,7 +1109,9 @@ def downloading(file, wait, path, control):
             file.save(path)
             # 人员类型
             file.active.cell(row=countx, column=27).value = "入党申请人"
+
             print("填写第",count,"个入党申请人",name_temp,"信息成功") 
+            file.save(path)
             amount_applicant_complete = amount_applicant_complete + 1
 
 

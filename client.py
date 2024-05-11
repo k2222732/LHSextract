@@ -27,12 +27,14 @@ class ClientApp:
         self.login_button.grid(row=2, column=1, sticky=tk.E, pady=5)
         self.register_button.grid(row=2, column=2, sticky=tk.W, pady=5)
 
+
     def login(self):
         username = self.entry_username.get()
         password = self.entry_password.get()
 
         request = {'action': 'login', 'username': username, 'password': password}
         self.send_request(request)
+
 
     def register(self):
         self.root.withdraw()
@@ -65,7 +67,8 @@ class ClientApp:
         self.cancel_button_r = tk.Button(self.registration_window, text="取消", command=self.reg_cancel)
         self.register_button_r.grid(row=5, column=1, padx=5, pady=5)
         self.cancel_button_r.grid(row=5, column=2, padx=5, pady=5)
-        pass
+        
+
 
     def reg_confirm(self):
         user_name = self.entry_username_r.get()
@@ -78,12 +81,15 @@ class ClientApp:
         self.registration_window.destroy()
         self.root.deiconify()
 
+
     def reg_cancel(self):
         self.registration_window.destroy()
         self.root.deiconify()
 
+
     def show_login_window(self):
         self.root.deiconify()
+
 
     def send_request(self, request):
         try:
@@ -112,21 +118,22 @@ class ClientApp:
                 client_socket.close()
 
 
-    
-
     def open_ui_thread(self):
         if self.ui_thread is None or not self.ui_thread.is_alive():
-            self.ui_thread = threading.Thread(target=self.open_ui)
+            self.ui_thread = threading.Thread(target=self.load_ui)
             self.ui_thread.start()
             print("UI界面启动成功！")
         else:
             print("UI线程正在工作。")
 
-        
-    def open_ui(self):
+
+    def load_ui(self):
         import ui
+
 
 if __name__ == "__main__":
     root = tk.Tk()
     app = ClientApp(root)
     root.mainloop()
+
+

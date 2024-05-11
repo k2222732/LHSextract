@@ -10,14 +10,17 @@ import os
 import configparser
 import threading
 
+
 stop_event = threading.Event()
 amount_that_complete = 0
 org_directory = ""
-
 captcha = ""
+
 
 def stop_org_thread():
     stop_event.set()
+
+
 
 def load_config(self):
         if os.path.exists(self.config_file):
@@ -52,6 +55,7 @@ def access_org_database(driver, wait):
         time.sleep(1)
 
 
+
 def switch_role(wait):
     while 1:
         try:
@@ -73,6 +77,7 @@ def switch_role(wait):
                 pass
         except:
             time.sleep(2)
+
 
 
 #切换到党组织信息页面
@@ -101,6 +106,7 @@ def switch_item_org(wait):
             break
         except:
             org_info = wait.until(EC.element_to_be_clickable((By.XPATH, '(//*[contains(text(), "信息管理")]/..)[2]')))
+
 
 
 def new_excel(wait, driver):
@@ -182,10 +188,12 @@ def access_info_page(wait, row):
     print(f"进入党员个人页面成功") 
 
 
+
 def rebuild(excel_file_path, wait, org_total_amount, org_excel, org_excel_path):
     #先改变全局变量
     init_complete_amount(excel_file_path)
     synchronizing(wait, org_excel, org_excel_path)
+
 
 
 def init_complete_amount(excel_file_path):
@@ -193,6 +201,7 @@ def init_complete_amount(excel_file_path):
     df = pd.read_excel(excel_file_path, sheet_name=0)
     row_count = df.dropna(how='all').shape[0]
     amount_that_complete = row_count - 1
+
 
 
 def synchronizing(wait, org_excel, org_excel_path, driver):
@@ -230,6 +239,7 @@ def synchronizing(wait, org_excel, org_excel_path, driver):
 
     #recursion(tree_root)
     recursion(tree_root = tree_root, file = org_excel, wait = wait, driver = driver, path = org_excel_path)
+
 
 
 def recursion(tree_root, file, wait, driver, path):
