@@ -40,7 +40,6 @@ def _main():
     global account
     global password
     global url
-
     config_file = 'config.ini'
     config = configparser.ConfigParser()
     config.read(config_file)
@@ -53,7 +52,6 @@ def _main():
     wait = WebDriverWait(driver, 10, 0.5)
     login(account, password, driver, url, wait)
     return driver
-
 
 
 
