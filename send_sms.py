@@ -1,15 +1,11 @@
-# -*- coding: utf-8 -*-
-# This file is auto-generated, don't edit it. Thanks.
 import os
-import sys
-import random
 from typing import List
+import random
 from alibabacloud_dysmsapi20170525.client import Client as Dysmsapi20170525Client
 from alibabacloud_tea_openapi import models as open_api_models
 from alibabacloud_dysmsapi20170525 import models as dysmsapi_20170525_models
 from alibabacloud_tea_util import models as util_models
 from alibabacloud_tea_util.client import Client as UtilClient
-
 
 class Sample:
     def __init__(self):
@@ -34,22 +30,17 @@ class Sample:
         config.endpoint = f'dysmsapi.aliyuncs.com'
         return Dysmsapi20170525Client(config)
 
-    def generate_verification_code():
-        code = ""
-        for _ in range(6):
-            code += str(random.randint(0, 9))
-        return code
-
     @staticmethod
-    def main(
-        args: List[str],
-    ) -> None:
+    def _main(
+        args: List[str]
+    ) -> str:
+        
         client = Sample.create_client()
         code = Sample.generate_verification_code()
         send_sms_request = dysmsapi_20170525_models.SendSmsRequest(
             sign_name='lhsserver',
             template_code='SMS_465901623',
-            phone_numbers='19953722937',
+            phone_numbers=args[0]
             template_param='{"code":' + code + '}'
         )
         runtime = util_models.RuntimeOptions()
@@ -63,9 +54,10 @@ class Sample:
             # 诊断地址
             print(error.data.get("Recommend"))
             UtilClient.assert_as_string(error.message)
+        return code
 
-
-if __name__ == '__main__':
-    a = Sample
-    a.main(sys.argv[1:])
-    
+    def generate_verification_code():
+        code = ""
+        for _ in range(6):
+            code += str(random.randint(0, 9))
+        return code

@@ -3,72 +3,30 @@ import json
 import threading
 import mysql.connector
 import datetime
-import os
-import sys
-import random
-from typing import List
-from alibabacloud_dysmsapi20170525.client import Client as Dysmsapi20170525Client
-from alibabacloud_tea_openapi import models as open_api_models
-from alibabacloud_dysmsapi20170525 import models as dysmsapi_20170525_models
-from alibabacloud_tea_util import models as util_models
-from alibabacloud_tea_util.client import Client as UtilClient
+import send_sms
+import traceback
+import list
 lock = threading.Lock()
 
+validate_sent = list.LinkedList
+
+def handle_send_validate(client_socket, data):
+    try:
+        arg = [data['phone_number']]
+        x = send_sms.Sample
+        code = x._main(arg)
+        code_prepare_to_send = {'validate_code':code}
+        client_socket.sendall(json.dumps(code_prepare_to_send).encode('utf-8'))
+        data = {'phone_number':arg[0], 'validate_code':code}
+        global validate_sent
+        validate_sent.insert(data)
 
 
-class Sample:
-    def __init__(self):
-        pass
-
-    @staticmethod
-    def create_client() -> Dysmsapi20170525Client:
-        """
-        使用AK&SK初始化账号Client
-        @return: Client
-        @throws Exception
-        """
-        # 工程代码泄露可能会导致 AccessKey 泄露，并威胁账号下所有资源的安全性。以下代码示例仅供参考。
-        # 建议使用更安全的 STS 方式，更多鉴权访问方式请参见：https://help.aliyun.com/document_detail/378659.html。
-        config = open_api_models.Config(
-            # 必填，请确保代码运行环境设置了环境变量 ALIBABA_CLOUD_ACCESS_KEY_ID。,
-            access_key_id=os.environ['ALIBABA_CLOUD_ACCESS_KEY_ID'],
-            # 必填，请确保代码运行环境设置了环境变量 ALIBABA_CLOUD_ACCESS_KEY_SECRET。,
-            access_key_secret=os.environ['ALIBABA_CLOUD_ACCESS_KEY_SECRET']
-        )
-        # Endpoint 请参考 https://api.aliyun.com/product/Dysmsapi
-        config.endpoint = f'dysmsapi.aliyuncs.com'
-        return Dysmsapi20170525Client(config)
-
-    @staticmethod
-    def _main(
-        args: List[str]
-    ) -> str:
-        client = Sample.create_client()
-        code = Sample.generate_verification_code()
-        send_sms_request = dysmsapi_20170525_models.SendSmsRequest(
-            sign_name='lhsserver',
-            template_code='SMS_465901623',
-            phone_numbers='19953722937',
-            template_param='{"code":' + code + '}'
-        )
-        runtime = util_models.RuntimeOptions()
-        try:
-            # 复制代码运行请自行打印 API 的返回值
-            client.send_sms_with_options(send_sms_request, runtime)
-        except Exception as error:
-            # 此处仅做打印展示，请谨慎对待异常处理，在工程项目中切勿直接忽略异常。
-            # 错误 message
-            print(error.message)
-            # 诊断地址
-            print(error.data.get("Recommend"))
-            UtilClient.assert_as_string(error.message)
-        return code
-
-    def generate_verification_code():
-        code = ""
-        for _ in range(6):
-            code += str(random.randint(0, 9))
-        return code
+    except Exception as e:
+        timenow = datetime.datetime.now()
+        print("handle_send_validate()发送验证码时产生异常,错误发生在", timenow, "\n", e)
+        traceback.print_exc()
+        
 
 
 
@@ -82,6 +40,7 @@ def handle_login(client_socket, data, db, cursor):
     except:
         timenow = datetime.datetime.now()
         print("handle_login()读取username、password键值时产生异常,错误发生在", timenow)
+        traceback.print_exc()
     cursor.execute('SELECT * FROM users WHERE username=%s AND password=%s', (username, password))
     user = cursor.fetchone()
     if user:
@@ -93,6 +52,7 @@ def handle_login(client_socket, data, db, cursor):
     except:
         timenow = datetime.datetime.now()
         print("handle_login()回发信息时产生异常,错误发生在", timenow)
+        traceback.print_exc()
 
 def handle_register(client_socket, data, db, cursor):
     try:
@@ -101,6 +61,7 @@ def handle_register(client_socket, data, db, cursor):
     except:
         timenow = datetime.datetime.now()
         print("handle_register()读取键值1组时产生异常,错误发生在", timenow)
+        traceback.print_exc()
     cursor.execute('SELECT * FROM users WHERE username=%s', (username,))
     existing_user = cursor.fetchone()
 
@@ -109,27 +70,30 @@ def handle_register(client_socket, data, db, cursor):
     else:
         try:
             confirm_password = data['confirm_password']
-
             party_organization = data.get('party_organization', '')
             phone_number = data.get('phone_number', '')
+            validate_code = data.get('validate_code', '')
         except:
             timenow = datetime.datetime.now()
             print("handle_register()读取键值2组时产生异常,错误发生在", timenow)
+            traceback.print_exc()
 
-        if password == confirm_password:
+        
+        validate_code_find = validate_sent.find_validate_by_phone_number(phone_number)
 
+        if password == confirm_password and validate_code == validate_code_find:
             cursor.execute('INSERT INTO users (username, password, phone_number, party_organization) VALUES (%s, %s, %s, %s)',
                            (username, password, phone_number, party_organization))
             db.commit()
-            response = {'status': 'success', 'message': 'Registration successful!'}
+            response = {'status': 'success', 'message': '注册成功！'}
         else:
-            response = {'status': 'failure', 'message': 'Passwords do not match!'}
+            response = {'status': 'failure', 'message': '确认密码与密码不一致或验证码错误!'}
     try:
-
         client_socket.sendall(json.dumps(response).encode('utf-8'))
     except:
         timenow = datetime.datetime.now()
         print("handle_register()回发信息时产生异常,错误发生在", timenow)
+        traceback.print_exc()
 
 def handle_client(client_socket):
     lock.acquire()
@@ -157,7 +121,8 @@ def handle_client(client_socket):
             data = client_socket.recv(1024)
         except:
             timenow = datetime.datetime.now()
-            print("从访客套接字中接收数据时产生异常,错误发生在", timenow)           
+            print("从访客套接字中接收数据时产生异常,错误发生在", timenow)  
+            traceback.print_exc()         
         #如果是数据包为空推出循环
         #尝试用utf-8解码数据
         try:
@@ -165,6 +130,7 @@ def handle_client(client_socket):
         except:
             timenow = datetime.datetime.now()
             print("使用utf-8解码数据时产生异常,错误发生在", timenow)
+            traceback.print_exc()
         #尝试判断访客请求类型，并路由处理函数。
         try:
             if 'action' in request:
@@ -172,6 +138,8 @@ def handle_client(client_socket):
                     handle_login(client_socket, request, db, cursor)
                 elif request['action'] == 'register':
                     handle_register(client_socket, request, db, cursor)
+                elif request['action'] == 'call_validate_code':
+                    handle_send_validate(client_socket, request)
             else:
                 print("action不存在login和register")
         except Exception as e:
@@ -180,6 +148,7 @@ def handle_client(client_socket):
             if request is not None:
                 print(f"{request}")
             print(e)
+            traceback.print_exc()
 
     finally:
         lock.release()
@@ -198,13 +167,14 @@ def main():
         try:
             #等待访问，阻塞
             client_socket, addr = server_socket.accept()
-            #访问来了，打印访客ip地址，启动新线程运行处理程序，此处有可能涉及多线程同步问题。
+            #访问来了，打印访客ip地址，启动新线程运行处理程序，此处有可能涉及多线程同步问题。                
             print(f"Connection from {addr}")
             client_handler = threading.Thread(target=handle_client, args=(client_socket,))
             client_handler.start()
         except:
             timenow = datetime.datetime.now()
             print("堵塞等待套接字，启动新线程时产生异常,错误发生在", timenow)
+            traceback.print_exc()
 
 if __name__ == "__main__":
     main()

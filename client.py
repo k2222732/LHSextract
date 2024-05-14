@@ -6,7 +6,6 @@ import threading
 import time
 
 
-
 class ClientApp:
     def __init__(self, root):
         self.ui_thread = None
@@ -35,11 +34,15 @@ class ClientApp:
 
 
     def call_validate_code(self):
-        request = {'action':'call_validate_code'}
-        self.send_request(request)
-        self.send_validate_code.config(state=tk.DISABLED)
-        self.remaining_time.set("60")
-        threading.Thread(target=self.enable_button_after_delay).start()
+        if not self.entry_phonenum_r.get():
+            phone_number = self.entry_phonenum_r.get()
+            request = {'action':'call_validate_code', 'phone_number':phone_number}
+            self.send_request(request)
+            self.send_validate_code.config(state=tk.DISABLED)
+            self.remaining_time.set("60")
+            threading.Thread(target=self.enable_button_after_delay).start()
+        else:
+            messagebox.showinfo("请输入手机号码！")
 
 
     def enable_button_after_delay(self):
@@ -96,12 +99,11 @@ class ClientApp:
         cfpassword = self.entry_cfpassword_r.get()
         phonenum = self.entry_phonenum_r.get()
         org = self.entry_org_r.get()
-        request =  {'action': 'register', 'username': user_name, 'password': password, 'confirm_password':cfpassword, 'phone_number':phonenum, 'party_organization':org}
+        validate_code = self.validate_code.get()
+        request =  {'action': 'register', 'username': user_name, 'password': password, 'confirm_password':cfpassword, 'phone_number':phonenum, 'validate_code':validate_code, 'party_organization':org}
         self.send_request(request)
         self.registration_window.destroy()
         self.root.deiconify()
-
-
 
 
     def reg_cancel(self):
