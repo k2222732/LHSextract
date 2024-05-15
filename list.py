@@ -9,8 +9,8 @@ class Node:
 
 
 class LinkedList:
-    def __init__(self):
-        head_init = Node("")
+    def __init__(self, data):
+        head_init = Node(data)
         self.head = head_init
 
     def insert(self, data):

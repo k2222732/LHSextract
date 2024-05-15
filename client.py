@@ -35,22 +35,24 @@ class ClientApp:
 
     def call_validate_code(self):
         if not self.entry_phonenum_r.get():
+            messagebox.showinfo("提示","请输入手机号码！")
+        else:
             phone_number = self.entry_phonenum_r.get()
             request = {'action':'call_validate_code', 'phone_number':phone_number}
             self.send_request(request)
             self.send_validate_code.config(state=tk.DISABLED)
             self.remaining_time.set("60")
             threading.Thread(target=self.enable_button_after_delay).start()
-        else:
-            messagebox.showinfo("请输入手机号码！")
+            
 
 
     def enable_button_after_delay(self):
         for i in range(60, 0, -1):  # 倒计时60秒
             self.remaining_time.set(str(i))  # 更新剩余时间显示
             time.sleep(1)
-        self.send_validate_code.config(state=tk.NORMAL)  # 恢复按钮为可用状态
-        self.remaining_time.set("")
+        if self.registration_window is not None:
+            self.send_validate_code.config(state=tk.NORMAL)  # 恢复按钮为可用状态
+            self.remaining_time.set("")
 
 
     def register(self):
@@ -75,17 +77,14 @@ class ClientApp:
         self.label_cfpassword_r.grid(row=2, sticky=tk.E, pady=5)
         self.label_phonenum_r.grid(row=3, sticky=tk.E, pady=5)
         self.time_left.grid(row=3, sticky=tk.E, pady=5)
-
         self.validate_code.grid(row=4, column=1, sticky=tk.E, padx=(0,7))
         self.send_validate_code.grid(row=4, column=2, sticky=tk.E, pady=5)
         self.time_left.grid(row=4, column=3, sticky=tk.E, pady=5)
-
         self.label_org_r.grid(row=5, sticky=tk.E, pady=5)
         self.entry_username_r.grid(row=0, column=1, padx=5, pady=5)
         self.entry_password_r.grid(row=1, column=1, padx=5, pady=5)
         self.entry_cfpassword_r.grid(row=2, column=1, padx=5, pady=5)
         self.entry_phonenum_r.grid(row=3, column=1, padx=5, pady=5)
-
         self.entry_org_r.grid(row=5, column=1, padx=5, pady=5)
         self.register_button_r = tk.Button(self.registration_window, text="注册", command=self.reg_confirm)
         self.cancel_button_r = tk.Button(self.registration_window, text="取消", command=self.reg_cancel)
@@ -100,10 +99,15 @@ class ClientApp:
         phonenum = self.entry_phonenum_r.get()
         org = self.entry_org_r.get()
         validate_code = self.validate_code.get()
-        request =  {'action': 'register', 'username': user_name, 'password': password, 'confirm_password':cfpassword, 'phone_number':phonenum, 'validate_code':validate_code, 'party_organization':org}
-        self.send_request(request)
-        self.registration_window.destroy()
-        self.root.deiconify()
+        if  user_name == "" or password == "" or phonenum == "" or org == "":
+            messagebox.showwarning("提示", "请完善必填信息！")
+        elif password != cfpassword:
+            messagebox.showwarning("提示", "两次密码输入不一致！")
+        else:
+            request =  {'action': 'register', 'username': user_name, 'password': password, 'confirm_password':cfpassword, 'phone_number':phonenum, 'validate_code':validate_code, 'party_organization':org}
+            self.send_request(request)
+            self.registration_window.destroy()
+            self.root.deiconify()
 
 
     def reg_cancel(self):

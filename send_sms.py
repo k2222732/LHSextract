@@ -40,7 +40,7 @@ class Sample:
         send_sms_request = dysmsapi_20170525_models.SendSmsRequest(
             sign_name='lhsserver',
             template_code='SMS_465901623',
-            phone_numbers=args[0]
+            phone_numbers=args[0],
             template_param='{"code":' + code + '}'
         )
         runtime = util_models.RuntimeOptions()

@@ -7,8 +7,7 @@ import send_sms
 import traceback
 import list
 lock = threading.Lock()
-
-validate_sent = list.LinkedList
+validate_sent = list.LinkedList("")
 
 def handle_send_validate(client_socket, data):
     try:
@@ -18,6 +17,7 @@ def handle_send_validate(client_socket, data):
         code_prepare_to_send = {'validate_code':code}
         client_socket.sendall(json.dumps(code_prepare_to_send).encode('utf-8'))
         data = {'phone_number':arg[0], 'validate_code':code}
+        print(data)
         global validate_sent
         validate_sent.insert(data)
 
@@ -26,14 +26,13 @@ def handle_send_validate(client_socket, data):
         timenow = datetime.datetime.now()
         print("handle_send_validate()发送验证码时产生异常,错误发生在", timenow, "\n", e)
         traceback.print_exc()
+        client_socket.close()
         
-
 
 
 # 连接到 MySQL 数据库（请替换为你的实际数据库信息）
                  #访客套接字     #解码后的数据
-
-def handle_login(client_socket, data, db, cursor):
+def handle_login(client_socket, data):
     try:
         username = data['username']
         password = data['password']
@@ -41,20 +40,52 @@ def handle_login(client_socket, data, db, cursor):
         timenow = datetime.datetime.now()
         print("handle_login()读取username、password键值时产生异常,错误发生在", timenow)
         traceback.print_exc()
-    cursor.execute('SELECT * FROM users WHERE username=%s AND password=%s', (username, password))
-    user = cursor.fetchone()
+        client_socket.close()
+
+    try:
+        db = mysql.connector.connect(
+        host="127.0.0.1",
+        user="root",
+        password="327105",
+        database="LHSmanager"
+        )
+        cursor = db.cursor()
+        cursor.execute('''
+            CREATE TABLE IF NOT EXISTS users (
+                id INT AUTO_INCREMENT PRIMARY KEY,
+                username VARCHAR(255) NOT NULL,
+                password VARCHAR(255) NOT NULL,
+                phone_number VARCHAR(15),
+                party_organization VARCHAR(255),
+                vip VARCHAR(10),
+                vip_type VARCHAR(20),
+                vip_deadline DATE
+                )
+            ''')
+        db.commit()
+        cursor.execute('SELECT * FROM users WHERE username=%s AND password=%s', (username, password))
+        user = cursor.fetchone()
+    except:
+        traceback.print_exc()
+        client_socket.close()
+        db.close()
+    
+        
+        
     if user:
-        response = {'status': 'success', 'message': 'Login successful!'}
+        response = {'status': 'success', 'message': '登录成功'}
     else:
-        response = {'status': 'failure', 'message': 'Invalid username or password!'}
+        response = {'status': 'failure', 'message': '无效的用户名或密码'}
     try:
         client_socket.sendall(json.dumps(response).encode('utf-8'))
     except:
         timenow = datetime.datetime.now()
         print("handle_login()回发信息时产生异常,错误发生在", timenow)
         traceback.print_exc()
+        client_socket.close()
+    db.close()
 
-def handle_register(client_socket, data, db, cursor):
+def handle_register(client_socket, data):
     try:
         username = data['username']
         password = data['password']
@@ -62,11 +93,40 @@ def handle_register(client_socket, data, db, cursor):
         timenow = datetime.datetime.now()
         print("handle_register()读取键值1组时产生异常,错误发生在", timenow)
         traceback.print_exc()
-    cursor.execute('SELECT * FROM users WHERE username=%s', (username,))
-    existing_user = cursor.fetchone()
+        client_socket.close()
+
+    try:
+        
+        db = mysql.connector.connect(
+        host="127.0.0.1",
+        user="root",
+        password="327105",
+        database="LHSmanager"
+        )
+        cursor = db.cursor()
+        cursor.execute('''
+            CREATE TABLE IF NOT EXISTS users (
+                id INT AUTO_INCREMENT PRIMARY KEY,
+                username VARCHAR(255) NOT NULL,
+                password VARCHAR(255) NOT NULL,
+                phone_number VARCHAR(15),
+                party_organization VARCHAR(255),
+                vip VARCHAR(10),
+                vip_type VARCHAR(20),
+                vip_deadline DATE
+                )
+            ''')
+        db.commit()
+        cursor.execute('SELECT * FROM users WHERE username=%s', (username,))
+        existing_user = cursor.fetchone()
+    except:
+        traceback.print_exc()
+        client_socket.close()
+        db.close()
+    
 
     if existing_user:
-        response = {'status': 'failure', 'message': 'Username already exists!'}
+        response = {'status': 'failure', 'message': '用户已存在!'}
     else:
         try:
             confirm_password = data['confirm_password']
@@ -77,12 +137,13 @@ def handle_register(client_socket, data, db, cursor):
             timenow = datetime.datetime.now()
             print("handle_register()读取键值2组时产生异常,错误发生在", timenow)
             traceback.print_exc()
+            client_socket.close()
 
         
         validate_code_find = validate_sent.find_validate_by_phone_number(phone_number)
 
         if password == confirm_password and validate_code == validate_code_find:
-            cursor.execute('INSERT INTO users (username, password, phone_number, party_organization) VALUES (%s, %s, %s, %s)',
+            cursor.execute('INSERT INTO users (username, password, phone_number, party_organization, vip, vip_type, vip_deadline) VALUES (%s, %s, %s, %s, "非会员", "无", null)',
                            (username, password, phone_number, party_organization))
             db.commit()
             response = {'status': 'success', 'message': '注册成功！'}
@@ -94,65 +155,50 @@ def handle_register(client_socket, data, db, cursor):
         timenow = datetime.datetime.now()
         print("handle_register()回发信息时产生异常,错误发生在", timenow)
         traceback.print_exc()
+        client_socket.close()
+    db.close()
+
 
 def handle_client(client_socket):
-    lock.acquire()
-    db = mysql.connector.connect(
-    host="127.0.0.1",
-    user="root",
-    password="327105",
-    database="LHSmanager"
-    )
-    cursor = db.cursor()
-    cursor.execute('''
-        CREATE TABLE IF NOT EXISTS users (
-            id INT AUTO_INCREMENT PRIMARY KEY,
-            username VARCHAR(255) NOT NULL,
-            password VARCHAR(255) NOT NULL,
-            phone_number VARCHAR(15),
-            party_organization VARCHAR(255)
-            )
-        ''')
-    db.commit()
-    request = None
     #尝试接收数据
+    request = None
     try:
-        try:
-            data = client_socket.recv(1024)
-        except:
-            timenow = datetime.datetime.now()
-            print("从访客套接字中接收数据时产生异常,错误发生在", timenow)  
-            traceback.print_exc()         
-        #如果是数据包为空推出循环
-        #尝试用utf-8解码数据
-        try:
-            request = json.loads(data.decode('utf-8'))
-        except:
-            timenow = datetime.datetime.now()
-            print("使用utf-8解码数据时产生异常,错误发生在", timenow)
-            traceback.print_exc()
-        #尝试判断访客请求类型，并路由处理函数。
-        try:
-            if 'action' in request:
-                if request['action'] == 'login':
-                    handle_login(client_socket, request, db, cursor)
-                elif request['action'] == 'register':
-                    handle_register(client_socket, request, db, cursor)
-                elif request['action'] == 'call_validate_code':
-                    handle_send_validate(client_socket, request)
-            else:
-                print("action不存在login和register")
-        except Exception as e:
-            timenow = datetime.datetime.now()
-            print("路由请求时产生异常,错误发生在", timenow)
-            if request is not None:
-                print(f"{request}")
-            print(e)
-            traceback.print_exc()
+        data = client_socket.recv(1024)
+    except:
+        timenow = datetime.datetime.now()
+        print("从访客套接字中接收数据时产生异常,错误发生在", timenow)  
+        traceback.print_exc()      
+        client_socket.close()   
+    #如果是数据包为空推出循环
+    #尝试用utf-8解码数据
+    try:
+        request = json.loads(data.decode('utf-8'))
+    except:
+        timenow = datetime.datetime.now()
+        print("使用utf-8解码数据时产生异常,错误发生在", timenow)
+        traceback.print_exc()
+    #尝试判断访客请求类型，并路由处理函数。
+        client_socket.close()
+    try:
+        if 'action' in request:
+            if request['action'] == 'login':
+                handle_login(client_socket, request)
+            elif request['action'] == 'register':
+                handle_register(client_socket, request)
+            elif request['action'] == 'call_validate_code':
+                handle_send_validate(client_socket, request)
+        else:
+            print("action不存在login和register")
+    except Exception as e:
+        timenow = datetime.datetime.now()
+        print("路由请求时产生异常,错误发生在", timenow)
+        if request is not None:
+            print(f"{request}")
+        print(e)
+        traceback.print_exc()
+        client_socket.close()
 
-    finally:
-        lock.release()
-        db.close()
+
     client_socket.close()
     print("退出接待线程\n******************************************")
 
