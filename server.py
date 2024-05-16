@@ -58,6 +58,7 @@ def handle_login(client_socket, data):
                 phone_number VARCHAR(15),
                 party_organization VARCHAR(255),
                 vip VARCHAR(10),
+                vip_start_time DATE,
                 vip_type VARCHAR(20),
                 vip_deadline DATE
                 )
@@ -73,7 +74,13 @@ def handle_login(client_socket, data):
         
         
     if user:
-        response = {'status': 'success', 'message': '登录成功'}
+        cursor.execute("SELECT vip,vip_start_time,vip_type,vip_deadline FROM users WHERE username = %s", (username,))
+        result = cursor.fetchone()
+        vip = result[0]
+        vip_start_time = result[1]
+        vip_type = result[2]
+        vip_deadline = result[3]
+        response = {'status': 'success', 'message': '登录成功','vip': vip, 'vip_start_time':vip_start_time, 'vip_type':vip_type, 'vip_deadline':vip_deadline }
     else:
         response = {'status': 'failure', 'message': '无效的用户名或密码'}
     try:
@@ -112,6 +119,7 @@ def handle_register(client_socket, data):
                 phone_number VARCHAR(15),
                 party_organization VARCHAR(255),
                 vip VARCHAR(10),
+                vip_start_time DATE,   
                 vip_type VARCHAR(20),
                 vip_deadline DATE
                 )
@@ -143,7 +151,7 @@ def handle_register(client_socket, data):
         validate_code_find = validate_sent.find_validate_by_phone_number(phone_number)
 
         if password == confirm_password and validate_code == validate_code_find:
-            cursor.execute('INSERT INTO users (username, password, phone_number, party_organization, vip, vip_type, vip_deadline) VALUES (%s, %s, %s, %s, "非会员", "无", null)',
+            cursor.execute('INSERT INTO users (username, password, phone_number, party_organization, vip, vip_start_time ,vip_type, vip_deadline) VALUES (%s, %s, %s, %s, "非会员", null, "无", null)',
                            (username, password, phone_number, party_organization))
             db.commit()
             response = {'status': 'success', 'message': '注册成功！'}

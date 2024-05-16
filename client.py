@@ -4,6 +4,9 @@ import json
 import socket
 import threading
 import time
+import vip_struct
+import ui
+
 
 
 class ClientApp:
@@ -130,8 +133,8 @@ class ClientApp:
             if request['action'] == 'login':
 
                 if response['status'] == 'success':
-                    messagebox.showinfo("登录成功", response['message'])
-                    self.open_ui_thread()
+                    vip_info = vip_struct.VIP(response['vip'], response['vip_start_time'], response['vip_type'], response['vip_deadline'])
+                    self.open_ui_thread(vip_info)
                     self.root.destroy()
                 else:
                     messagebox.showerror("登录失败", response['message'])
@@ -147,17 +150,15 @@ class ClientApp:
                 client_socket.close()
 
 
-    def open_ui_thread(self):
+    def open_ui_thread(self, vip_info):
         if self.ui_thread is None or not self.ui_thread.is_alive():
-            self.ui_thread = threading.Thread(target=self.load_ui)
+            self.ui_thread = threading.Thread(target=ui.main, args=(vip_info,))
             self.ui_thread.start()
             print("UI界面启动成功！")
         else:
             print("UI线程正在工作。")
 
-
-    def load_ui(self):
-        import ui
+        
 
 
 if __name__ == "__main__":

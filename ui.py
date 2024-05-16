@@ -13,6 +13,7 @@ import member_func
 import org_func
 import dev_func
 import login
+import vip_struct
 
 role_name_mem = ""
 role_name_org = ""
@@ -24,6 +25,7 @@ class MainApp:
         self.mem_thread = None
         self.org_thread = None
         self.dev_thread = None
+
         self.config_file = 'config.ini'
         self.config = configparser.ConfigParser()
         self.config.read(self.config_file)
@@ -148,6 +150,18 @@ class MainApp:
 
             self.setup_tab5()
             self.privious_tab = self.tab5
+
+        elif current_tab == '账号信息':
+            num_columns, num_rows = self.privious_tab.grid_size()
+            while n <= num_rows-1:
+                slaves = self.privious_tab.grid_slaves(row=n)
+                for slave in slaves:
+                    slave.destroy()
+                n = n + 1
+            
+
+            self.setup_tab7()
+            self.privious_tab = self.tab7
     
         
 
@@ -227,13 +241,13 @@ class MainApp:
         self.role_to_up_load_ztdr.grid(row=1, column=0, columnspan=2, sticky="w", pady=5, padx=(10, 0))
         self.label_instruction = tk.Label(self.tab4, text="请输入角色名称")
         self.label_instruction.grid(row=2, column=0, columnspan=2, sticky="w", pady=0, padx=(10, 0))
-        self.var = tk.StringVar()
+        self.var = tk.StringVar(master=self.tab4)
         self.radio_button1 = tk.Radiobutton(self.tab4, text="主题党日", variable=self.var, value="选项1")
         self.radio_button2 = tk.Radiobutton(self.tab4, text="灯塔大课堂", variable=self.var, value="选项2")
         self.radio_button3 = tk.Radiobutton(self.tab4, text="主题党日+灯塔大课堂", variable=self.var, value="选项3")
         self.radio_button4 = tk.Radiobutton(self.tab4, text="组织生活会", variable=self.var, value="选项4")
         self.radio_button5 = tk.Radiobutton(self.tab4, text="民主生活会", variable=self.var, value="选项5")
-        self.var0 = tk.StringVar()
+        self.var0 = tk.StringVar(master=self.tab4)
         self.radio_button1_way = tk.Radiobutton(self.tab4, text="以文本形式上传", variable=self.var0, value="文本")
         self.label_instruction = tk.Label(self.tab4, text="在此输入文字版会议纪录：")
         self.role_to_up_load_ztdr = tk.Text(self.tab4, state="normal", width=20, height = 13)
@@ -287,13 +301,13 @@ class MainApp:
             self.role_to_up_load_ztdr.grid(row=1, column=0, columnspan=2, sticky="w", pady=5, padx=(10, 0))
             self.label_instruction = tk.Label(self.tab4, text="请输入角色名称")
             self.label_instruction.grid(row=2, column=0, columnspan=2, sticky="w", pady=0, padx=(10, 0))
-            self.var = tk.StringVar()
+            self.var = tk.StringVar(master=self.tab4)
             self.radio_button1 = tk.Radiobutton(self.tab4, text="主题党日", variable=self.var, value="选项1")
             self.radio_button2 = tk.Radiobutton(self.tab4, text="灯塔大课堂", variable=self.var, value="选项2")
             self.radio_button3 = tk.Radiobutton(self.tab4, text="主题党日+灯塔大课堂", variable=self.var, value="选项3")
             self.radio_button4 = tk.Radiobutton(self.tab4, text="组织生活会", variable=self.var, value="选项4")
             self.radio_button5 = tk.Radiobutton(self.tab4, text="民主生活会", variable=self.var, value="选项5")
-            self.var0 = tk.StringVar()
+            self.var0 = tk.StringVar(master=self.tab4)
             self.radio_button1_way = tk.Radiobutton(self.tab4, text="以文本形式上传", variable=self.var0, value="文本")
             self.label_instruction = tk.Label(self.tab4, text="在此输入文字版会议纪录：")
             self.role_to_up_load_ztdr = tk.Text(self.tab4, state="normal", width=20, height = 13)
@@ -333,7 +347,7 @@ class MainApp:
                 for slave in slaves:
                     slave.destroy()
                 n = n + 1
-            self.var = tk.StringVar()
+            self.var = tk.StringVar(master=self.tab4)
             self.radio_button1 = tk.Radiobutton(self.tab4, text="主题党日", variable=self.var, value="选项1")          
             self.radio_button2 = tk.Radiobutton(self.tab4, text="灯塔大课堂", variable=self.var, value="选项2")           
             self.radio_button3 = tk.Radiobutton(self.tab4, text="主题党日+灯塔大课堂", variable=self.var, value="选项3")    
@@ -368,15 +382,6 @@ class MainApp:
                 }
         with open(self.config_file, 'w') as configfile:
             self.config.write(configfile)
-        
-
-    
-
-
-
-        
-
-
 
 
     def setup_tab5(self):
@@ -551,6 +556,49 @@ class MainApp:
         pass
 
     def setup_tab7(self):
+        self.vip_info_frame = ttk.Frame(self.tab7)
+        self.vip_info_frame.grid(row=0, column=0, sticky="w")
+        self.vip_label = tk.Label(self.vip_info_frame, text="会员信息：")
+        self.vip_label.grid(row=0, column=0, sticky="w")
+        self.vip_start_time = tk.Label(self.vip_info_frame, text="开通时间：")
+        self.vip_start_time.grid(row=1, column=0, sticky="w")
+        self.vip_type = tk.Label(self.vip_info_frame, text="会员类型：")
+        self.vip_type.grid(row=2, column=0, sticky="w")
+        self.vip_deadline = tk.Label(self.vip_info_frame, text="到期时间：")
+        self.vip_deadline.grid(row=3, column=0, sticky="w")
+
+        global vip_info
+
+        self.is_vip = tk.Label(self.vip_info_frame, text=vip_info.vip)
+        self.is_vip.grid(row=0, column=1, sticky="w")
+        self.vip_start_time_value = tk.Label(self.vip_info_frame, text=vip_info.vip_start_time)
+        self.vip_start_time_value.grid(row=1, column=1, sticky="w")
+        self.vip_type_value = tk.Label(self.vip_info_frame, text=vip_info.type)
+        self.vip_type_value.grid(row=2, column=1, sticky="w")
+        self.vip_deadline_value = tk.Label(self.vip_info_frame, text=vip_info.deadline)
+        self.vip_deadline_value.grid(row=3, column=1, sticky="w")
+
+
+        self.vip_active = ttk.Frame(self.tab7)
+        self.vip_active.grid(row=5, column=0, pady=10)
+        self.activation_code = tk.Label(self.vip_active, text="输入激活码：")
+        self.activation_code.grid(row=0, column=0, sticky="w")
+        self.activation_input = ttk.Entry(self.vip_active)
+        self.activation_input.grid(row=1, column=0, sticky="w", padx=3, pady=3)
+        self.button_active = ttk.Button(self.vip_active, text="激活/续期", command = self.vip_active)
+        self.button_active.grid(row=1, column=2, sticky="w", padx=3, pady=3)
+
+
+        self.buy_activation_code = tk.Label(self.vip_active, text="购买激活码", cursor="hand2", foreground="blue")
+        self.buy_activation_code.bind("<Button-1>", self.open_url)
+        self.buy_activation_code.grid(row=2, column=0, sticky="w")
+
+        
+    def open_url(self, event = None):
+        messagebox.showwarning("提示", "你好")
+
+
+    def vip_active(self):
         pass
 
     def open_login(self):
@@ -732,15 +780,21 @@ class MainApp:
 
 
 
-# def main(): 
-root2 = tk.Tk()
-app = MainApp(root2)
-root2.protocol("WM_DELETE_WINDOW", app.on_closing)
-root2.mainloop()
+vip_info = vip_struct.VIP
 
 
-# if __name__ == "__main__":
-#     main()
+def main(arg): 
+    import tkinter as tk
+    global vip_info
+    vip_info = arg
+    root2 = tk.Tk()
+    app = MainApp(root2)
+    root2.protocol("WM_DELETE_WINDOW", app.on_closing)
+    root2.mainloop()
+
+
+if __name__ == "__main__":
+    main()
 
 
 
