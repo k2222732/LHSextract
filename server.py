@@ -96,6 +96,7 @@ def handle_register(client_socket, data):
     try:
         username = data['username']
         password = data['password']
+        phone_number = data['phone_number']
     except:
         timenow = datetime.datetime.now()
         print("handle_register()读取键值1组时产生异常,错误发生在", timenow)
@@ -127,6 +128,8 @@ def handle_register(client_socket, data):
         db.commit()
         cursor.execute('SELECT * FROM users WHERE username=%s', (username,))
         existing_user = cursor.fetchone()
+        cursor.execute('SELECT * FROM users WHERE phone_number=%s', (phone_number,))
+        existing_phone_number = cursor.fetchone()
     except:
         traceback.print_exc()
         client_socket.close()
@@ -135,6 +138,8 @@ def handle_register(client_socket, data):
 
     if existing_user:
         response = {'status': 'failure', 'message': '用户已存在!'}
+    elif existing_phone_number:
+        response = {'status': 'failure', 'message': '电话号码已注册！'}
     else:
         try:
             confirm_password = data['confirm_password']

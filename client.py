@@ -13,7 +13,8 @@ class ClientApp:
     def __init__(self, root):
         self.ui_thread = None
         self.root = root
-        self.root.title("组工填表神器")
+        self.root.geometry("240x130")
+        self.root.title("组工干活神器")
         self.label_username = tk.Label(root, text="用户名:")
         self.label_password = tk.Label(root, text="密码:")
         self.entry_username = tk.Entry(root)
@@ -22,11 +23,47 @@ class ClientApp:
         self.label_password.grid(row=1, sticky=tk.E, pady=5)
         self.entry_username.grid(row=0, column=1, pady=5)
         self.entry_password.grid(row=1, column=1, pady=5)
+
+        self.forget_password = tk.Label(self.root, text="忘记密码", cursor="hand2", foreground="blue")
+        self.forget_password.bind("<Button-1>", self.forget_password_func)
+
         self.login_button = tk.Button(root, text="登录", command=self.login)
         self.register_button = tk.Button(root, text="注册", command=self.register)
+        self.forget_password.grid(row=2, column=1, sticky=tk.EW)
         self.login_button.grid(row=2, column=1, sticky=tk.E, pady=5)
         self.register_button.grid(row=2, column=2, sticky=tk.W, pady=5)
-        self.remaining_time = tk.StringVar()
+        
+        self.remaining_time = tk.StringVar(self.root)
+
+    def forget_password_func(self, event=None):
+        self.root.withdraw()
+        self.password_restore = tk.Toplevel(self.root)
+        self.password_restore.protocol("WM_DELETE_WINDOW", self.show_login_window_forget)
+
+        self.label_phonenum_card2 = tk.Label(self.password_restore, text="手机号码:")
+        self.phone_number_card2 = tk.Entry(self.password_restore, width = 15)
+        self.send_validate_code_card2 = tk.Button(self.password_restore, text="发送验证码", command=lambda: self.call_validate_code_w(self.phone_number_card2, self.send_validate_code_card2, self.remaining_time, self.password_restore))
+        self.validate_code_card2 = tk.Entry(self.password_restore, width = 7)
+        self.reset_pass_word = tk.Button(self.password_restore, text="重置密码", command=self.reset_password)
+        self.time_left = tk.Label(self.password_restore, textvariable = self.remaining_time)#textvariable = self.remaining_time, 
+        
+
+        self.label_phonenum_card2.grid(row=1, column=1, sticky=tk.E, padx=(0,7))
+        self.phone_number_card2.grid(row=1, column = 2,sticky=tk.E, pady=5)
+        self.send_validate_code_card2.grid(row=1, column=3, sticky=tk.E, pady=5, padx=(10,7))
+        self.time_left.grid(row=1, column=4, sticky=tk.E, pady=5)
+        self.validate_code_card2.grid(row=2, column=2, sticky=tk.E, pady=5)
+        self.reset_pass_word.grid(row=2, column=3)
+
+
+
+    def reset_password(self):
+        phone_number = self.phone_number_card2.get()
+        validate_code = self.validate_code_card2.get()
+        request = {'action':'reset_password', 'phone_number':phone_number, 'validate_code':validate_code}
+        self.send_request(request)
+
+
 
 
     def login(self):
@@ -34,6 +71,20 @@ class ClientApp:
         password = self.entry_password.get()
         request = {'action': 'login', 'username': username, 'password': password}
         self.send_request(request)
+
+    def call_validate_code_w(self, entry, button, time, father_window):
+        if not entry.get():
+            messagebox.showinfo("提示","请输入手机号码！")
+        else:
+            phone_number = entry.get()
+            request = {'action':'call_validate_code', 'phone_number':phone_number}
+            self.send_request(request)
+            button.config(state=tk.DISABLED)
+            time.set("60")
+            threading.Thread(target= lambda :self.enable_button_after_delay_w(father_window, button, self.remaining_time)).start()
+
+
+
 
 
     def call_validate_code(self):
@@ -47,6 +98,14 @@ class ClientApp:
             self.remaining_time.set("60")
             threading.Thread(target=self.enable_button_after_delay).start()
             
+    def enable_button_after_delay_w(self, father_window, button, timeb):
+        for i in range(60, 0, -1):  # 倒计时60秒
+            self.remaining_time.set(str(i))  # 更新剩余时间显示
+            time.sleep(1)
+        if father_window is not None:
+            button.config(state=tk.NORMAL)  # 恢复按钮为可用状态
+            timeb.set("")
+
 
 
     def enable_button_after_delay(self):
@@ -120,6 +179,11 @@ class ClientApp:
 
     def show_login_window(self):
         self.registration_window.destroy()
+        self.root.deiconify()
+
+
+    def show_login_window_forget(self):
+        self.password_restore.destroy()
         self.root.deiconify()
 
 
