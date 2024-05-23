@@ -14,8 +14,6 @@ def handle_send_validate(client_socket, data):
         arg = [data['phone_number']]
         x = send_sms.Sample
         code = x._main(arg)
-        code_prepare_to_send = {'validate_code':code}
-        client_socket.sendall(json.dumps(code_prepare_to_send).encode('utf-8'))
         data = {'phone_number':arg[0], 'validate_code':code}
         print(data)
         global validate_sent
@@ -102,7 +100,6 @@ def handle_register(client_socket, data):
         print("handle_register()读取键值1组时产生异常,错误发生在", timenow)
         traceback.print_exc()
         client_socket.close()
-
     try:
         
         db = mysql.connector.connect(
@@ -169,7 +166,78 @@ def handle_register(client_socket, data):
         print("handle_register()回发信息时产生异常,错误发生在", timenow)
         traceback.print_exc()
         client_socket.close()
-    db.close()
+    if client_socket:
+        client_socket.close()
+    if db:
+        db.close()
+
+
+def handle_apply_reset_password(client_socket, request):
+    try:
+        phone_number = request['phone_number']
+        validate_code = request['validate_code']
+        result = validate_sent.find_validate_by_phone_number(phone_number)
+        if result == None:
+            response = {'status':'failure', 'message': '验证码过时'}
+        elif result == validate_code:
+            db = mysql.connector.connect(
+            host="127.0.0.1",
+            user="root",
+            password="327105",
+            database="LHSmanager"
+            )
+            cursor = db.cursor()
+            cursor.execute('SELECT username FROM users WHERE phone_number=%s', (phone_number,))
+            result = cursor.fetchone()
+            if result:
+                response = {'status':'success', 'message': '验证通过', 'username':result[0]}
+            else:
+                response = {'status':'failure', 'message': '手机号对应的账号不存在'}
+        else:
+            response = {'status':'failure', 'message': '验证失败'}
+        client_socket.sendall(json.dumps(response).encode('utf-8'))
+    except:
+        print('handle_apply_reset_password')
+        traceback.print_exc()
+    finally:
+        if client_socket:
+            client_socket.close()
+        if db:
+            db.close()
+
+    
+
+def handle_reset_password(client_socket, request):
+    try:
+        username = request['user_name']
+        new_password = request['new_password']
+        new_password_confirm = request['new_password_confirm']
+        db = mysql.connector.connect(
+            host="127.0.0.1",
+            user="root",
+            password="327105",
+            database="LHSmanager"
+            )
+        cursor = db.cursor()
+        cursor.execute('UPDATE users SET pass_word = %s WHERE username = %s', (new_password, username))
+        db.commit()
+        if cursor.rowcount > 0:
+            response = {'status':'success', 'message':'重置密码成功'}
+        else:
+            response = {'status':'failure', 'message':'重置密码失败'}
+        client_socket.sendall(json.dumps(response).encode('utf-8'))
+        
+    except:
+        print('handle_reset_password')
+        traceback.print_exc()
+
+    finally:
+        if client_socket:
+            client_socket.close()
+        if db:
+            db.close()
+
+
 
 
 def handle_client(client_socket):
@@ -200,8 +268,13 @@ def handle_client(client_socket):
                 handle_register(client_socket, request)
             elif request['action'] == 'call_validate_code':
                 handle_send_validate(client_socket, request)
+            elif request['action'] == 'apply_reset_password':
+                handle_apply_reset_password(client_socket, request)
+            elif request['action'] == 'reset_password':
+                handle_reset_password(client_socket, request)
         else:
             print("action不存在login和register")
+
     except Exception as e:
         timenow = datetime.datetime.now()
         print("路由请求时产生异常,错误发生在", timenow)
@@ -210,10 +283,11 @@ def handle_client(client_socket):
         print(e)
         traceback.print_exc()
         client_socket.close()
-
-
     client_socket.close()
     print("退出接待线程\n******************************************")
+
+
+
 
 
 def main():

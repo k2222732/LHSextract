@@ -60,7 +60,7 @@ class ClientApp:
     def reset_password(self):
         phone_number = self.phone_number_card2.get()
         validate_code = self.validate_code_card2.get()
-        request = {'action':'reset_password', 'phone_number':phone_number, 'validate_code':validate_code}
+        request = {'action':'apply_reset_password', 'phone_number':phone_number, 'validate_code':validate_code}
         self.send_request(request)
 
 
@@ -78,7 +78,7 @@ class ClientApp:
         else:
             phone_number = entry.get()
             request = {'action':'call_validate_code', 'phone_number':phone_number}
-            self.send_request(request)
+            self.send_request_only(request)
             button.config(state=tk.DISABLED)
             time.set("60")
             threading.Thread(target= lambda :self.enable_button_after_delay_w(father_window, button, self.remaining_time)).start()
@@ -93,7 +93,7 @@ class ClientApp:
         else:
             phone_number = self.entry_phonenum_r.get()
             request = {'action':'call_validate_code', 'phone_number':phone_number}
-            self.send_request(request)
+            self.send_request_only(request)
             self.send_validate_code.config(state=tk.DISABLED)
             self.remaining_time.set("60")
             threading.Thread(target=self.enable_button_after_delay).start()
@@ -113,8 +113,9 @@ class ClientApp:
             self.remaining_time.set(str(i))  # 更新剩余时间显示
             time.sleep(1)
         if self.registration_window is not None:
-            self.send_validate_code.config(state=tk.NORMAL)  # 恢复按钮为可用状态
-            self.remaining_time.set("")
+            if self.send_validate_code.winfo_exists():
+                self.send_validate_code.config(state=tk.NORMAL)  # 恢复按钮为可用状态
+                self.remaining_time.set("")
 
 
     def register(self):
@@ -187,6 +188,12 @@ class ClientApp:
         self.root.deiconify()
 
 
+    def show_pass_word_restore_window(self):
+        self.password_restore2.destroy()
+        self.password_restore.deiconify()
+
+
+
     def send_request(self, request):
         try:
             client_socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
@@ -195,7 +202,6 @@ class ClientApp:
             response_data = client_socket.recv(1024)
             response = json.loads(response_data.decode('utf-8'))
             if request['action'] == 'login':
-
                 if response['status'] == 'success':
                     vip_info = vip_struct.VIP(response['vip'], response['vip_start_time'], response['vip_type'], response['vip_deadline'])
                     self.open_ui_thread(vip_info)
@@ -209,9 +215,63 @@ class ClientApp:
                     messagebox.showinfo("注册成功", response['message'])
                 else:
                     messagebox.showerror("注册失败", response['message'])
+
+            elif request['action'] == 'apply_reset_password':
+                if response['status'] == 'failure':
+                    messagebox.showinfo("提示", response['message'])
+                elif response['status'] == 'success':
+                    username = response['username']
+                    self.reset_pass_word_ui(username)
+
+            elif request['action'] == 'reset_password':
+                if response['status'] == 'failure':
+                    messagebox.showinfo("提示", response['message'])
+                elif response['status'] == 'success':
+                    messagebox.showinfo("提示", response['message'])
+            
         finally:
             if client_socket:
                 client_socket.close()
+
+
+
+    def send_request_only(self, request):
+        try:
+            client_socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+            client_socket.connect(('82.157.124.132', 8888))
+            client_socket.sendall(json.dumps(request).encode('utf-8'))
+        finally:
+            if client_socket:
+                client_socket.close()
+
+
+    def reset_pass_word_ui(self, username):
+        self.password_restore.withdraw()
+        self.password_restore2 = tk.Toplevel(self.root)
+        self.password_restore2.protocol("WM_DELETE_WINDOW", self.show_pass_word_restore_window)
+        self.password_restore2_label1 = tk.Label(self.password_restore2, text="请修改"+username+"的登录密码")
+        self.password_restore2_label1.grid(row= 0, column= 0, sticky= "w", padx=5)
+        self.password_restore2_label2 = tk.Label(self.password_restore2, text="新密码：")
+        self.password_restore2_label2.grid(row=1, column=0, sticky="w",padx=5)
+        self.password_restore2_entry1 = tk.Entry(self.password_restore2)
+        self.password_restore2_entry1.grid(row=1, column=1, sticky="w", padx=5)
+        self.password_restore2_label3 = tk.Label(self.password_restore2, text="确认密码")
+        self.password_restore2_label3.grid(row=2, column=0, sticky="w", padx=5)
+        self.password_restore2_entry2 = tk.Entry(self.password_restore2)
+        self.password_restore2_entry2.grid(row=2, column=1, sticky="w", padx=5)
+        self.password_restore2_button1 = tk.Button(self.password_restore2, text= "提交", command = lambda:self.submit_new_password(username))
+        self.password_restore2_button1.grid(row=3, column=0, sticky="w", padx=5)
+
+
+    def submit_new_password(self, username):
+        if self.password_restore2_entry1.get() != self.password_restore2_entry2.get():
+            messagebox.showinfo("提示", '两次输入密码不一致')
+        else:
+            request = {'action':'reset_password', 'user_name':username, 'new_password':self.password_restore2_entry1.get(), 'new_password_confirm':self.password_restore2_entry2.get()}
+            self.send_request(request)
+
+        
+
 
 
     def open_ui_thread(self, vip_info):
