@@ -14,6 +14,7 @@ import org_func
 import dev_func
 import login
 import vip_struct
+import ui_button_func
 
 role_name_mem = ""
 role_name_org = ""
@@ -441,10 +442,13 @@ class MainApp:
 
 
     def tab5_button_func_2(self):
+        
+
         pass
 
 
     def tab5_button_func_3(self):
+
         pass
 
 
@@ -488,7 +492,7 @@ class MainApp:
             self.excel_template_path.insert(0, self.config.get('tab5_path1', 'activist_info_path', fallback=''))
             self.tab5_button_choose_dir_1 = ttk.Button(self.tab5_frame1, text="选择目录", command=self.tab5_button_func_1, width = 8)
             self.tab5_button_choose_dir_1.grid(row=1, column=1, padx=(10, 0))
-            self.tab5_button_1 = ttk.Button(self.tab5_frame1, text="点击生成积极分子信息采集模板", command=self.tab5_button_func_2, width = 31)
+            self.tab5_button_1 = ttk.Button(self.tab5_frame1, text="点击生成积极分子信息采集模板", command=ui_button_func.tab5_button_func_2, width = 31)
             self.tab5_button_1.grid(row=2, column=0, columnspan=2, sticky="w")
 
             self.tab5_frame2 = ttk.Frame(self.tab5)
