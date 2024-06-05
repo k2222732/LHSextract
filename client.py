@@ -98,6 +98,7 @@ class ClientApp:
             self.remaining_time.set("60")
             threading.Thread(target=self.enable_button_after_delay).start()
             
+            
     def enable_button_after_delay_w(self, father_window, button, timeb):
         for i in range(60, 0, -1):  # 倒计时60秒
             self.remaining_time.set(str(i))  # 更新剩余时间显示

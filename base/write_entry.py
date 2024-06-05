@@ -30,3 +30,12 @@ def select_jobposition():
 #单击通用按钮
 def commen_button():
     pass
+
+#上传图片
+def upload_pic(pic_dir, input_xpath, button_xpath):
+    '''
+    pic_dir:图片路径
+    input_xpath:输入位置的xpath
+    button_xpath:保存按钮的xpath
+    '''
+    pass
