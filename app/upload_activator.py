@@ -8,6 +8,9 @@ import os
 import pandas as pd
 from tkinter import messagebox
 import base.rwconfig as conf
+import base.write_entry as input
+import base.uploadpic as uppic
+
 
 applicant_info = {}
 
@@ -44,10 +47,30 @@ def load_to_cache(mfilepath):
     df = pd.read_excel(file_path)
     data_dict = {}
     for index, row in df.iterrows():#df.iterrows()方法返回一个迭代器,该迭代器会生成DataFrame中每行的索引和行数据。具体来说,每次迭代时,它会返回一个包含两个元素的元组
-            name = row['Name']
-            age = row['Age']
-            role = row['Role']
-            data_dict[name] = {'Age': age, 'Role': role}
+            xh = row['序号']
+            xm = row['姓名']
+            xb = row['性别']
+            gmsfzhm = row['公民身份证号码']
+            mz = row['民族']
+            csny = row['出生日期']
+            xl = row['学历']
+            sqrdrq = row['申请入党日期']
+            sjhm = row['手机号码']
+            gzgw = row['工作岗位']
+            zzmm = row['政治面貌']
+            jssqdzz = row['接受申请党组织']
+            jg = row['籍贯']
+            rtrq = row['入团日期']
+            cjgzrq = row['参加工作日期']
+            sqrdrq = row['申请入党日期']
+            qdrdjjfzrq = row['确定入党积极分子日期']
+            gzdwjzw = row['工作单位及职务']
+            jtzz = row['家庭住址']
+            data_dict[gmsfzhm] = {'序号': xh, '姓名': xm, '性别':xb, '公民身份证号码':gmsfzhm,'民族':mz,
+                                  '出生日期':csny, '学历':xl, '申请入党日期':sqrdrq, '手机号码':sjhm, 
+                                  '工作岗位':gzgw, '政治面貌':zzmm, '接受申请党组织':jssqdzz, '籍贯':jg ,
+                                  '入团日期':rtrq, '参加工作日期':cjgzrq, '申请入党日期':sqrdrq, '确定入党积极分子日期':qdrdjjfzrq,
+                                  '工作单位及职务':gzdwjzw, '家庭住址':jtzz}
     return data_dict
 
 
@@ -55,6 +78,14 @@ def load_to_cache(mfilepath):
 def step_1(driver, wait):
     #import base.write_entry as input
     #import base.uploadpic as uppic
+
+    #编辑#(//span[contains(text(), '编辑')])[1]
+    #姓名#(//input[@placeholder = '请输入内容'])[1]
+    #公民身份证号码#(//input[@placeholder = '请输入内容'])[2]
+
+    
+
+
     pass
 
 def step_2(driver, wait):
