@@ -3,9 +3,11 @@ from selenium.webdriver.support import expected_conditions as EC
 from selenium.webdriver.common.by import By
 import traceback
 from dataclasses import dataclass
-from mystruct import TreeNode
-from waitclick import wait_click_xpath, wait_click_xpath_relative, wait_return_subelement_relative
-
+from base.mystruct import TreeNode
+from base.waitclick import wait_click_xpath, wait_click_xpath_relative, wait_return_subelement_relative, wait_return_subelement_absolute, wait_return_subelement_absolute_notmust, wait_click_xpath_notmust
+import pandas as pd
+import os
+import time
 
 @dataclass
 class DATE:
@@ -29,12 +31,15 @@ def input_text(wait, driver, xpath, text):
     try:
         input_element = wait.until(EC.presence_of_element_located((By.XPATH, xpath)))
         input_element.clear()
-        input_element.send_keys(text)
+        if isinstance(text, pd.Timestamp):
+            input_element.send_keys(text._date_repr)
+        else:
+            input_element.send_keys(text)
     except Exception:
         traceback.print_exc()
 
 #单日期选择输入
-def select_date_single(wait, driver, xpath, date:DATE):
+def select_date_single(wait, driver, xpath, date):
     try:
         date_input = wait.until(EC.presence_of_element_located((By.XPATH, xpath)))
         date_input.clear()
@@ -87,14 +92,15 @@ def select_party_org(wait, driver, tree:TreeNode, target:str, element_xpath, lab
     '''
     target_node = tree.find_node(target)
     path_to_root = target_node.path_to_root()
-    current_element = element_xpath
+    path_to_root = path_to_root[1:]
+    current_element = wait_return_subelement_absolute(wait, time_w=0.5, xpath=element_xpath)
     for i, node_value in enumerate(path_to_root): #enumerate(path_to_root) 会产生 [(0, 'node1'), (1, 'node2'), (2, 'node3')]
         #如果node_value不是列表中的最后一个元素，则点击下拉箭头
                                     #(//div[@role = 'treeitem'])[1]//span[contains(text(),'中国共产党山东汶上经济开发区工作委员会')]
         if i<len(path_to_root)-1:
             wait_click_xpath_relative(wait, time_w = 0.5, element = current_element, xpath = f".//{label_1}[contains(text(), '{node_value}')]/../preceding-sibling::span")
                                                                                                                     #(//div[@role = 'treeitem'])[1]//span[contains(text(), '中国共产党山东汶上经济开发区工作委员会')]/../../following-sibling::div[@role = 'group']
-            current_element = wait_return_subelement_relative(wait, time_w = 0.5, element = current_element, xpath = f".//{label_1}[contains(text(), '{node_value}')]/../../following-sibling::div[@role = 'group']")
+            current_element = wait_return_subelement_relative(time_w = 0.5, element = current_element, xpath = f".//{label_1}[contains(text(), '{node_value}')]/../../following-sibling::div[@role = 'group']")
     #如果node_value是列表中的最后一个元素，则点击元素体     
         else:                                                #测试：  (//div[@role = 'treeitem'])[1]//span[contains(text(), '中国共产党山东汶上经济开发区工作委员会')]/../../following-sibling::div[@role = 'group']/.//span[contains(text(), '中国共产党新风光电子科技股份有限公司委员会')]/../preceding-sibling::span
             wait_click_xpath_relative(wait, time_w = 0.5, element = current_element, xpath = f".//{label_2}[contains(text(), '{node_value}')]")                                                                                                     #测试： (//div[@role = 'treeitem'])[1]//span[contains(text(), '中国共产党山东汶上经济开发区工作委员会')]/../../following-sibling::div[@role = 'group']//span[contains(text(), '中国共产党新风光电子科技股份有限公司第一支部委员会')]
@@ -102,10 +108,32 @@ def select_party_org(wait, driver, tree:TreeNode, target:str, element_xpath, lab
 
 #单击通用按钮
 def commen_button(wait, driver, xpath):
+    
     try:
         wait_click_xpath(wait, time_w = 0.5, xpath = xpath)
     except Exception:
         traceback.print_exc()
+
+#单击通用按钮非一定
+def commen_button_notmust(wait, driver, xpath):
+    
+    try:
+        wait_click_xpath_notmust(wait, time_w = 0.5, xpath = xpath)
+    except Exception:
+        traceback.print_exc()
+
+
+def click_button_until_specifyxpath_disappear(wait, driver, specifyxpath, buttonxpath, time_w, times):
+    while 1:
+        yanzheng = wait_return_subelement_absolute_notmust(wait=wait, time_w=time_w, xpath=specifyxpath, times=times)
+        if yanzheng is not None:
+            try:
+                commen_button_notmust(wait, driver, xpath=buttonxpath)
+            except:
+                pass
+        elif yanzheng is None: 
+            break
+
 
 
 #上传图片
@@ -115,8 +143,9 @@ def upload_pic(pic_dir, input_xpath, wait, driver):
     input_xpath:输入位置的xpath
     '''
     try:
+        files = [os.path.join(pic_dir, f) for f in os.listdir(pic_dir) if os.path.isfile(os.path.join(pic_dir, f))]
         file_input = wait.until(EC.presence_of_element_located((By.XPATH, input_xpath)))
-        file_input.send_keys(pic_dir)
-        # wait.until(EC.presence_of_element_located((By.XPATH, "上传完成提示元素的XPath")))
+        for file in files:
+            file_input.send_keys(file)
     except Exception:
         traceback.print_exc()
