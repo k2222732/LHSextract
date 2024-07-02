@@ -5,6 +5,7 @@ import traceback
 from dataclasses import dataclass
 from base.mystruct import TreeNode
 from base.waitclick import wait_click_xpath, wait_click_xpath_relative, wait_return_subelement_relative, wait_return_subelement_absolute, wait_return_subelement_absolute_notmust, wait_click_xpath_notmust
+from base.waitclick import wait_return_subelement_absolute_notmust_visiable
 import pandas as pd
 import os
 import time
@@ -32,9 +33,10 @@ def input_text(wait, driver, xpath, text):
         input_element = wait.until(EC.presence_of_element_located((By.XPATH, xpath)))
         input_element.clear()
         if isinstance(text, pd.Timestamp):
-            input_element.send_keys(text._date_repr)
+            input_element.send_keys(text._date_repr) 
         else:
             input_element.send_keys(text)
+            
     except Exception:
         traceback.print_exc()
 
@@ -84,6 +86,9 @@ def select_background(wait, driver, element_xpath, label='span', value='汉族')
         traceback.print_exc()
 
 
+
+
+
 #点选列表（树）
 def select_party_org(wait, driver, tree:TreeNode, target:str, element_xpath, label_1 = 'span', label_2 = 'span'):
     '''
@@ -122,17 +127,32 @@ def commen_button_notmust(wait, driver, xpath):
     except Exception:
         traceback.print_exc()
 
-
+#点击按钮直到某个xpath消失
 def click_button_until_specifyxpath_disappear(wait, driver, specifyxpath, buttonxpath, time_w, times):
     while 1:
         yanzheng = wait_return_subelement_absolute_notmust(wait=wait, time_w=time_w, xpath=specifyxpath, times=times)
         if yanzheng is not None:
             try:
                 commen_button_notmust(wait, driver, xpath=buttonxpath)
+                time.sleep(1)
             except:
                 pass
         elif yanzheng is None: 
             break
+
+
+#等待某个xpath出现，然后再消失
+def wait_specifyxpath_appear_disappear(wait, driver, xpath):
+    wait.until(EC.visibility_of_element_located(By.XPATH, xpath))
+    while 1:
+        t = wait.until(EC.visibility_of_element_located(By.XPATH, xpath))
+        if t is not None:
+            time.sleep(0.5)
+        elif t is None:
+            break
+
+        
+
 
 
 

@@ -105,3 +105,16 @@ def wait_return_subelement_absolute_notmust(wait, time_w, xpath, times):
             i+=1
             if i>=times:
                 return None
+            
+#鲁棒返回对象（绝对）非一定
+def wait_return_subelement_absolute_notmust_visiable(wait, time_w, xpath, times):
+    i = 1
+    while(1):
+        try:
+            target_element = wait.until(EC.visibility_of_element_located((By.XPATH, xpath)))
+            return target_element
+        except:
+            time.sleep(time_w)
+            i+=1
+            if i>=times:
+                return None

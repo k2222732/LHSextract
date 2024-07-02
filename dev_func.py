@@ -10,6 +10,8 @@ import os
 import re
 import configparser
 import threading
+from bs4 import BeautifulSoup
+from base.waitclick import wait_return_subelement_absolute
 stop_event = threading.Event()
 
 def stop_dev_thread():
@@ -53,7 +55,7 @@ def access_dev_database(driver, wait):
 def switch_role(wait, driver):
     while 1:
         try:
-            wait_click_xpath(wait, time_w = 0.5, xpath = '//span[@class = "el-dropdown-link el-dropdown-selfdefine"]')
+            wait_click_xpath(wait, time_w = 0.5, xpath = "//i[@class = 'el-icon-caret-bottom']")
             print(f"进入角色下拉列表成功")
             config_file = 'config.ini'
             config = configparser.ConfigParser()
@@ -328,10 +330,22 @@ def synchronizing(wait, member_excel, member_excel_path, control):
 
 def get_total_amount(wait, xpath):
     time.sleep(1)
-    char_amountof_member = wait.until(EC.presence_of_element_located((By.XPATH, xpath))).text
-    int_amountof_members = re.findall(r'\d+', char_amountof_member)
-    int_amountof_member = int(int_amountof_members[0]) if int_amountof_members else None
-    return int(int_amountof_member)
+    try:
+        char_amountof_member = wait.until(EC.presence_of_element_located((By.XPATH, xpath))).text
+        int_amountof_members = re.findall(r'\d+', char_amountof_member)
+        int_amountof_member = int(int_amountof_members[0]) if int_amountof_members else None
+        return int(int_amountof_member)
+    except:
+        #//div[@class = "el-table y_table el-table--fit el-table--border el-table--enable-row-hover el-table--enable-row-transition"]
+        can = wait_return_subelement_absolute(wait, 0.5, "//main[@class ='el-main main']")
+        can_html = can.get_attribute('outerHTML')
+        soup = BeautifulSoup(can_html, 'html.parser')
+        result = soup.find('span', class_ = "el-table__empty-text")
+        if result:
+            return 0
+        else:
+            return -1
+
 
 
 def set_amount_perpage(wait):
