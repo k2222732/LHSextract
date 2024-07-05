@@ -14,6 +14,9 @@ from bs4 import BeautifulSoup
 from base.waitclick import wait_return_subelement_absolute
 stop_event = threading.Event()
 
+
+
+
 def stop_dev_thread():
     stop_event.set()
 
