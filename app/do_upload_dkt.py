@@ -31,6 +31,8 @@ hdzt = ""
 hdsj = ""
 text = ""
 zbordw = ""
+qc = ""
+
 
 
 def main():
@@ -64,8 +66,16 @@ def main():
     #//span[contains(text(), '支部委员会')]
     #//span[contains(text(), '支部委员会') and @class = 'fs-checkbox__label']
     #//span[contains(text(), '党课') and @class = 'fs-checkbox__label']
-    #//span[contains(text(), '灯塔大课堂')]
-    
+    #//span[contains(text(), '灯塔大课堂')] 
+    #//input[@placeholder = '请选择期次']   (//ul[@class = 'fs-scrollbar__view fs-select-dropdown__list'])[1]    (//ul[@class = 'fs-scrollbar__view fs-select-dropdown__list'])[1]//span[contains(text(), qc)]  
+    #//input[@placeholder = '请输入主持人']  <--  (//div[@aria-label = 'checkbox-group'])[2]/label[1]
+    #//input[@placeholder = '请输入记录人']  <--  (//div[@aria-label = 'checkbox-group'])[2]/label[2]
+    #(//label[@class = 'fs-checkbox left-checkbox margin-right-10-px']//span[@class = 'fs-checkbox__input'])[1]   全选
+    #driver.switch_to.frame(driver.find_element(By.ID, "edui1_iframeholder"))
+    #//html[@class = 'view']//body  <--  text
+    #driver.switch_to.default_content()
+    #//span[contains(text(), '保存并归档')]
+    #//button[@class = 'el-button el-button--default el-button--small el-button--primary ']
     input("")
 
 
