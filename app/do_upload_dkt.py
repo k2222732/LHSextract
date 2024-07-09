@@ -3,7 +3,7 @@
 
 #检查谁没上传主题党日、灯塔大课堂（仅党委有此功能）
 import dev_func
-from base.waitclick import wait_click_xpath, wait_return_element_text, wait_return_subelement_absolute_notmust,wait_return_subelement_absolute
+from base.waitclick import *
 from selenium.webdriver.support.ui import WebDriverWait
 import login
 import os
@@ -11,7 +11,7 @@ import pandas as pd
 from tkinter import messagebox
 import base.rwconfig as conf
 import base.write_entry as cursor
-from base.boot import synchronizing_org, synchronizing_job, synchronizing_xueli, synchronizing_jg
+from base.boot import *
 from base.mystruct import TreeNode
 import time
 from base.solv_date import calculate_date_add
@@ -25,14 +25,17 @@ from selenium.webdriver.common.by import By
 from bs4 import BeautifulSoup
 from selenium.webdriver.support import expected_conditions as EC
 from base.mystruct import TreeNode
-from base.waitclick import wait_click_xpath, wait_click_xpath_relative, wait_return_subelement_relative, wait_return_subelement_absolute
+from base.waitclick import *
+from base.write_entry import *
 
-hdzt = ""
-hdsj = ""
-text = ""
-zbordw = ""
-qc = ""
 
+
+hdzt = ""#活动主题
+hdsj = {}#活动时间
+text = ""#三会一课内容
+zbordw = ""#支部还是党委
+qc = ""#期次
+excel_path = ""#未上传名单的路径
 
 
 def main():
@@ -54,29 +57,72 @@ def main():
     middle.switch_role.access_e_shandong(driver, wait)
     middle.switch_role.switch_role(wait)
     #//span[contains(text(), '党务管理')]
+    commen_button(wait, driver, xpath="//span[contains(text(), '党务管理')]")
     #(//span[contains(text(), '支部活动')])[1]
-    #(//span[contains(text(), '记入电子日志')])[1]
-    #wait_click_xpath(wait, driver, xpath="(//input[@placeholder = '请选择字段项'])[8]")
-    #//input[@placeholder = '请输入活动主题'] <--- hdzt   
-    #//input[@class = 'vue-treeselect__input']    出现
-    #//div[@class = 'vue-treeselect__option-arrow-container']   展开
-    #(//div[@class = 'vue-treeselect__list'])[2]     获取
-    #select_party_org(wait, driver, tree:TreeNode, target:str, element_xpath, label_1 = 'span', label_2 = 'span'):
-    #//span[contains(text(), '支部党员大会')]
-    #//span[contains(text(), '支部委员会')]
-    #//span[contains(text(), '支部委员会') and @class = 'fs-checkbox__label']
-    #//span[contains(text(), '党课') and @class = 'fs-checkbox__label']
-    #//span[contains(text(), '灯塔大课堂')] 
-    #//input[@placeholder = '请选择期次']   (//ul[@class = 'fs-scrollbar__view fs-select-dropdown__list'])[1]    (//ul[@class = 'fs-scrollbar__view fs-select-dropdown__list'])[1]//span[contains(text(), qc)]  
-    #//input[@placeholder = '请输入主持人']  <--  (//div[@aria-label = 'checkbox-group'])[2]/label[1]
-    #//input[@placeholder = '请输入记录人']  <--  (//div[@aria-label = 'checkbox-group'])[2]/label[2]
-    #(//label[@class = 'fs-checkbox left-checkbox margin-right-10-px']//span[@class = 'fs-checkbox__input'])[1]   全选
-    #driver.switch_to.frame(driver.find_element(By.ID, "edui1_iframeholder"))
-    #//html[@class = 'view']//body  <--  text
-    #driver.switch_to.default_content()
-    #//span[contains(text(), '保存并归档')]
-    #//button[@class = 'el-button el-button--default el-button--small el-button--primary ']
-    input("")
+    commen_button(wait, driver, xpath="(//span[contains(text(), '支部活动')])[1]")
+    df = pd.read_excel(excel_path)
+    data_dict = {}
+    for index, row in df.iterrows():#df.iterrows()方法返回一个迭代器,该迭代器会生成DataFrame中每行的索引和行数据。具体来说,每次迭代时,它会返回一个包含两个元素的元组
+            dkt = row['未上传大课堂的企业']
+            nested_dict = {'未上传大课堂的企业':dkt}
+            data_dict[index]=nested_dict
+    for qy in data_dict:
+        target = qy['未上传大课堂的企业']
+        ####################循环开始#########################
+        #(//span[contains(text(), '记入电子日志')])[1]
+        commen_button(wait, driver, xpath="(//span[contains(text(), '记入电子日志')])[1]")
+        #wait_click_xpath(wait, driver, xpath="(//input[@placeholder = '请选择字段项'])[8]")
+        #//input[@placeholder = '请输入活动主题'] <--- hdzt 
+        input_text(wait, driver, xpath="//input[@placeholder = '请输入活动主题']", text=hdzt)
+        #//input[@class = 'vue-treeselect__input']    出现
+        commen_button(wait, driver, xpath="//input[@class = 'vue-treeselect__input']")
+        #//div[@class = 'vue-treeselect__option-arrow-container']   展开
+        commen_button(wait, driver, xpath="//div[@class = 'vue-treeselect__option-arrow-container']")
+        #(//div[@class = 'vue-treeselect__list'])[2]     获取
+        element_list = wait_return_subelement_absolute(wait, time_w=0.5, xpath="(//div[@class = 'vue-treeselect__list'])[2]")
+        #select_party_org(wait, driver, tree:TreeNode, target:str, element_xpath, label_1 = 'span', label_2 = 'span'):
+        select_party_org(wait, driver, tree=org_tree, target=target, element_xpath="(//div[@class = 'vue-treeselect__list'])[2]", label_1 = 'label', label_2 = 'label')
+        #//span[contains(text(), '支部党员大会')]
+        commen_button(wait, driver, xpath="//span[contains(text(), '支部党员大会')]")
+        #//span[contains(text(), '支部委员会')]
+        commen_button(wait, driver, xpath= "//span[contains(text(), '支部委员会')]")
+        #//span[contains(text(), '支部委员会') and @class = 'fs-checkbox__label']
+        commen_button(wait, driver, xpath="//span[contains(text(), '支部委员会') and @class = 'fs-checkbox__label']")
+        #//span[contains(text(), '党课') and @class = 'fs-checkbox__label']
+        commen_button(wait, driver, xpath="//span[contains(text(), '党课') and @class = 'fs-checkbox__label']")
+        #//span[contains(text(), '灯塔大课堂')] 
+        commen_button(wait, driver, xpath="//span[contains(text(), '灯塔大课堂')]")
+        #//input[@placeholder = '请选择期次']   (//ul[@class = 'fs-scrollbar__view fs-select-dropdown__list'])[1]    (//ul[@class = 'fs-scrollbar__view fs-select-dropdown__list'])[1]//span[contains(text(), qc)]  
+        commen_button(wait, driver, xpath="//input[@placeholder = '请选择期次']")
+        select_background(wait, driver, element_xpath="(//ul[@class = 'fs-scrollbar__view fs-select-dropdown__list'])[1]", label='span', value=qc)
+        #//input[@placeholder = '请输入主持人']  <--  (//div[@aria-label = 'checkbox-group'])[2]/label[1]
+        element_zcr = wait.until(EC.presence_of_element_located(By.XPATH, "(//div[@aria-label = 'checkbox-group'])[2]/label[1]"))
+        zcr = element_zcr.get_attribute('textContent')
+        input_text(wait, driver, xpath="//input[@placeholder = '请输入主持人']", text=zcr)
+        #//input[@placeholder = '请输入记录人']  <--  (//div[@aria-label = 'checkbox-group'])[2]/label[2]
+        element_jlr = wait.until(EC.presence_of_element_located(By.XPATH, "(//div[@aria-label = 'checkbox-group'])[2]/label[2]"))
+        jlr = element_jlr.get_attribute('textContent')
+        input_text(wait, driver, xpath="//input[@placeholder = '请输入记录人']", text=jlr)
+        #//input[@placeholder = '开始时间']
+        input_text(wait, driver, xpath="//input[@placeholder = '开始时间']", text=hdsj['开始时间'])
+        #//input[@placeholder = '结束时间']
+        input_text(wait, driver, xpath="//input[@placeholder = '结束时间']", text=hdsj['结束时间'])
+        #//input[@placeholder = '请输入活动地点']
+        input_text(wait, driver, xpath="//input[@placeholder = '请输入活动地点']", text="单位党务活动室")
+        #(//label[@class = 'fs-checkbox left-checkbox margin-right-10-px']//span[@class = 'fs-checkbox__input'])[1]   全选
+        commen_button(wait, driver, xpath="(//label[@class = 'fs-checkbox left-checkbox margin-right-10-px']//span[@class = 'fs-checkbox__input'])[1]")
+        #driver.switch_to.frame(driver.find_element(By.ID, "edui1_iframeholder"))
+        driver.switch_to.frame(driver.find_element(By.ID, "edui1_iframeholder"))
+        #//html[@class = 'view']//body  <--  text
+        input_text(wait, driver, xpath="//html[@class = 'view']//body", text=text)
+        #driver.switch_to.default_content()
+        driver.switch_to.default_content()
+        #//span[contains(text(), '保存并归档')]
+        commen_button(wait, driver, xpath="//span[contains(text(), '保存并归档')]")
+        #//button[@class = 'el-button el-button--default el-button--small el-button--primary ']
+        commen_button(wait, driver, xpath="//button[@class = 'el-button el-button--default el-button--small el-button--primary ']")
+        ####################循环结束#########################
+    input("按任意键结束")
 
 
 def synchronizing_org(wait, driver, input_node:TreeNode):
