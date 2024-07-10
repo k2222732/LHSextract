@@ -45,6 +45,7 @@ def main():
     dev_func.switch_role(wait, driver)
     commen_button(wait, driver, xpath="(//span[contains(text(), '人员信息')])[1]")
     #(//span[contains(text(), '人员信息')])[1]
+
     org_tree = TreeNode()
     synchronizing_org(wait, driver, input_node=org_tree)
     try:
@@ -154,10 +155,11 @@ def recursion_org(tree_root, wait, driver, root_node:TreeNode):
         item_html = item.get_attribute('outerHTML')
         soup = BeautifulSoup(item_html, 'html.parser')
         div_element = soup.find('span')
-        if div_element and div_element.get('class') == 'is-leaf el-tree-node__expand-icon el-icon-caret-right':
+        test = div_element.get('class')
+        if div_element and test[0] == 'is-leaf':
             next
         else:
-            wait_click_xpath_relative(wait=wait,time_w = 0.5, element = item, xpath = ".el-tree-node__expand-icon el-icon-caret-right")
+            wait_click_xpath_relative(wait=wait,time_w = 0.5, element = item, xpath = ".//span[@class = 'el-tree-node__expand-icon el-icon-caret-right']")
             new_tree_root = wait_return_subelement_relative(time_w = 0.5, element= item, xpath = ".//div[@role = 'group']")
             recursion_org(new_tree_root, wait, driver, new_node)
             
