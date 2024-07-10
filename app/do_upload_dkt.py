@@ -140,7 +140,7 @@ def synchronizing_org(wait, driver, input_node:TreeNode):
     
     
     
-    
+
     
     
     
@@ -163,6 +163,8 @@ def recursion_org(tree_root, wait, driver, root_node:TreeNode):
             new_tree_root = wait_return_subelement_relative(time_w = 0.5, element= item, xpath = ".//div[@role = 'group']")
             recursion_org(new_tree_root, wait, driver, new_node)
             
+
+
 
 #点选列表（树）                                                                          label             label
 def select_party_org(wait, driver, tree:TreeNode, target:str, element_xpath, label_1 = 'span', label_2 = 'span'):
