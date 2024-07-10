@@ -30,12 +30,12 @@ from base.write_entry import *
 
 
 
-hdzt = ""#活动主题
-hdsj = {}#活动时间
-text = ""#三会一课内容
+hdzt = "上传测试"#活动主题
+hdsj = {"开始时间":"2024-07-01 00:00", "结束时间":"2024-07-01 00:30"}#活动时间
+text = "测试测试测试测试测试测试测试测试测试测试测试测试"#三会一课内容
 zbordw = ""#支部还是党委
-qc = ""#期次
-excel_path = ""#未上传名单的路径
+qc = "202406  “请党放心 强国有我”——青年党员学习研讨"#期次
+excel_path = "G:\\project\\LHSextract\\三会一课未上传.xlsx"#未上传名单的路径
 
 
 def main():
@@ -43,6 +43,7 @@ def main():
     wait = WebDriverWait(driver, 2, 0.5)
     dev_func.access_dev_database(driver, wait)
     dev_func.switch_role(wait, driver)
+    commen_button(wait, driver, xpath="(//span[contains(text(), '人员信息')])[1]")
     #(//span[contains(text(), '人员信息')])[1]
     org_tree = TreeNode()
     synchronizing_org(wait, driver, input_node=org_tree)
@@ -141,7 +142,7 @@ def synchronizing_org(wait, driver, input_node:TreeNode):
     
     
     
-
+    
 
 def recursion_org(tree_root, wait, driver, root_node:TreeNode):
     org_items = []
