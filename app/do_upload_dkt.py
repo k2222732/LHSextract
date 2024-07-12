@@ -116,21 +116,27 @@ def main():
         #(//label[@class = 'fs-checkbox left-checkbox margin-right-10-px']//span[@class = 'fs-checkbox__input'])[1]   全选
         commen_button(wait, driver, xpath="(//label[@class = 'fs-checkbox left-checkbox margin-right-10-px']//span[@class = 'fs-checkbox__input'])[1]")
         #driver.switch_to.frame(driver.find_element(By.ID, "edui1_iframeholder"))
-        #while(1):
-        #    try:
-        #        driver.switch_to.frame(driver.find_element(By.ID, "edui1_iframeholder"))
-        #        break
-        #    except:
-        #        time.sleep(1)
-        #//html[@class = 'view']//body  <--  text
-        word = wait_return_subelement_absolute(wait, time_w = 0.5, xpath="//html[@class = 'view']//body")
+        while(1):
+           try:
+               iframe = WebDriverWait(driver, 10).until(EC.presence_of_element_located((By.XPATH, "//iframe[1]")))
+               driver.switch_to.frame(iframe)
+               break
+           except:
+               time.sleep(1)
+        # //html[@class = 'view']//body  <--  text
+        word = wait_return_subelement_absolute(wait, time_w = 2, xpath="//html[@class = 'view']//body")
         word.send_keys(text)
         #driver.switch_to.default_content()
-        #driver.switch_to.default_content()
+        driver.switch_to.default_content()
         #//span[contains(text(), '保存并归档')]
-        commen_button(wait, driver, xpath="//span[contains(text(), '保存并归档')]")
+        #button = wait.until(EC.element_to_be_clickable((By.XPATH, "//span[contains(text(), '保存并归档')]/..")))
+        #button.click()
+        time.sleep(1)
+        commen_button(wait, driver, xpath="//span[contains(text(), '保存并归档')]/..")
         #//button[@class = 'el-button el-button--default el-button--small el-button--primary ']
-        commen_button(wait, driver, xpath="//button[@class = 'el-button el-button--default el-button--small el-button--primary ']")
+        #commen_button(wait, driver, xpath="//button[@class = 'el-button el-button--default el-button--small el-button--primary ']")
+        time.sleep(1)
+        click_button_until_specifyxpath_disappear(wait, driver, specifyxpath="//button[@class = 'el-button el-button--default el-button--small el-button--primary ']", buttonxpath="//button[@class = 'el-button el-button--default el-button--small el-button--primary ']", time_w = 1, times = 3)
         ####################循环结束#########################
     input("按任意键结束")
 
@@ -144,12 +150,12 @@ def synchronizing_org(wait, driver, input_node:TreeNode):
     #获取根节点结构体//div[@class = "tree_wrapper"]//div[@role = "treeitem"]/div[@role = "group"]到tree_root
     tree_root = wait_return_subelement_absolute(wait, time_w = 0.5, xpath = "//div[@class = 'el-tree-node__children']")
     recursion_org(tree_root = tree_root, wait = wait, driver = driver, root_node = input_node)
-    
-    
+
+
     
     
 
-    
+
     
     
 
@@ -189,9 +195,9 @@ def select_party_org(wait, driver, tree:TreeNode, target:str, element_xpath, lab
                                     #(//div[@role = 'treeitem'])[1]//span[contains(text(),'中国共产党山东汶上经济开发区工作委员会')]
         if i<len(path_to_root)-1:
             wait_click_xpath_relative(wait, time_w = 0.5, element = current_element, xpath = f".//{label_1}[contains(text(), '{node_value}')]/../preceding-sibling::div")
-                                                                                                                    #(//div[@role = 'treeitem'])[1]//span[contains(text(), '中国共产党山东汶上经济开发区工作委员会')]/../../following-sibling::div[@role = 'group']
+                                                                    #(//div[@role = 'treeitem'])[1]//span[contains(text(), '中国共产党山东汶上经济开发区工作委员会')]/../../following-sibling::div[@role = 'group']
             current_element = wait_return_subelement_relative(time_w = 0.5, element = current_element, xpath = f".//{label_1}[contains(text(), '{node_value}')]/../../following-sibling::div[@class = 'vue-treeselect__list']")
-    #如果node_value是列表中的最后一个元素，则点击元素体     
+        #如果node_value是列表中的最后一个元素，则点击元素体
         else:                                                #测试：  (//div[@role = 'treeitem'])[1]//span[contains(text(), '中国共产党山东汶上经济开发区工作委员会')]/../../following-sibling::div[@role = 'group']/.//span[contains(text(), '中国共产党新风光电子科技股份有限公司委员会')]/../preceding-sibling::span
             wait_click_xpath_relative(wait, time_w = 0.5, element = current_element, xpath = f".//{label_2}[contains(text(), '{node_value}')]")                                                                                                     #测试： (//div[@role = 'treeitem'])[1]//span[contains(text(), '中国共产党山东汶上经济开发区工作委员会')]/../../following-sibling::div[@role = 'group']//span[contains(text(), '中国共产党新风光电子科技股份有限公司第一支部委员会')]
 
