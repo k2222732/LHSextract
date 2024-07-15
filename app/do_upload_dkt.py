@@ -27,6 +27,7 @@ from selenium.webdriver.support import expected_conditions as EC
 from base.mystruct import TreeNode
 from base.waitclick import *
 from base.write_entry import *
+from selenium.common.exceptions import NoSuchElementException
 
 
 
@@ -39,6 +40,7 @@ excel_path = "G:\project\LHSextract\三会一课未上传\三会一课未上传�
 
 
 def main():
+    result = []
     driver = login._main()
     wait = WebDriverWait(driver, 2, 0.5)
     dev_func.access_dev_database(driver, wait)
@@ -89,16 +91,25 @@ def main():
         #//span[contains(text(), '支部党员大会')]
         commen_button(wait, driver, xpath="//span[contains(text(), '支部党员大会')]")
         #//span[contains(text(), '支部委员会')]
-        commen_button(wait, driver, xpath= "//span[contains(text(), '支部委员会')]")
+        #commen_button(wait, driver, xpath= "//span[contains(text(), '支部委员会')]")
         #//span[contains(text(), '支部委员会') and @class = 'fs-checkbox__label']
-        commen_button(wait, driver, xpath="//span[contains(text(), '支部委员会') and @class = 'fs-checkbox__label']")
+        #commen_button(wait, driver, xpath="//span[contains(text(), '支部委员会') and @class = 'fs-checkbox__label']")
         #//span[contains(text(), '党课') and @class = 'fs-checkbox__label']
         commen_button(wait, driver, xpath="//span[contains(text(), '党课') and @class = 'fs-checkbox__label']")
         #//span[contains(text(), '灯塔大课堂')] 
         commen_button(wait, driver, xpath="//span[contains(text(), '灯塔大课堂')]")
         #//input[@placeholder = '请选择期次']   (//ul[@class = 'fs-scrollbar__view fs-select-dropdown__list'])[1]    (//ul[@class = 'fs-scrollbar__view fs-select-dropdown__list'])[1]//span[contains(text(), qc)]  
         commen_button(wait, driver, xpath="//input[@placeholder = '请选择期次']")
+        time.sleep(1)
+        try:
+            temp = driver.find_element(By.XPATH, f"(//ul[@class = 'fs-scrollbar__view fs-select-dropdown__list'])[1]//span[contains(text(), '{qc}')]")
+        except NoSuchElementException as e:
+            result.append(f"{data_dict[qy]['未上传大课堂的企业']}已上传\n")
+            driver.back()
+            continue
         select_background(wait, driver, element_xpath="(//ul[@class = 'fs-scrollbar__view fs-select-dropdown__list'])[1]", label='span', value=qc)
+
+
         #//input[@placeholder = '请输入主持人']  <--  (//div[@aria-label = 'checkbox-group'])[2]/label[1]
         element_zcr = wait.until(EC.presence_of_element_located((By.XPATH, "(//div[@aria-label = 'checkbox-group'])[2]/label[1]")))
         zcr = element_zcr.get_attribute('textContent')
@@ -138,6 +149,8 @@ def main():
         time.sleep(1)
         click_button_until_specifyxpath_disappear(wait, driver, specifyxpath="//button[@class = 'el-button el-button--default el-button--small el-button--primary ']", buttonxpath="//button[@class = 'el-button el-button--default el-button--small el-button--primary ']", time_w = 1, times = 3)
         ####################循环结束#########################
+    for element in result:
+        print(element)
     input("按任意键结束")
 
 

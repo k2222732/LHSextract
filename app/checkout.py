@@ -27,6 +27,7 @@ def main():
     wait = WebDriverWait(driver, 2, 0.5)
     middle.switch_role.access_e_shandong(driver, wait)
     middle.switch_role.switch_role(wait)
+    
     input("")
 
 
