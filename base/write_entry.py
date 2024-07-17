@@ -36,7 +36,6 @@ def input_text(wait, driver, xpath, text):
             input_element.send_keys(text._date_repr) 
         else:
             input_element.send_keys(text)
-            
     except Exception:
         traceback.print_exc()
 
@@ -119,6 +118,14 @@ def commen_button(wait, driver, xpath):
     except Exception:
         traceback.print_exc()
 
+
+def commen_button_w(wait, xpath):
+    try:
+        wait_click_xpath(wait, time_w = 0.5, xpath = xpath)
+    except Exception:
+        traceback.print_exc()
+
+
 #单击通用按钮非一定
 def commen_button_notmust(wait, driver, xpath):
     
@@ -126,6 +133,7 @@ def commen_button_notmust(wait, driver, xpath):
         wait_click_xpath_notmust(wait, time_w = 0.5, xpath = xpath)
     except Exception:
         traceback.print_exc()
+
 
 #点击按钮直到某个xpath消失
 def click_button_until_specifyxpath_disappear(wait, driver, specifyxpath, buttonxpath, time_w, times):
@@ -150,8 +158,6 @@ def wait_specifyxpath_appear_disappear(wait, driver, xpath):
             time.sleep(0.5)
         elif t is None:
             break
-
-        
 
 
 

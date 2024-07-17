@@ -11,15 +11,15 @@ import re
 import configparser
 import threading
 from bs4 import BeautifulSoup
-from base.waitclick import wait_return_subelement_absolute
+from base.waitclick import *
+from base.write_entry import *
+from middle.dev_download import *
 stop_event = threading.Event()
-
 
 
 
 def stop_dev_thread():
     stop_event.set()
-
 
 
 
@@ -30,6 +30,8 @@ amount_activist_complete = 0
 amount_devtar_complete = 0
 amount_applicant_complete = 0
 
+
+
 mem_total_amount = 0
 infomem_total_amount = 0
 activist_total_amount = 0
@@ -37,7 +39,6 @@ devtar_total_amount = 0
 applicant_total_amount = 0
 
 dev_directory = ""
-
 driver0 = ""
 temp_countx = 0
 
@@ -75,6 +76,13 @@ def switch_role(wait, driver):
 def switch_formal_mem(wait):
     wait_click_xpath(wait, time_w = 0.5, xpath = '(//*[contains(text(), "人员信息")]/..)[1]')
     wait_click_xpath(wait, time_w = 0.5, xpath = '(//input[@placeholder = "请选择"])[1]')
+    while 1:    
+        try:
+        
+            wait.until(EC.presence_of_element_located((By.XPATH, "//div[@class = 'el-input el-input--suffix is-focus']")))
+            break
+        except:
+            wait_click_xpath(wait, time_w = 0.5, xpath = '(//input[@placeholder = "请选择"])[1]')
     wait_click_xpath(wait, time_w = 0.5, xpath = '//ul[@class = "el-scrollbar__view el-select-dropdown__list"]//li//span[contains(text(), "正式党员")]')
     wait_click_xpath(wait, time_w = 0.5, xpath = '//span[contains(text(), "搜索")]')
     
@@ -426,29 +434,17 @@ def schedule(complete, total, xpath, wait, member_excel, member_excel_path, cont
 
 def access_info_page(wait, rowx, file, path):
     global temp_countx
-    lishudangzuzhi = wait.until(EC.visibility_of_element_located((By.XPATH, f"//table[@class = 'el-table__body']/tbody/tr[{rowx}]/td[5]//a"))).text
+    lishudangzuzhi = wait_return_subelement_absolute(wait, time_w = 0.5, xpath = f"//table[@class = 'el-table__body']/tbody/tr[{rowx}]/td[4]//a").text
+    #lishudangzuzhi = wait.until(EC.visibility_of_element_located((By.XPATH, f"//table[@class = 'el-table__body']/tbody/tr[{rowx}]/td[5]//a"))).text
     file.active.cell(row=temp_countx+2, column=28).value = lishudangzuzhi
     file.save(path)
+
     wait_click_xpath(wait, time_w = 0.5, xpath = f"//table[@class = 'el-table__body']/tbody/tr[{rowx}]/td[1]//a")
     
     
     
 
 
-def bitian_located(file, path, row, column, wait, str):
-    file.active.cell(row=row, column=column).value = wait.until(EC.presence_of_element_located((By.XPATH, str))).text
-    start_time = time.time()
-    while(1):
-            elapsed_time = time.time() - start_time
-            if elapsed_time > 5:
-                break
-            try:
-                df = file.active.cell(row=row, column=column).value
-                assert df != ""
-                break
-            except AssertionError:
-                file.active.cell(row=row, column=column).value = wait.until(EC.presence_of_element_located((By.XPATH, str))).text
-                file.save(path)
 
 
 def downloading(file, wait, path, control):
@@ -464,7 +460,7 @@ def downloading(file, wait, path, control):
     elif control == 2:
         count = amount_infomem_complete + amount_mem_complete
     elif control == 3:
-        count = amount_activist_complete + amount_infomem_complete + amount_mem_complete
+        count = amount_devtar_complete + amount_infomem_complete + amount_mem_complete
     elif control == 4:
         count = amount_devtar_complete + amount_activist_complete + amount_infomem_complete + amount_mem_complete
     elif control == 5:
@@ -474,141 +470,9 @@ def downloading(file, wait, path, control):
         count = count + 1
         countx = count + 1
         temp_countx = count
-        #填写序号
-        file.active.cell(row=countx, column=1).value = count
-        file.save(path)
-        
-        #姓名
-        name_temp = wait.until(EC.visibility_of_element_located((By.XPATH, "(//tbody)[1]/tr[1]/td[2]/span"))).text
-
-
-
-        file.active.cell(row=countx, column=2).value = name_temp
-        file.save(path)
-        #循环断言
-        while(1):
-            try:
-                df = file.active.cell(row=countx, column=2).value
-                assert df != ""
-                break
-            except AssertionError:
-                time.sleep(0.5)
-                file.active.cell(row=countx, column=2).value = wait.until(EC.presence_of_element_located((By.XPATH, "(//tbody)[1]/tr[1]/td[2]/span"))).text
-                file.save(path)
-        #性别
-        file.active.cell(row=countx, column=3).value = wait.until(EC.presence_of_element_located((By.XPATH, "(//tbody)[1]/tr[2]/td[2]//span[1]"))).text
-        
-        #公民身份证号码
-        file.active.cell(row=countx, column=4).value = wait.until(EC.presence_of_element_located((By.XPATH, "(//tbody)[1]/tr[1]/td[4]//span[1]"))).text
-        
-        #民族
-        file.active.cell(row=countx, column=5).value = wait.until(EC.presence_of_element_located((By.XPATH, "(//tbody)[1]/tr[1]/td[6]//span[1]"))).text
-        
-        #出生日期
-        file.active.cell(row=countx, column=6).value = wait.until(EC.presence_of_element_located((By.XPATH, "(//tbody)[1]/tr[2]/td[4]//span[1]"))).text
-        
-        #学历
-        bitian_located(file, path, countx, column=7, wait = wait, str = "(//tbody)[1]/tr[2]/td[6]//span[1]")
-        
-
-
-        #申请入党日期
-        file.active.cell(row=countx, column=8).value = wait.until(EC.presence_of_element_located((By.XPATH, "(//tbody)[1]/tr[3]/td[2]//span[1]"))).text
-        
-        #手机号码
-        file.active.cell(row=countx, column=9).value = wait.until(EC.presence_of_element_located((By.XPATH, "(//tbody)[1]/tr[3]/td[4]//span[1]"))).text
-        
-        #背景信息
-        bitian_located(file, path, countx, column=10, wait = wait, str = "(//tbody)[1]/tr[3]/td[6]//span[1]")
-        
-
-
-        #工作岗位
-        bitian_located(file, path, countx, column=11, wait = wait, str = "(//tbody)[1]/tr[4]/td[2]//span[1]")
-        
-
-
-        #政治面貌
-        bitian_located(file, path, countx, column=12, wait = wait, str = "(//tbody)[1]/tr[4]/td[4]//span[1]")
-        
-
-
-        #接受申请党组织
-        file.active.cell(row=countx, column=13).value = wait.until(EC.presence_of_element_located((By.XPATH, "(//tbody)[1]/tr[5]/td[2]//span[1]"))).text
-        file.save(path)
-        #切换到积极分子信息
-        while(1):
-            try:
-                company_info = wait.until(EC.element_to_be_clickable((By.XPATH, "//div[contains(text(), '入党积极分子基本信息')]")))
-                break
-            except:
-                time.sleep(0.1)
-        while(1):
-            try:
-                company_info.click()
-                break
-            except:
-                company_info = wait.until(EC.element_to_be_clickable((By.XPATH, "//div[contains(text(), '入党积极分子基本信息')]")))
-        #籍贯
-        while 1:
-            jiguan = wait.until(EC.presence_of_element_located((By.XPATH, "(//tbody)[2]/tr[3]/td[4]//span[1]"))).text
-            if jiguan == "":
-                pass
-            else:
-                file.active.cell(row=countx, column=14).value = jiguan
-                break
-        #入团日期
-        file.active.cell(row=countx, column=15).value = wait.until(EC.presence_of_element_located((By.XPATH, "((//tbody)[2]/tr[4]/td[4]//span)[1]"))).text
-        
-        #参加工作日期
-        file.active.cell(row=countx, column=16).value = wait.until(EC.presence_of_element_located((By.XPATH, "((//tbody)[2]/tr[4]/td[6]//span)[1]"))).text
-        
-        #申请入党日期
-        file.active.cell(row=countx, column=17).value = wait.until(EC.presence_of_element_located((By.XPATH, "((//tbody)[2]/tr[5]/td[2]//span)[1]"))).text
-        
-        #确定入党积极分子日期
-        file.active.cell(row=countx, column=18).value = wait.until(EC.presence_of_element_located((By.XPATH, "((//tbody)[2]/tr[5]/td[4]//span)[1]"))).text
-        
-        #工作单位及职务
-        file.active.cell(row=countx, column=19).value = wait.until(EC.presence_of_element_located((By.XPATH, "((//tbody)[2]/tr[6]/td[4]//span)[1]"))).text
-        
-        #家庭住址
-        file.active.cell(row=countx, column=20).value = wait.until(EC.presence_of_element_located((By.XPATH, "((//tbody)[2]/tr[7]/td[2]//span)[1]"))).text
-        file.save(path)
-        #切换到预备党员
-        while(1):
-            try:
-                company_info = wait.until(EC.element_to_be_clickable((By.XPATH, "//div[contains(text(), '预备党员')]")))
-                break
-            except:
-                time.sleep(0.1)
-        while(1):
-            try:
-                company_info.click()
-                break
-            except:
-                company_info = wait.until(EC.element_to_be_clickable((By.XPATH, "//div[contains(text(), '预备党员')]")))
-        # 加入党组织日期
-        file.active.cell(row=countx, column=21).value = wait.until(EC.presence_of_element_located((By.XPATH, "(//tbody)[4]/tr[4]/td[6]"))).text
-        
-        # 转为正式党员日期
-        file.active.cell(row=countx, column=22).value = wait.until(EC.presence_of_element_located((By.XPATH, "(//tbody)[4]/tr[5]/td[2]"))).text
-               
-        # 人员类别
-        file.active.cell(row=countx, column=23).value = wait.until(EC.presence_of_element_located((By.XPATH, "(//tbody)[4]/tr[6]/td[2]"))).text
-               
-        # 党籍状态
-        file.active.cell(row=countx, column=24).value = wait.until(EC.presence_of_element_located((By.XPATH, "(//tbody)[4]/tr[6]/td[4]"))).text
-           
-        # 入党类型
-        file.active.cell(row=countx, column=25).value = wait.until(EC.presence_of_element_located((By.XPATH, "(//tbody)[4]/tr[6]/td[6]"))).text
-        
-        # 所在党支部
-        file.active.cell(row=countx, column=26).value = wait.until(EC.presence_of_element_located((By.XPATH, "(//tbody)[4]/tr[8]/td[4]"))).text
-        
-        # 人员类型
-        file.active.cell(row=countx, column=27).value = "正式党员"
-        file.save(path)
+        name_temp = jibenxinxi_download(file, path, wait, countx, count)
+        jijifenzi_download(path, file, wait, countx)
+        yubeidangyuan(path, file, wait, countx, control)
         print("填写第",count,"个正式党员",name_temp,"信息成功") 
         amount_mem_complete = amount_mem_complete + 1
 
@@ -618,125 +482,9 @@ def downloading(file, wait, path, control):
         count = count + 1
         countx = count + 1
         temp_countx = count
-        #填写序号
-        file.active.cell(row=countx, column=1).value = count
-        
-        #姓名
-        name_temp = wait.until(EC.visibility_of_element_located((By.XPATH, "(//tbody)[1]/tr[1]/td[2]/span"))).text
-        file.active.cell(row=countx, column=2).value = name_temp
-        file.save(path)
-        #循环断言
-        while(1):
-            try:
-                df = file.active.cell(row=countx, column=2).value
-                assert df != ""
-                break
-            except AssertionError:
-                time.sleep(0.5)
-                file.active.cell(row=countx, column=2).value = wait.until(EC.presence_of_element_located((By.XPATH, "(//tbody)[1]/tr[1]/td[2]/span"))).text
-                file.save(path)
-        #性别
-        file.active.cell(row=countx, column=3).value = wait.until(EC.presence_of_element_located((By.XPATH, "(//tbody)[1]/tr[2]/td[2]//span[1]"))).text
-        
-        #公民身份证号码
-        file.active.cell(row=countx, column=4).value = wait.until(EC.presence_of_element_located((By.XPATH, "(//tbody)[1]/tr[1]/td[4]//span[1]"))).text
-        
-        #民族
-        file.active.cell(row=countx, column=5).value = wait.until(EC.presence_of_element_located((By.XPATH, "(//tbody)[1]/tr[1]/td[6]//span[1]"))).text
-        
-        #出生日期
-        file.active.cell(row=countx, column=6).value = wait.until(EC.presence_of_element_located((By.XPATH, "(//tbody)[1]/tr[2]/td[4]//span[1]"))).text
-       
-        #学历
-        bitian_located(file, path, countx, column=7, wait = wait, str = "(//tbody)[1]/tr[2]/td[6]//span[1]")
-
-
-        #申请入党日期
-        file.active.cell(row=countx, column=8).value = wait.until(EC.presence_of_element_located((By.XPATH, "(//tbody)[1]/tr[3]/td[2]//span[1]"))).text
-        
-        #手机号码
-        file.active.cell(row=countx, column=9).value = wait.until(EC.presence_of_element_located((By.XPATH, "(//tbody)[1]/tr[3]/td[4]//span[1]"))).text
-        
-        #背景信息
-        bitian_located(file, path, countx, column=10, wait = wait, str = "(//tbody)[1]/tr[3]/td[6]//span[1]")
-
-        #工作岗位
-        bitian_located(file, path, countx, column=11, wait = wait, str = "(//tbody)[1]/tr[4]/td[2]//span[1]")
-
-        #政治面貌
-        bitian_located(file, path, countx, column=12, wait = wait, str = "(//tbody)[1]/tr[4]/td[4]//span[1]")
-
-        #接受申请党组织
-        file.active.cell(row=countx, column=13).value = wait.until(EC.presence_of_element_located((By.XPATH, "(//tbody)[1]/tr[5]/td[2]//span[1]"))).text
-        file.save(path)
-        #切换到积极分子信息
-        while(1):
-            try:
-                company_info = wait.until(EC.element_to_be_clickable((By.XPATH, "//div[contains(text(), '入党积极分子基本信息')]")))
-                break
-            except:
-                time.sleep(0.1)
-        while(1):
-            try:
-                company_info.click()
-                break
-            except:
-                company_info = wait.until(EC.element_to_be_clickable((By.XPATH, "//div[contains(text(), '入党积极分子基本信息')]")))
-        #籍贯
-        file.active.cell(row=countx, column=14).value = wait.until(EC.presence_of_element_located((By.XPATH, "(//tbody)[2]/tr[3]/td[4]//span[1]"))).text
-      
-        #入团日期
-        file.active.cell(row=countx, column=15).value = wait.until(EC.presence_of_element_located((By.XPATH, "((//tbody)[2]/tr[4]/td[4]//span)[1]"))).text
-        
-        #参加工作日期
-        file.active.cell(row=countx, column=16).value = wait.until(EC.presence_of_element_located((By.XPATH, "((//tbody)[2]/tr[4]/td[6]//span)[1]"))).text
-        
-        #申请入党日期
-        file.active.cell(row=countx, column=17).value = wait.until(EC.presence_of_element_located((By.XPATH, "((//tbody)[2]/tr[5]/td[2]//span)[1]"))).text
-        
-        #确定入党积极分子日期
-        file.active.cell(row=countx, column=18).value = wait.until(EC.presence_of_element_located((By.XPATH, "((//tbody)[2]/tr[5]/td[4]//span)[1]"))).text
-        
-        #工作单位及职务
-        file.active.cell(row=countx, column=19).value = wait.until(EC.presence_of_element_located((By.XPATH, "((//tbody)[2]/tr[6]/td[4]//span)[1]"))).text
-        
-        #家庭住址
-        file.active.cell(row=countx, column=20).value = wait.until(EC.presence_of_element_located((By.XPATH, "((//tbody)[2]/tr[7]/td[2]//span)[1]"))).text
-        file.save(path)
-        #切换到预备党员
-        while(1):
-            try:
-                company_info = wait.until(EC.element_to_be_clickable((By.XPATH, "//div[contains(text(), '预备党员')]")))
-                break
-            except:
-                time.sleep(0.1)
-        while(1):
-            try:
-                company_info.click()
-                break
-            except:
-                company_info = wait.until(EC.element_to_be_clickable((By.XPATH, "//div[contains(text(), '预备党员')]")))
-        # 加入党组织日期
-        file.active.cell(row=countx, column=21).value = wait.until(EC.presence_of_element_located((By.XPATH, "(//tbody)[4]/tr[4]/td[6]"))).text
-        
-        # 转为正式党员日期
-        file.active.cell(row=countx, column=22).value = wait.until(EC.presence_of_element_located((By.XPATH, "(//tbody)[4]/tr[5]/td[2]"))).text
-              
-        # 人员类别
-        file.active.cell(row=countx, column=23).value = wait.until(EC.presence_of_element_located((By.XPATH, "(//tbody)[4]/tr[6]/td[2]"))).text
-               
-        # 党籍状态
-        file.active.cell(row=countx, column=24).value = wait.until(EC.presence_of_element_located((By.XPATH, "(//tbody)[4]/tr[6]/td[4]"))).text
-              
-        # 入党类型
-        file.active.cell(row=countx, column=25).value = wait.until(EC.presence_of_element_located((By.XPATH, "(//tbody)[4]/tr[6]/td[6]"))).text
-        
-        # 所在党支部
-        file.active.cell(row=countx, column=26).value = wait.until(EC.presence_of_element_located((By.XPATH, "(//tbody)[4]/tr[8]/td[4]"))).text
-        
-        # 人员类型
-        file.active.cell(row=countx, column=27).value = "预备党员"
-        file.save(path)
+        name_temp = jibenxinxi_download(file, path, wait, countx, count)
+        jijifenzi_download(path, file, wait, countx, control)
+        yubeidangyuan(path, file, wait, countx, control)
         print("填写第",count,"个预备党员",name_temp,"信息成功") 
         amount_infomem_complete = amount_infomem_complete + 1
 
@@ -746,111 +494,8 @@ def downloading(file, wait, path, control):
         count = count + 1
         countx = count + 1
         temp_countx = count
-        #填写序号
-        file.active.cell(row=countx, column=1).value = count
-        
-        #姓名
-        name_temp = wait.until(EC.visibility_of_element_located((By.XPATH, "(//tbody)[1]/tr[1]/td[2]/span"))).text
-        file.active.cell(row=countx, column=2).value = name_temp
-        file.save(path)
-        #循环断言
-        while(1):
-            try:
-                df = file.active.cell(row=countx, column=2).value
-                assert df != ""
-                break
-            except AssertionError:
-                time.sleep(0.5)
-                file.active.cell(row=countx, column=2).value = wait.until(EC.presence_of_element_located((By.XPATH, "(//tbody)[1]/tr[1]/td[2]/span"))).text
-                file.save(path)
-        #性别
-        file.active.cell(row=countx, column=3).value = wait.until(EC.presence_of_element_located((By.XPATH, "(//tbody)[1]/tr[2]/td[2]//span[1]"))).text
-        
-        #公民身份证号码
-        file.active.cell(row=countx, column=4).value = wait.until(EC.presence_of_element_located((By.XPATH, "(//tbody)[1]/tr[1]/td[4]//span[1]"))).text
-        
-        #民族
-        file.active.cell(row=countx, column=5).value = wait.until(EC.presence_of_element_located((By.XPATH, "(//tbody)[1]/tr[1]/td[6]//span[1]"))).text
-        
-        #出生日期
-        file.active.cell(row=countx, column=6).value = wait.until(EC.presence_of_element_located((By.XPATH, "(//tbody)[1]/tr[2]/td[4]//span[1]"))).text
-        
-        #学历
-        bitian_located(file, path, countx, column=7, wait = wait, str = "(//tbody)[1]/tr[2]/td[6]//span[1]")
-
-        #申请入党日期
-        file.active.cell(row=countx, column=8).value = wait.until(EC.presence_of_element_located((By.XPATH, "(//tbody)[1]/tr[3]/td[2]//span[1]"))).text
-        
-        #手机号码
-        file.active.cell(row=countx, column=9).value = wait.until(EC.presence_of_element_located((By.XPATH, "(//tbody)[1]/tr[3]/td[4]//span[1]"))).text
-        
-        #背景信息
-        bitian_located(file, path, countx, column=10, wait = wait, str = "(//tbody)[1]/tr[3]/td[6]//span[1]")
-        
-        #工作岗位
-        bitian_located(file, path, countx, column=11, wait = wait, str = "(//tbody)[1]/tr[4]/td[2]//span[1]")
-
-        #政治面貌
-        bitian_located(file, path, countx, column=12, wait = wait, str = "(//tbody)[1]/tr[4]/td[4]//span[1]")
-
-
-        #接受申请党组织
-        file.active.cell(row=countx, column=13).value = wait.until(EC.presence_of_element_located((By.XPATH, "(//tbody)[1]/tr[5]/td[2]//span[1]"))).text
-        file.save(path)
-        #切换到积极分子信息
-        while(1):
-            try:
-                company_info = wait.until(EC.element_to_be_clickable((By.XPATH, "//div[contains(text(), '入党积极分子基本信息')]")))
-                break
-            except:
-                time.sleep(0.1)
-        while(1):
-            try:
-                company_info.click()
-                break
-            except:
-                company_info = wait.until(EC.element_to_be_clickable((By.XPATH, "//div[contains(text(), '入党积极分子基本信息')]")))
-        #籍贯
-        file.active.cell(row=countx, column=14).value = wait.until(EC.presence_of_element_located((By.XPATH, "(//tbody)[2]/tr[3]/td[4]//span[1]"))).text
-        
-        #入团日期
-        file.active.cell(row=countx, column=15).value = wait.until(EC.presence_of_element_located((By.XPATH, "((//tbody)[2]/tr[4]/td[4]//span)[1]"))).text
-        
-        #参加工作日期
-        file.active.cell(row=countx, column=16).value = wait.until(EC.presence_of_element_located((By.XPATH, "((//tbody)[2]/tr[4]/td[6]//span)[1]"))).text
-        
-        #申请入党日期
-        file.active.cell(row=countx, column=17).value = wait.until(EC.presence_of_element_located((By.XPATH, "((//tbody)[2]/tr[5]/td[2]//span)[1]"))).text
-        
-        #确定入党积极分子日期
-        file.active.cell(row=countx, column=18).value = wait.until(EC.presence_of_element_located((By.XPATH, "((//tbody)[2]/tr[5]/td[4]//span)[1]"))).text
-        
-        #工作单位及职务
-        file.active.cell(row=countx, column=19).value = wait.until(EC.presence_of_element_located((By.XPATH, "((//tbody)[2]/tr[6]/td[4]//span)[1]"))).text
-        
-        #家庭住址
-        file.active.cell(row=countx, column=20).value = wait.until(EC.presence_of_element_located((By.XPATH, "((//tbody)[2]/tr[7]/td[2]//span)[1]"))).text
-        
-        # 加入党组织日期
-        file.active.cell(row=countx, column=21).value = "-"
-        
-        # 转为正式党员日期
-        file.active.cell(row=countx, column=22).value = "-"
-             
-        # 人员类别
-        file.active.cell(row=countx, column=23).value = "-"
-             
-        # 党籍状态
-        file.active.cell(row=countx, column=24).value = "-"
-             
-        # 入党类型
-        file.active.cell(row=countx, column=25).value = "-"
-        
-        # 所在党支部
-        file.active.cell(row=countx, column=26).value = "-"
-        file.save(path)
-        # 人员类型
-        file.active.cell(row=countx, column=27).value = "发展对象"
+        name_temp = jibenxinxi_download(file, path, wait, countx, count)
+        jijifenzi_download(path, file, wait, countx, control)
         print("填写第",count,"个发展对象",name_temp,"信息成功") 
         amount_devtar_complete = amount_devtar_complete + 1
 
@@ -860,112 +505,8 @@ def downloading(file, wait, path, control):
         count = count + 1
         countx = count + 1
         temp_countx = count
-        #填写序号
-        file.active.cell(row=countx, column=1).value = count
-        
-        #姓名
-        name_temp = wait.until(EC.visibility_of_element_located((By.XPATH, "(//tbody)[1]/tr[1]/td[2]/span"))).text
-        file.active.cell(row=countx, column=2).value = name_temp
-        file.save(path)
-        #循环断言
-        while(1):
-            try:
-                df = file.active.cell(row=countx, column=2).value
-                assert df != ""
-                break
-            except AssertionError:
-                time.sleep(0.5)
-                file.active.cell(row=countx, column=2).value = wait.until(EC.presence_of_element_located((By.XPATH, "(//tbody)[1]/tr[1]/td[2]/span"))).text
-                file.save(path)
-        #性别
-        file.active.cell(row=countx, column=3).value = wait.until(EC.presence_of_element_located((By.XPATH, "(//tbody)[1]/tr[2]/td[2]//span[1]"))).text
-        
-        #公民身份证号码
-        file.active.cell(row=countx, column=4).value = wait.until(EC.presence_of_element_located((By.XPATH, "(//tbody)[1]/tr[1]/td[4]//span[1]"))).text
-        
-        #民族
-        file.active.cell(row=countx, column=5).value = wait.until(EC.presence_of_element_located((By.XPATH, "(//tbody)[1]/tr[1]/td[6]//span[1]"))).text
-        
-        #出生日期
-        file.active.cell(row=countx, column=6).value = wait.until(EC.presence_of_element_located((By.XPATH, "(//tbody)[1]/tr[2]/td[4]//span[1]"))).text
-        
-        #学历
-        bitian_located(file, path, countx, column=7, wait = wait, str = "(//tbody)[1]/tr[2]/td[6]//span[1]")
-
-        #申请入党日期
-        file.active.cell(row=countx, column=8).value = wait.until(EC.presence_of_element_located((By.XPATH, "(//tbody)[1]/tr[3]/td[2]//span[1]"))).text
-        
-        #手机号码
-        file.active.cell(row=countx, column=9).value = wait.until(EC.presence_of_element_located((By.XPATH, "(//tbody)[1]/tr[3]/td[4]//span[1]"))).text
-        
-        #背景信息
-        bitian_located(file, path, countx, column=10, wait = wait, str = "(//tbody)[1]/tr[3]/td[6]//span[1]")
-
-        #工作岗位
-        bitian_located(file, path, countx, column=11, wait = wait, str = "(//tbody)[1]/tr[4]/td[2]//span[1]")
-
-        #政治面貌
-        bitian_located(file, path, countx, column=12, wait = wait, str = "(//tbody)[1]/tr[4]/td[4]//span[1]")
-
-
-        #接受申请党组织
-        file.active.cell(row=countx, column=13).value = wait.until(EC.presence_of_element_located((By.XPATH, "(//tbody)[1]/tr[5]/td[2]//span[1]"))).text
-        file.save(path)
-        #切换到积极分子信息
-
-        while(1):
-            try:
-                company_info = wait.until(EC.element_to_be_clickable((By.XPATH, "//div[contains(text(), '入党积极分子基本信息')]")))
-                break
-            except:
-                time.sleep(0.1)
-        while(1):
-            try:
-                company_info.click()
-                break
-            except:
-                company_info = wait.until(EC.element_to_be_clickable((By.XPATH, "//div[contains(text(), '入党积极分子基本信息')]")))
-        #籍贯
-        file.active.cell(row=countx, column=14).value = wait.until(EC.presence_of_element_located((By.XPATH, "(//tbody)[2]/tr[3]/td[4]//span[1]"))).text
-        
-        #入团日期
-        file.active.cell(row=countx, column=15).value = wait.until(EC.presence_of_element_located((By.XPATH, "((//tbody)[2]/tr[4]/td[4]//span)[1]"))).text
-        
-        #参加工作日期
-        file.active.cell(row=countx, column=16).value = wait.until(EC.presence_of_element_located((By.XPATH, "((//tbody)[2]/tr[4]/td[6]//span)[1]"))).text
-        
-        #申请入党日期
-        file.active.cell(row=countx, column=17).value = wait.until(EC.presence_of_element_located((By.XPATH, "((//tbody)[2]/tr[5]/td[2]//span)[1]"))).text
-        
-        #确定入党积极分子日期
-        file.active.cell(row=countx, column=18).value = wait.until(EC.presence_of_element_located((By.XPATH, "((//tbody)[2]/tr[5]/td[4]//span)[1]"))).text
-       
-        #工作单位及职务
-        file.active.cell(row=countx, column=19).value = wait.until(EC.presence_of_element_located((By.XPATH, "((//tbody)[2]/tr[6]/td[4]//span)[1]"))).text
-       
-        #家庭住址
-        file.active.cell(row=countx, column=20).value = wait.until(EC.presence_of_element_located((By.XPATH, "((//tbody)[2]/tr[7]/td[2]//span)[1]"))).text
-        
-        # 加入党组织日期
-        file.active.cell(row=countx, column=21).value = "-"
-        
-        # 转为正式党员日期
-        file.active.cell(row=countx, column=22).value = "-"
-               
-        # 人员类别
-        file.active.cell(row=countx, column=23).value = "-"
-             
-        # 党籍状态
-        file.active.cell(row=countx, column=24).value = "-"
-            
-        # 入党类型
-        file.active.cell(row=countx, column=25).value = "-"
-        
-        # 所在党支部
-        file.active.cell(row=countx, column=26).value = "-"
-        file.save(path)
-        # 人员类型
-        file.active.cell(row=countx, column=27).value = "积极分子"
+        name_temp = jibenxinxi_download(file, path, wait, countx, count)
+        jijifenzi_download(path, file, wait, countx, control)
         print("填写第",count,"个积极分子",name_temp,"信息成功") 
         amount_activist_complete = amount_activist_complete + 1
 
@@ -975,91 +516,9 @@ def downloading(file, wait, path, control):
         count = count + 1
         countx = count + 1
         temp_countx = count
-        #填写序号
-        file.active.cell(row=countx, column=1).value = count
-       
-        #姓名
-        name_temp = wait.until(EC.visibility_of_element_located((By.XPATH, "(//tbody)[1]/tr[1]/td[2]/span"))).text
-        file.active.cell(row=countx, column=2).value = name_temp
-        file.save(path)
-        #循环断言
-        while(1):
-            try:
-                df = file.active.cell(row=countx, column=2).value
-                assert df != ""
-                break
-            except AssertionError:
-                time.sleep(0.5)
-                file.active.cell(row=countx, column=2).value = wait.until(EC.presence_of_element_located((By.XPATH, "(//tbody)[1]/tr[1]/td[2]/span"))).text
-                file.save(path)
-        #性别
-        file.active.cell(row=countx, column=3).value = wait.until(EC.presence_of_element_located((By.XPATH, "(//tbody)[1]/tr[2]/td[2]//span[1]"))).text
-        
-        #公民身份证号码
-        file.active.cell(row=countx, column=4).value = wait.until(EC.presence_of_element_located((By.XPATH, "(//tbody)[1]/tr[1]/td[4]//span[1]"))).text
-        
-        #民族
-        file.active.cell(row=countx, column=5).value = wait.until(EC.presence_of_element_located((By.XPATH, "(//tbody)[1]/tr[1]/td[6]//span[1]"))).text
-        
-        #出生日期
-        file.active.cell(row=countx, column=6).value = wait.until(EC.presence_of_element_located((By.XPATH, "(//tbody)[1]/tr[2]/td[4]//span[1]"))).text
-        
-        #学历
-        bitian_located(file, path, countx, column=7, wait = wait, str = "(//tbody)[1]/tr[2]/td[6]//span[1]")
-
-        #申请入党日期
-        file.active.cell(row=countx, column=8).value = wait.until(EC.presence_of_element_located((By.XPATH, "(//tbody)[1]/tr[3]/td[2]//span[1]"))).text
-        
-        #手机号码
-        file.active.cell(row=countx, column=9).value = wait.until(EC.presence_of_element_located((By.XPATH, "(//tbody)[1]/tr[3]/td[4]//span[1]"))).text
-        
-        #背景信息
-        bitian_located(file, path, countx, column=10, wait = wait, str = "(//tbody)[1]/tr[3]/td[6]//span[1]")
-
-        #工作岗位
-        bitian_located(file, path, countx, column=11, wait = wait, str = "(//tbody)[1]/tr[4]/td[2]//span[1]")
-        
-        #政治面貌
-        bitian_located(file, path, countx, column=12, wait = wait, str = "(//tbody)[1]/tr[4]/td[4]//span[1]")
-
-
-        #接受申请党组织
-        file.active.cell(row=countx, column=13).value = wait.until(EC.presence_of_element_located((By.XPATH, "(//tbody)[1]/tr[5]/td[2]//span[1]"))).text
-        file.save(path)
+        name_temp = jibenxinxi_download(file, path, wait, countx, count)
         if "入党积极分子基本信息" in driver0.page_source:
-            #切换到积极分子信息
-            while(1):
-                try:
-                    company_info = wait.until(EC.element_to_be_clickable((By.XPATH, "//div[contains(text(), '入党积极分子基本信息')]")))
-                    break
-                except:
-                    time.sleep(0.1)
-            while(1):
-                try:
-                    company_info.click()
-                    break
-                except:
-                    company_info = wait.until(EC.element_to_be_clickable((By.XPATH, "//div[contains(text(), '入党积极分子基本信息')]")))
-            #籍贯
-            file.active.cell(row=countx, column=14).value = wait.until(EC.presence_of_element_located((By.XPATH, "(//tbody)[2]/tr[3]/td[4]//span[1]"))).text
-            
-            #入团日期
-            file.active.cell(row=countx, column=15).value = wait.until(EC.presence_of_element_located((By.XPATH, "((//tbody)[2]/tr[4]/td[4]//span)[1]"))).text
-            
-            #参加工作日期
-            file.active.cell(row=countx, column=16).value = wait.until(EC.presence_of_element_located((By.XPATH, "((//tbody)[2]/tr[4]/td[6]//span)[1]"))).text
-            
-            #申请入党日期
-            file.active.cell(row=countx, column=17).value = wait.until(EC.presence_of_element_located((By.XPATH, "((//tbody)[2]/tr[5]/td[2]//span)[1]"))).text
-            
-            #确定入党积极分子日期
-            file.active.cell(row=countx, column=18).value = wait.until(EC.presence_of_element_located((By.XPATH, "((//tbody)[2]/tr[5]/td[4]//span)[1]"))).text
-            
-            #工作单位及职务
-            file.active.cell(row=countx, column=19).value = wait.until(EC.presence_of_element_located((By.XPATH, "((//tbody)[2]/tr[6]/td[4]//span)[1]"))).text
-            
-            #家庭住址
-            file.active.cell(row=countx, column=20).value = wait.until(EC.presence_of_element_located((By.XPATH, "((//tbody)[2]/tr[7]/td[2]//span)[1]"))).text
+            jijifenzi_download(path, file, wait, countx)
             
             # 加入党组织日期
             file.active.cell(row=countx, column=21).value = "-"
