@@ -14,6 +14,8 @@ from bs4 import BeautifulSoup
 from base.waitclick import *
 from base.write_entry import *
 from middle.dev_download import *
+from openpyxl import load_workbook
+import openpyxl
 stop_event = threading.Event()
 
 
@@ -85,30 +87,149 @@ def switch_formal_mem(wait):
             wait_click_xpath(wait, time_w = 0.5, xpath = '(//input[@placeholder = "请选择"])[1]')
     wait_click_xpath(wait, time_w = 0.5, xpath = '//ul[@class = "el-scrollbar__view el-select-dropdown__list"]//li//span[contains(text(), "正式党员")]')
     wait_click_xpath(wait, time_w = 0.5, xpath = '//span[contains(text(), "搜索")]')
+    while 1:
+        time.sleep(0.5)
+        t = wait_return_subelement_absolute(wait, time_w=0.5, xpath='(//input[@placeholder = "请选择"])[1]')
+        u=t.get_attribute("value")
+        if u =="正式党员":
+            break
+        else:
+            wait_click_xpath(wait, time_w = 0.5, xpath = '(//*[contains(text(), "人员信息")]/..)[1]')
+            wait_click_xpath(wait, time_w = 0.5, xpath = '(//input[@placeholder = "请选择"])[1]')
+            while 1:    
+                try:
+                    time.sleep(1)
+                    wait.until(EC.presence_of_element_located((By.XPATH, "//div[@class = 'el-input el-input--suffix is-focus']")))
+                    break
+                except:
+                    wait_click_xpath(wait, time_w = 0.5, xpath = '(//input[@placeholder = "请选择"])[1]')
+            wait_click_xpath(wait, time_w = 0.5, xpath = '//ul[@class = "el-scrollbar__view el-select-dropdown__list"]//li//span[contains(text(), "正式党员")]')
+            wait_click_xpath(wait, time_w = 0.5, xpath = '//span[contains(text(), "搜索")]')
     
 def switch_informal_mem(wait):
     wait_click_xpath(wait, time_w = 0.5, xpath = '(//*[contains(text(), "人员信息")]/..)[1]')
     wait_click_xpath(wait, time_w = 0.5, xpath = '(//input[@placeholder = "请选择"])[1]')
+    while 1:    
+        try:
+            time.sleep(1)
+            wait.until(EC.presence_of_element_located((By.XPATH, "//div[@class = 'el-input el-input--suffix is-focus']")))
+            break
+        except:
+            wait_click_xpath(wait, time_w = 0.5, xpath = '(//input[@placeholder = "请选择"])[1]')
     wait_click_xpath(wait, time_w = 0.5, xpath = '//ul[@class = "el-scrollbar__view el-select-dropdown__list"]//li//span[contains(text(), "预备党员")]')
     wait_click_xpath(wait, time_w = 0.5, xpath = '//span[contains(text(), "搜索")]')
+    while 1:
+        time.sleep(0.5)
+        t = wait_return_subelement_absolute(wait, time_w=0.5, xpath='(//input[@placeholder = "请选择"])[1]')
+        u=t.get_attribute("value")
+        if u =="预备党员":
+            break
+        else:
+            wait_click_xpath(wait, time_w = 0.5, xpath = '(//*[contains(text(), "人员信息")]/..)[1]')
+            wait_click_xpath(wait, time_w = 0.5, xpath = '(//input[@placeholder = "请选择"])[1]')
+            while 1:    
+                try:
+                    time.sleep(1)
+                    wait.until(EC.presence_of_element_located((By.XPATH, "//div[@class = 'el-input el-input--suffix is-focus']")))
+                    break
+                except:
+                    wait_click_xpath(wait, time_w = 0.5, xpath = '(//input[@placeholder = "请选择"])[1]')
+            wait_click_xpath(wait, time_w = 0.5, xpath = '//ul[@class = "el-scrollbar__view el-select-dropdown__list"]//li//span[contains(text(), "预备党员")]')
+            wait_click_xpath(wait, time_w = 0.5, xpath = '//span[contains(text(), "搜索")]')
 
 def switch_devtarg(wait):
     wait_click_xpath(wait, time_w = 0.5, xpath = '(//*[contains(text(), "人员信息")]/..)[1]')
     wait_click_xpath(wait, time_w = 0.5, xpath = '(//input[@placeholder = "请选择"])[1]')
+    while 1:    
+        try:
+            time.sleep(1)
+            wait.until(EC.presence_of_element_located((By.XPATH, "//div[@class = 'el-input el-input--suffix is-focus']")))
+            break
+        except:
+            wait_click_xpath(wait, time_w = 0.5, xpath = '(//input[@placeholder = "请选择"])[1]')
     wait_click_xpath(wait, time_w = 0.5, xpath = '//ul[@class = "el-scrollbar__view el-select-dropdown__list"]//li//span[contains(text(), "发展对象")]')
     wait_click_xpath(wait, time_w = 0.5, xpath = '//span[contains(text(), "搜索")]')
+    while 1:
+        time.sleep(0.5)
+        t = wait_return_subelement_absolute(wait, time_w=0.5, xpath='(//input[@placeholder = "请选择"])[1]')
+        u=t.get_attribute("value")
+        if u =="发展对象":
+            break
+        else:
+            wait_click_xpath(wait, time_w = 0.5, xpath = '(//*[contains(text(), "人员信息")]/..)[1]')
+            wait_click_xpath(wait, time_w = 0.5, xpath = '(//input[@placeholder = "请选择"])[1]')
+            while 1:    
+                try:
+                    time.sleep(1)
+                    wait.until(EC.presence_of_element_located((By.XPATH, "//div[@class = 'el-input el-input--suffix is-focus']")))
+                    break
+                except:
+                    wait_click_xpath(wait, time_w = 0.5, xpath = '(//input[@placeholder = "请选择"])[1]')
+            wait_click_xpath(wait, time_w = 0.5, xpath = '//ul[@class = "el-scrollbar__view el-select-dropdown__list"]//li//span[contains(text(), "发展对象")]')
+            wait_click_xpath(wait, time_w = 0.5, xpath = '//span[contains(text(), "搜索")]')
 
 def switch_activist(wait):
     wait_click_xpath(wait, time_w = 0.5, xpath = '(//*[contains(text(), "人员信息")]/..)[1]')
     wait_click_xpath(wait, time_w = 0.5, xpath = '(//input[@placeholder = "请选择"])[1]')
+    while 1:    
+        try:
+            time.sleep(1)
+            wait.until(EC.presence_of_element_located((By.XPATH, "//div[@class = 'el-input el-input--suffix is-focus']")))
+            break
+        except:
+            wait_click_xpath(wait, time_w = 0.5, xpath = '(//input[@placeholder = "请选择"])[1]')
     wait_click_xpath(wait, time_w = 0.5, xpath = '//ul[@class = "el-scrollbar__view el-select-dropdown__list"]//li//span[contains(text(), "入党积极分子")]')
     wait_click_xpath(wait, time_w = 0.5, xpath = '//span[contains(text(), "搜索")]')
+    while 1:
+        time.sleep(0.5)
+        t = wait_return_subelement_absolute(wait, time_w=0.5, xpath='(//input[@placeholder = "请选择"])[1]')
+        u=t.get_attribute("value")
+        if u =="入党积极分子":
+            break
+        else:
+            wait_click_xpath(wait, time_w = 0.5, xpath = '(//*[contains(text(), "人员信息")]/..)[1]')
+            wait_click_xpath(wait, time_w = 0.5, xpath = '(//input[@placeholder = "请选择"])[1]')
+            while 1:    
+                try:
+                    time.sleep(1)
+                    wait.until(EC.presence_of_element_located((By.XPATH, "//div[@class = 'el-input el-input--suffix is-focus']")))
+                    break
+                except:
+                    wait_click_xpath(wait, time_w = 0.5, xpath = '(//input[@placeholder = "请选择"])[1]')
+            wait_click_xpath(wait, time_w = 0.5, xpath = '//ul[@class = "el-scrollbar__view el-select-dropdown__list"]//li//span[contains(text(), "入党积极分子")]')
+            wait_click_xpath(wait, time_w = 0.5, xpath = '//span[contains(text(), "搜索")]')
 
 def switch_applicant(wait):
     wait_click_xpath(wait, time_w = 0.5, xpath = '(//*[contains(text(), "人员信息")]/..)[2]')
     wait_click_xpath(wait, time_w = 0.5, xpath = '(//input[@placeholder = "请选择"])[1]')
+    while 1:    
+        try:
+            time.sleep(1)
+            wait.until(EC.presence_of_element_located((By.XPATH, "//div[@class = 'el-input el-input--suffix is-focus']")))
+            break
+        except:
+            wait_click_xpath(wait, time_w = 0.5, xpath = '(//input[@placeholder = "请选择"])[1]')
     wait_click_xpath(wait, time_w = 0.5, xpath = '//ul[@class = "el-scrollbar__view el-select-dropdown__list"]//li//span[contains(text(), "入党申请人")]')
     wait_click_xpath(wait, time_w = 0.5, xpath = '//span[contains(text(), "搜索")]')
+    while 1:
+        time.sleep(0.5)
+        t = wait_return_subelement_absolute(wait, time_w=0.5, xpath='(//input[@placeholder = "请选择"])[1]')
+        u=t.get_attribute("value")
+        if u =="入党申请人":
+            break
+        else:
+            wait_click_xpath(wait, time_w = 0.5, xpath = '(//*[contains(text(), "人员信息")]/..)[2]')
+            wait_click_xpath(wait, time_w = 0.5, xpath = '(//input[@placeholder = "请选择"])[1]')
+            while 1:    
+                try:
+                    time.sleep(1)
+                    wait.until(EC.presence_of_element_located((By.XPATH, "//div[@class = 'el-input el-input--suffix is-focus']")))
+                    break
+                except:
+                    wait_click_xpath(wait, time_w = 0.5, xpath = '(//input[@placeholder = "请选择"])[1]')
+            wait_click_xpath(wait, time_w = 0.5, xpath = '//ul[@class = "el-scrollbar__view el-select-dropdown__list"]//li//span[contains(text(), "入党申请人")]')
+            wait_click_xpath(wait, time_w = 0.5, xpath = '//span[contains(text(), "搜索")]')
+
 
 
 
@@ -128,6 +249,8 @@ def new_excel(wait):
     today_date = datetime.now().strftime("%Y-%m-%d")
     excel_file_name = f"{today_date}党员发展纪实信息库.xlsx"
     excel_file_path = os.path.join(dev_directory, excel_file_name)
+    
+    
     #if os.path.isfile(excel_file_path):
         #member_excel = load_workbook(excel_file_path)
         #rebuild(excel_file_path, wait, member_total_amount, member_excel, excel_file_path)
@@ -135,10 +258,11 @@ def new_excel(wait):
         #在当前文件夹新建一个文件夹命名为"database"在里面新建一个文件夹名为"database_member"
         #os.makedirs(dev_directory, exist_ok=True)
         #在database_member文件夹里新建一个excel文件命名为"今天的日期"&"党员信息库"
-
         #在excel里的第一行建立表头，分别是"姓名、性别、公民身份号码、民族、出生日期、学历、人员类别、学位、所在党支部、手机号码、入党日期
         #转正日期、党龄、党龄校正值、新社会阶层类型、工作岗位、从事专业技术职务、是否农民工、现居住地、户籍所在地、是否失联党员、是否流动党员、
         #党员注册时间、注册手机号、党员增加信息、党员减少信息、入党类型、转正情况、入党时所在支部、延长预备期时间
+    
+    
     if os.path.isfile(excel_file_path):
         member_excel = load_workbook(excel_file_path)
         rebuild(excel_file_path, wait, member_excel)
@@ -148,8 +272,17 @@ def new_excel(wait):
                 "政治面貌","接受申请党组织","籍贯","入团日期","参加工作日期","申请入党日期","确定入党积极分子日期",
                 "工作单位及职务","家庭住址","加入党组织日期","转为正式党员日期","人员类别","党籍状态","入党类型","所在党支部", "人员类型", "隶属党组织"]
             
-        df = pd.DataFrame(columns=columns)
-        df.to_excel(excel_file_path, index=False)
+        # df = pd.DataFrame(columns=columns)
+        # df.to_excel(excel_file_path, index=False)
+        wb = openpyxl.Workbook()
+        ws = wb.active
+        ws.title = "sheet1"
+        for i, value in enumerate(columns, start=1):
+            ws.cell(row=1, column = i, value=value)
+        
+
+        wb.save(excel_file_path)
+        
         member_excel = load_workbook(excel_file_path)
         print(f"文件 '{excel_file_path}' 已成功创建。")
         switch_formal_mem(wait)
@@ -303,11 +436,28 @@ def rebuild(excel_file_path, wait, member_excel):
 
 def init_complete_amount(excel_file_path):
     df = pd.read_excel(excel_file_path, sheet_name=0)
-    row_count = df.dropna(how='all').shape[0]
+    row_count = count_non_empty_rows(excel_file_path, sheet_name=0)
     amount_that_complete = row_count - 1
     return amount_that_complete
 
-
+def count_non_empty_rows(excel_file_path, sheet_name=0):
+    # 加载Excel工作簿
+    workbook = load_workbook(filename=excel_file_path, data_only=True)
+    
+    # 获取工作表（可以通过名称或索引获取）
+    if isinstance(sheet_name, int):
+        sheet = workbook.worksheets[sheet_name]
+    else:
+        sheet = workbook[sheet_name]
+    
+    non_empty_row_count = 0
+    
+    # 逐行检查是否有数据
+    for row in sheet.iter_rows():
+        if any(cell.value is not None for cell in row):
+            non_empty_row_count += 1
+    
+    return non_empty_row_count
 
 
 def synchronizing(wait, member_excel, member_excel_path, control):
@@ -339,7 +489,27 @@ def synchronizing(wait, member_excel, member_excel_path, control):
 def get_total_amount(wait, xpath):
     time.sleep(1)
     try:
-        char_amountof_member = wait.until(EC.presence_of_element_located((By.XPATH, xpath))).text
+        can= wait_return_subelement_absolute(wait, time_w = 0.5, xpath=xpath)
+        char_amountof_member =can.get_attribute("textContent")
+        int_amountof_members = re.findall(r'\d+', char_amountof_member)
+        int_amountof_member = int(int_amountof_members[0]) if int_amountof_members else None
+        return int(int_amountof_member)
+    except:
+        #//div[@class = "el-table y_table el-table--fit el-table--border el-table--enable-row-hover el-table--enable-row-transition"]
+        can = wait_return_subelement_absolute(wait, 0.5, "//main[@class ='el-main main']")
+        can_html = can.get_attribute('outerHTML')
+        soup = BeautifulSoup(can_html, 'html.parser')
+        result = soup.find('span', class_ = "el-table__empty-text")
+        if result:
+            return 0
+        else:
+            return -1
+
+def get_total_amount_list(wait, xpath):
+    time.sleep(1)
+    try:
+        can= wait_return_subelement_absolute(wait, time_w = 0.5, xpath=xpath)
+        char_amountof_member =can.get_attribute("value")
         int_amountof_members = re.findall(r'\d+', char_amountof_member)
         int_amountof_member = int(int_amountof_members[0]) if int_amountof_members else None
         return int(int_amountof_member)
@@ -359,7 +529,15 @@ def get_total_amount(wait, xpath):
 def set_amount_perpage(wait):
     wait_click_xpath(wait, time_w = 0.5, xpath = "(//input[@class = 'el-input__inner'])[4]")
     wait_click_xpath(wait, time_w = 0.5, xpath = "//span[contains(text(), '100条/页')]")
-    
+    num = get_total_amount_list(wait, xpath="(//input[@class = 'el-input__inner'])[4]")
+    while 1:
+        if num==100:
+            break
+        else:
+            time.sleep(1)
+            wait_click_xpath(wait, time_w = 0.5, xpath = "(//input[@class = 'el-input__inner'])[4]")
+            wait_click_xpath(wait, time_w = 0.5, xpath = "//span[contains(text(), '100条/页')]")
+
 
 
 
@@ -383,7 +561,7 @@ def schedule(complete, total, xpath, wait, member_excel, member_excel_path, cont
         switch_applicant(wait)
 
     set_amount_perpage(wait)
-    
+    page_number_old = 1
     while complete < total:
         page_number = int(complete / 100 + 1)
         row_number = int(complete % 100 + 1)
@@ -393,6 +571,8 @@ def schedule(complete, total, xpath, wait, member_excel, member_excel_path, cont
         input_page.send_keys(Keys.BACKSPACE)
         input_page.send_keys(page_number)
         input_page.send_keys(Keys.RETURN)
+        if page_number != page_number_old:
+            time.sleep(1)
         access_info_page(wait, row_number, file = member_excel, path = member_excel_path)
         try:
             for handle in driver0.window_handles:
@@ -426,6 +606,8 @@ def schedule(complete, total, xpath, wait, member_excel, member_excel_path, cont
             complete = amount_activist_complete
         elif control == 5:
             complete = amount_applicant_complete
+
+        page_number_old = page_number
 
 
 
