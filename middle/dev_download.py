@@ -111,7 +111,10 @@ def jijifenzi_download(path, file, wait, countx, control):
             file.active.cell(row=countx, column=24).value = "-"
             file.active.cell(row=countx, column=25).value = "-"
             file.active.cell(row=countx, column=26).value = file.active.cell(row=countx, column=28).value
-
+        elif control == 1:
+            pass
+        elif control == 5:
+            pass
 
         # 人员类型
         if control == 3:

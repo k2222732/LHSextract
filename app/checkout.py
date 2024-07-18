@@ -161,13 +161,11 @@ def synchronizing_ztdr(wait, member_total_amount):
         input_page.send_keys(Keys.BACKSPACE)
         input_page.send_keys(page_number)
         input_page.send_keys(Keys.RETURN)
-        
         if page_number - page_number_used != 0:
             time.sleep(1)
         access_info_page_ztdr(wait, row_number)
         amount_that_complete = amount_that_complete + 1
         page_number_used = page_number
-
         ##在这里检查线程关闭信号
 
 def access_info_page_ztdr(wait, row_number):
@@ -177,7 +175,6 @@ def access_info_page_ztdr(wait, row_number):
     element_name = element.get_attribute("textContent")
     ztdr.append(element_name)
     
-
 def synchronizing_dkt(wait, member_total_amount):
     amount_that_complete = 0
     while amount_that_complete < member_total_amount:
@@ -191,7 +188,6 @@ def synchronizing_dkt(wait, member_total_amount):
         input_page.send_keys(Keys.RETURN)
         access_info_page_dkt(wait, row_number)
         amount_that_complete = amount_that_complete + 1
-
         ##在这里检查线程关闭信号
 
 def access_info_page_dkt(wait, row_number):

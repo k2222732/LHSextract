@@ -78,7 +78,7 @@ def switch_formal_mem(wait):
     wait_click_xpath(wait, time_w = 0.5, xpath = '(//input[@placeholder = "请选择"])[1]')
     while 1:    
         try:
-        
+            time.sleep(1)
             wait.until(EC.presence_of_element_located((By.XPATH, "//div[@class = 'el-input el-input--suffix is-focus']")))
             break
         except:
@@ -190,7 +190,6 @@ def rebuild(excel_file_path, wait, member_excel):
     global devtar_total_amount
     global activist_total_amount
     global applicant_total_amount
-
     global amount_mem_complete
     global amount_infomem_complete
     global amount_activist_complete
@@ -312,7 +311,6 @@ def init_complete_amount(excel_file_path):
 
 
 def synchronizing(wait, member_excel, member_excel_path, control):
-
     global amount_mem_complete
     global amount_infomem_complete
     global amount_devtar_complete
@@ -325,8 +323,7 @@ def synchronizing(wait, member_excel, member_excel_path, control):
     global activist_total_amount
     global applicant_total_amount
 
-    
-    
+
     if control == 1:
         schedule(complete = amount_mem_complete, total = mem_total_amount, xpath = "//input[@type = 'number']", wait = wait, member_excel = member_excel, member_excel_path = member_excel_path, control = control)
     elif control == 2:
@@ -471,7 +468,7 @@ def downloading(file, wait, path, control):
         countx = count + 1
         temp_countx = count
         name_temp = jibenxinxi_download(file, path, wait, countx, count)
-        jijifenzi_download(path, file, wait, countx)
+        jijifenzi_download(path, file, wait, countx, control)
         yubeidangyuan(path, file, wait, countx, control)
         print("填写第",count,"个正式党员",name_temp,"信息成功") 
         amount_mem_complete = amount_mem_complete + 1
@@ -518,7 +515,7 @@ def downloading(file, wait, path, control):
         temp_countx = count
         name_temp = jibenxinxi_download(file, path, wait, countx, count)
         if "入党积极分子基本信息" in driver0.page_source:
-            jijifenzi_download(path, file, wait, countx)
+            jijifenzi_download(path, file, wait, countx, control)
             
             # 加入党组织日期
             file.active.cell(row=countx, column=21).value = "-"
