@@ -1,4 +1,4 @@
-
+from typing import List
 class TreeNode:
     def __init__(self, value = None):
         self.value = value
@@ -41,3 +41,12 @@ class TreeNode:
     
     def set_value(self, value):
         self.value = value
+
+    def copy_to_list(self, list:List):
+        for child in self.children:
+            
+            if child.children != []:
+                TreeNode.copy_to_list(self=child, list=list)
+            else:
+                ret = child.value
+                list.append(ret)

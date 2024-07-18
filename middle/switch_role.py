@@ -9,6 +9,7 @@ def access_e_shandong(driver, wait):
     global driver0
     driver0 = driver
     wait_click_xpath(wait, time_w = 0.5, xpath = '(//img[contains(@src, "山东e支部.png")])[2]')
+    time.sleep(0.8)
     try:
         for handle in driver.window_handles:
             driver.switch_to.window(handle)
@@ -20,7 +21,6 @@ def access_e_shandong(driver, wait):
 
 
 def switch_role(wait):
-    
     while 1:
         try:
             droplist = wait.until(EC.element_to_be_clickable((By.CSS_SELECTOR, '.avatar-wrapper.fs-dropdown-selfdefine')))

@@ -74,7 +74,6 @@ def new_excel(wait, member_total_amount):
         #在当前文件夹新建一个文件夹命名为"database"在里面新建一个文件夹名为"database_member"
         os.makedirs(mem_directory, exist_ok=True)
         #在database_member文件夹里新建一个excel文件命名为"今天的日期"&"党员信息库"
-
         #在excel里的第一行建立表头，分别是"姓名、性别、公民身份号码、民族、出生日期、学历、人员类别、学位、所在党支部、手机号码、入党日期
         #转正日期、党龄、党龄校正值、新社会阶层类型、工作岗位、从事专业技术职务、是否农民工、现居住地、户籍所在地、是否失联党员、是否流动党员、
         #党员注册时间、注册手机号、党员增加信息、党员减少信息、入党类型、转正情况、入党时所在支部、延长预备期时间
@@ -82,10 +81,8 @@ def new_excel(wait, member_total_amount):
             "所在党支部", "手机号码", "入党日期", "转正日期", "党龄", "党龄校正值", "新社会阶层类型", 
             "工作岗位", "从事专业技术职务", "是否农民工", "现居住地", "户籍所在地", "是否失联党员", 
             "是否流动党员", "入党类型", "转正情况", "入党时所在支部", "延长预备期时间"]
-        
         df = pd.DataFrame(columns=columns)
         df.to_excel(excel_file_path, index=False)
-
         member_excel = load_workbook(excel_file_path)
         print(f"文件 '{excel_file_path}' 已成功创建。")
         synchronizing(wait, member_total_amount, member_excel, excel_file_path)
