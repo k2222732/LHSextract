@@ -16,6 +16,9 @@ from base.write_entry import *
 from middle.dev_download import *
 from openpyxl import load_workbook
 import openpyxl
+from base.validate import *
+from middle.enter_person_infopage import enter_person_infopage
+from middle.dev_middle import *
 stop_event = threading.Event()
 
 
@@ -75,160 +78,9 @@ def switch_role(wait, driver):
 
 
 #切换到正式党员信息页面
-def switch_formal_mem(wait):
-    wait_click_xpath(wait, time_w = 0.5, xpath = '(//*[contains(text(), "人员信息")]/..)[1]')
-    wait_click_xpath(wait, time_w = 0.5, xpath = '(//input[@placeholder = "请选择"])[1]')
-    while 1:    
-        try:
-            time.sleep(1)
-            wait.until(EC.presence_of_element_located((By.XPATH, "//div[@class = 'el-input el-input--suffix is-focus']")))
-            break
-        except:
-            wait_click_xpath(wait, time_w = 0.5, xpath = '(//input[@placeholder = "请选择"])[1]')
-    wait_click_xpath(wait, time_w = 0.5, xpath = '//ul[@class = "el-scrollbar__view el-select-dropdown__list"]//li//span[contains(text(), "正式党员")]')
-    wait_click_xpath(wait, time_w = 0.5, xpath = '//span[contains(text(), "搜索")]')
-    while 1:
-        time.sleep(0.5)
-        t = wait_return_subelement_absolute(wait, time_w=0.5, xpath='(//input[@placeholder = "请选择"])[1]')
-        u=t.get_attribute("value")
-        if u =="正式党员":
-            break
-        else:
-            wait_click_xpath(wait, time_w = 0.5, xpath = '(//*[contains(text(), "人员信息")]/..)[1]')
-            wait_click_xpath(wait, time_w = 0.5, xpath = '(//input[@placeholder = "请选择"])[1]')
-            while 1:    
-                try:
-                    time.sleep(1)
-                    wait.until(EC.presence_of_element_located((By.XPATH, "//div[@class = 'el-input el-input--suffix is-focus']")))
-                    break
-                except:
-                    wait_click_xpath(wait, time_w = 0.5, xpath = '(//input[@placeholder = "请选择"])[1]')
-            wait_click_xpath(wait, time_w = 0.5, xpath = '//ul[@class = "el-scrollbar__view el-select-dropdown__list"]//li//span[contains(text(), "正式党员")]')
-            wait_click_xpath(wait, time_w = 0.5, xpath = '//span[contains(text(), "搜索")]')
+
     
-def switch_informal_mem(wait):
-    wait_click_xpath(wait, time_w = 0.5, xpath = '(//*[contains(text(), "人员信息")]/..)[1]')
-    wait_click_xpath(wait, time_w = 0.5, xpath = '(//input[@placeholder = "请选择"])[1]')
-    while 1:    
-        try:
-            time.sleep(1)
-            wait.until(EC.presence_of_element_located((By.XPATH, "//div[@class = 'el-input el-input--suffix is-focus']")))
-            break
-        except:
-            wait_click_xpath(wait, time_w = 0.5, xpath = '(//input[@placeholder = "请选择"])[1]')
-    wait_click_xpath(wait, time_w = 0.5, xpath = '//ul[@class = "el-scrollbar__view el-select-dropdown__list"]//li//span[contains(text(), "预备党员")]')
-    wait_click_xpath(wait, time_w = 0.5, xpath = '//span[contains(text(), "搜索")]')
-    while 1:
-        time.sleep(0.5)
-        t = wait_return_subelement_absolute(wait, time_w=0.5, xpath='(//input[@placeholder = "请选择"])[1]')
-        u=t.get_attribute("value")
-        if u =="预备党员":
-            break
-        else:
-            wait_click_xpath(wait, time_w = 0.5, xpath = '(//*[contains(text(), "人员信息")]/..)[1]')
-            wait_click_xpath(wait, time_w = 0.5, xpath = '(//input[@placeholder = "请选择"])[1]')
-            while 1:    
-                try:
-                    time.sleep(1)
-                    wait.until(EC.presence_of_element_located((By.XPATH, "//div[@class = 'el-input el-input--suffix is-focus']")))
-                    break
-                except:
-                    wait_click_xpath(wait, time_w = 0.5, xpath = '(//input[@placeholder = "请选择"])[1]')
-            wait_click_xpath(wait, time_w = 0.5, xpath = '//ul[@class = "el-scrollbar__view el-select-dropdown__list"]//li//span[contains(text(), "预备党员")]')
-            wait_click_xpath(wait, time_w = 0.5, xpath = '//span[contains(text(), "搜索")]')
 
-def switch_devtarg(wait):
-    wait_click_xpath(wait, time_w = 0.5, xpath = '(//*[contains(text(), "人员信息")]/..)[1]')
-    wait_click_xpath(wait, time_w = 0.5, xpath = '(//input[@placeholder = "请选择"])[1]')
-    while 1:    
-        try:
-            time.sleep(1)
-            wait.until(EC.presence_of_element_located((By.XPATH, "//div[@class = 'el-input el-input--suffix is-focus']")))
-            break
-        except:
-            wait_click_xpath(wait, time_w = 0.5, xpath = '(//input[@placeholder = "请选择"])[1]')
-    wait_click_xpath(wait, time_w = 0.5, xpath = '//ul[@class = "el-scrollbar__view el-select-dropdown__list"]//li//span[contains(text(), "发展对象")]')
-    wait_click_xpath(wait, time_w = 0.5, xpath = '//span[contains(text(), "搜索")]')
-    while 1:
-        time.sleep(0.5)
-        t = wait_return_subelement_absolute(wait, time_w=0.5, xpath='(//input[@placeholder = "请选择"])[1]')
-        u=t.get_attribute("value")
-        if u =="发展对象":
-            break
-        else:
-            wait_click_xpath(wait, time_w = 0.5, xpath = '(//*[contains(text(), "人员信息")]/..)[1]')
-            wait_click_xpath(wait, time_w = 0.5, xpath = '(//input[@placeholder = "请选择"])[1]')
-            while 1:    
-                try:
-                    time.sleep(1)
-                    wait.until(EC.presence_of_element_located((By.XPATH, "//div[@class = 'el-input el-input--suffix is-focus']")))
-                    break
-                except:
-                    wait_click_xpath(wait, time_w = 0.5, xpath = '(//input[@placeholder = "请选择"])[1]')
-            wait_click_xpath(wait, time_w = 0.5, xpath = '//ul[@class = "el-scrollbar__view el-select-dropdown__list"]//li//span[contains(text(), "发展对象")]')
-            wait_click_xpath(wait, time_w = 0.5, xpath = '//span[contains(text(), "搜索")]')
-
-def switch_activist(wait):
-    wait_click_xpath(wait, time_w = 0.5, xpath = '(//*[contains(text(), "人员信息")]/..)[1]')
-    wait_click_xpath(wait, time_w = 0.5, xpath = '(//input[@placeholder = "请选择"])[1]')
-    while 1:    
-        try:
-            time.sleep(1)
-            wait.until(EC.presence_of_element_located((By.XPATH, "//div[@class = 'el-input el-input--suffix is-focus']")))
-            break
-        except:
-            wait_click_xpath(wait, time_w = 0.5, xpath = '(//input[@placeholder = "请选择"])[1]')
-    wait_click_xpath(wait, time_w = 0.5, xpath = '//ul[@class = "el-scrollbar__view el-select-dropdown__list"]//li//span[contains(text(), "入党积极分子")]')
-    wait_click_xpath(wait, time_w = 0.5, xpath = '//span[contains(text(), "搜索")]')
-    while 1:
-        time.sleep(0.5)
-        t = wait_return_subelement_absolute(wait, time_w=0.5, xpath='(//input[@placeholder = "请选择"])[1]')
-        u=t.get_attribute("value")
-        if u =="入党积极分子":
-            break
-        else:
-            wait_click_xpath(wait, time_w = 0.5, xpath = '(//*[contains(text(), "人员信息")]/..)[1]')
-            wait_click_xpath(wait, time_w = 0.5, xpath = '(//input[@placeholder = "请选择"])[1]')
-            while 1:    
-                try:
-                    time.sleep(1)
-                    wait.until(EC.presence_of_element_located((By.XPATH, "//div[@class = 'el-input el-input--suffix is-focus']")))
-                    break
-                except:
-                    wait_click_xpath(wait, time_w = 0.5, xpath = '(//input[@placeholder = "请选择"])[1]')
-            wait_click_xpath(wait, time_w = 0.5, xpath = '//ul[@class = "el-scrollbar__view el-select-dropdown__list"]//li//span[contains(text(), "入党积极分子")]')
-            wait_click_xpath(wait, time_w = 0.5, xpath = '//span[contains(text(), "搜索")]')
-
-def switch_applicant(wait):
-    wait_click_xpath(wait, time_w = 0.5, xpath = '(//*[contains(text(), "人员信息")]/..)[2]')
-    wait_click_xpath(wait, time_w = 0.5, xpath = '(//input[@placeholder = "请选择"])[1]')
-    while 1:    
-        try:
-            time.sleep(1)
-            wait.until(EC.presence_of_element_located((By.XPATH, "//div[@class = 'el-input el-input--suffix is-focus']")))
-            break
-        except:
-            wait_click_xpath(wait, time_w = 0.5, xpath = '(//input[@placeholder = "请选择"])[1]')
-    wait_click_xpath(wait, time_w = 0.5, xpath = '//ul[@class = "el-scrollbar__view el-select-dropdown__list"]//li//span[contains(text(), "入党申请人")]')
-    wait_click_xpath(wait, time_w = 0.5, xpath = '//span[contains(text(), "搜索")]')
-    while 1:
-        time.sleep(0.5)
-        t = wait_return_subelement_absolute(wait, time_w=0.5, xpath='(//input[@placeholder = "请选择"])[1]')
-        u=t.get_attribute("value")
-        if u =="入党申请人":
-            break
-        else:
-            wait_click_xpath(wait, time_w = 0.5, xpath = '(//*[contains(text(), "人员信息")]/..)[2]')
-            wait_click_xpath(wait, time_w = 0.5, xpath = '(//input[@placeholder = "请选择"])[1]')
-            while 1:    
-                try:
-                    time.sleep(1)
-                    wait.until(EC.presence_of_element_located((By.XPATH, "//div[@class = 'el-input el-input--suffix is-focus']")))
-                    break
-                except:
-                    wait_click_xpath(wait, time_w = 0.5, xpath = '(//input[@placeholder = "请选择"])[1]')
-            wait_click_xpath(wait, time_w = 0.5, xpath = '//ul[@class = "el-scrollbar__view el-select-dropdown__list"]//li//span[contains(text(), "入党申请人")]')
-            wait_click_xpath(wait, time_w = 0.5, xpath = '//span[contains(text(), "搜索")]')
 
 
 
@@ -456,7 +308,6 @@ def count_non_empty_rows(excel_file_path, sheet_name=0):
     for row in sheet.iter_rows():
         if any(cell.value is not None for cell in row):
             non_empty_row_count += 1
-    
     return non_empty_row_count
 
 
@@ -505,38 +356,11 @@ def get_total_amount(wait, xpath):
         else:
             return -1
 
-def get_total_amount_list(wait, xpath):
-    time.sleep(1)
-    try:
-        can= wait_return_subelement_absolute(wait, time_w = 0.5, xpath=xpath)
-        char_amountof_member =can.get_attribute("value")
-        int_amountof_members = re.findall(r'\d+', char_amountof_member)
-        int_amountof_member = int(int_amountof_members[0]) if int_amountof_members else None
-        return int(int_amountof_member)
-    except:
-        #//div[@class = "el-table y_table el-table--fit el-table--border el-table--enable-row-hover el-table--enable-row-transition"]
-        can = wait_return_subelement_absolute(wait, 0.5, "//main[@class ='el-main main']")
-        can_html = can.get_attribute('outerHTML')
-        soup = BeautifulSoup(can_html, 'html.parser')
-        result = soup.find('span', class_ = "el-table__empty-text")
-        if result:
-            return 0
-        else:
-            return -1
 
 
 
-def set_amount_perpage(wait):
-    wait_click_xpath(wait, time_w = 0.5, xpath = "(//input[@class = 'el-input__inner'])[4]")
-    wait_click_xpath(wait, time_w = 0.5, xpath = "//span[contains(text(), '100条/页')]")
-    num = get_total_amount_list(wait, xpath="(//input[@class = 'el-input__inner'])[4]")
-    while 1:
-        if num==100:
-            break
-        else:
-            time.sleep(1)
-            wait_click_xpath(wait, time_w = 0.5, xpath = "(//input[@class = 'el-input__inner'])[4]")
-            wait_click_xpath(wait, time_w = 0.5, xpath = "//span[contains(text(), '100条/页')]")
+
+
 
 
 
@@ -566,22 +390,16 @@ def schedule(complete, total, xpath, wait, member_excel, member_excel_path, cont
         page_number = int(complete / 100 + 1)
         row_number = int(complete % 100 + 1)
         #time.sleep(0.1)
-        input_page = wait.until(EC.visibility_of_element_located((By.XPATH, xpath)))
-        input_page.send_keys(Keys.CONTROL + "a")
-        input_page.send_keys(Keys.BACKSPACE)
-        input_page.send_keys(page_number)
-        input_page.send_keys(Keys.RETURN)
         if page_number != page_number_old:
+            input_page = wait.until(EC.visibility_of_element_located((By.XPATH, xpath)))
+            input_page.send_keys(Keys.CONTROL + "a")
+            input_page.send_keys(Keys.BACKSPACE)
+            input_page.send_keys(page_number)
+            input_page.send_keys(Keys.RETURN)
             time.sleep(1)
-        access_info_page(wait, row_number, file = member_excel, path = member_excel_path)
-        try:
-            for handle in driver0.window_handles:
-                driver0.switch_to.window(handle)
-                if '入党申请人基本信息' in driver0.page_source:
-                    break
-        except:
-            time.sleep(0.3)
-        print(f"进入入党申请人基本信息页面成功")
+        else:
+            pass
+        enter_person_infopage(wait, driver0, row_number, member_excel, member_excel_path, page_number, xpath='(//input[@placeholder = "请选择"])[1]', control = control)
         downloading(file = member_excel, wait = wait, path = member_excel_path, control = control)
         driver0.close()
         try:

@@ -46,7 +46,13 @@ def main():
         wait_click_xpath(wait, time_w = 0.5, xpath = '(//input[@placeholder = "请选择"])[1]')
         wait_click_xpath(wait, time_w = 0.5, xpath = '//ul[@class = "el-scrollbar__view el-select-dropdown__list"]//li//span[contains(text(), "全部")]')
         wait_click_xpath(wait, time_w = 0.5, xpath = '//span[contains(text(), "搜索")]')
-        number = dev_func.get_total_amount(wait, "//span[@class = 'el-pagination__total']")
+        #number = dev_func.get_total_amount(wait, "//span[@class = 'el-pagination__total']")
+        t = wait_return_subelement_absolute_notmust(wait, time_w= 0.5, xpath="//span[contains(text(), '暂无数据')]", times=3)
+        if t == None:
+            number = 1
+        else :
+            number = 0
+        
         if number == 0:
             #
             #
