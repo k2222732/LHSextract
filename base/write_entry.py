@@ -148,6 +148,19 @@ def click_button_until_specifyxpath_disappear(wait, driver, specifyxpath, button
         elif yanzheng is None: 
             break
 
+def click_button_until_specifyxpath_appear(wait, driver, specifyxpath, buttonxpath):
+    while True:
+        # 查找并点击按钮
+        button = driver.find_element(By.XPATH, buttonxpath)
+        button.click()
+        
+        try:
+            # 等待目标元素出现
+            wait.until(EC.presence_of_element_located((By.XPATH, specifyxpath)))
+            break
+        except:
+            pass
+
 
 #等待某个xpath出现，然后再消失
 def wait_specifyxpath_appear_disappear(wait, driver, xpath):
@@ -175,3 +188,4 @@ def upload_pic(pic_dir, input_xpath, wait, driver):
             file_input.send_keys(file)
     except Exception:
         traceback.print_exc()
+
