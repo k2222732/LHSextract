@@ -5,7 +5,7 @@ import login
 
 def main():
     driver = login._main()
-    wait = WebDriverWait(driver, 10, 0.5)
+    wait = WebDriverWait(driver, 5, 0.5)
     dev_func.access_dev_database(driver, wait)
     dev_func.switch_role(wait, driver)
     #指定位置创建excel工作簿

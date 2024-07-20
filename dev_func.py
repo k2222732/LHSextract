@@ -372,6 +372,7 @@ def schedule(complete, total, xpath, wait, member_excel, member_excel_path, cont
     global amount_activist_complete
     global amount_devtar_complete
     global amount_applicant_complete
+    global temp_countx
 
     if control == 1:
         switch_formal_mem(wait)
@@ -399,7 +400,7 @@ def schedule(complete, total, xpath, wait, member_excel, member_excel_path, cont
             time.sleep(1)
         else:
             pass
-        enter_person_infopage(wait, driver0, row_number, member_excel, member_excel_path, page_number, xpath='(//input[@placeholder = "请选择"])[1]', control = control)
+        enter_person_infopage(wait, driver0, row_number, member_excel, member_excel_path, page_number, xpath="//li[@class = 'el-select-dropdown__item selected hover']//span", control = control, temp_countx = temp_countx)
         downloading(file = member_excel, wait = wait, path = member_excel_path, control = control)
         driver0.close()
         try:
