@@ -1,5 +1,5 @@
 import dev_func
-from base.waitclick import wait_click_xpath, wait_return_element_text, wait_return_subelement_absolute_notmust,wait_return_subelement_absolute
+from base.waitclick import *
 from selenium.webdriver.support.ui import WebDriverWait
 import login
 import os
@@ -52,7 +52,11 @@ def main():
     synchronizing_xueli(driver=driver, wait=wait, input_node=education_tree)
 
     #循环录入积极分子信息
+    person_old = ""
     for person in applicant_info:
+        if person == person_old:
+            print("循环失败" )
+            raise Exception("循环失败")
         card1 =None
         card2 =None
         card3 =None
@@ -102,45 +106,46 @@ def main():
                 cursor.input_text(wait, driver, xpath="//input[@placeholder = '请输入公民身份号码']", text=applicant_info[person]['公民身份证号码'])
                 wait_click_xpath(wait, time_w = 0.5, xpath = '(//span[contains(text(), "查询")])[3]')
                 try:
-                    wait.until(EC.element_to_be_clickable((By.XPATH, "//tbody[1]/tr[1]/td[2]//span")))
-                except:
+                    click_button_until_specifyxpath_appear_except(wait, driver, specifyxpath = "//span[contains(text(), '模板下载')]", buttonxpath = "//tbody[1]/tr[1]/td[2]//span", time_w=5, times=2)
+                except TimeoutException:
                     wait_click_xpath(wait, time_w=0.5, xpath="(//div[contains(text(), '入党积极分子')])[1]")
                     cursor.input_text(wait, driver, xpath="//input[@placeholder = '请输入姓名']", text=applicant_info[person]['姓名'])
                     cursor.input_text(wait, driver, xpath="//input[@placeholder = '请输入公民身份号码']", text=applicant_info[person]['公民身份证号码'])
                     wait_click_xpath(wait, time_w = 0.5, xpath = '(//span[contains(text(), "查询")])[3]')
                     wait_click_xpath(wait, time_w=0.5, xpath="//tbody[1]/tr[1]/td[2]//span")
                     jijifenzi(wait, driver, org_tree, job_tree, education_tree, person, jg)
+                    continue
 
                 #click_button_until_specifyxpath_appear(wait, driver, "//span[contains(text(), '模板下载')]", "//tbody[1]/tr[1]/td[2]//span")
             #输入身份证号查询
             #点击此人进入发展流程
             #获得‘提交入党申请书’元素，检查css (//div[contains(text(), '递交入党申请书')])[10]
 
-                card1a = wait_return_subelement_absolute_notmust(wait, time_w=0.5, xpath="(//div[contains(text(), '递交入党申请书')])", times=1) 
-                card2a = wait_return_subelement_absolute_notmust(wait, time_w=0.5, xpath="(//div[contains(text(), '党组织派人谈话')])", times=1) 
-                card3a = wait_return_subelement_absolute_notmust(wait, time_w=0.5, xpath="(//div[contains(text(), '推荐和确定入党积极分子')])", times=1) 
-                card4a = wait_return_subelement_absolute_notmust(wait, time_w=0.5, xpath="(//div[contains(text(), '入党积极分子公示和备案')])", times=1) 
-                card5a = wait_return_subelement_absolute_notmust(wait, time_w=0.5, xpath="(//div[contains(text(), '指定培养联系人')])", times=1) 
-                card6a = wait_return_subelement_absolute_notmust(wait, time_w=0.5, xpath="(//div[contains(text(), '入党积极分子培养教育考察')])", times=1) 
-                card7a = wait_return_subelement_absolute_notmust(wait, time_w=0.5, xpath="(//div[contains(text(), '确定发展对象人选')])", times=1)
+                card1a = wait_return_element_two_xpath(driver, xpath1= "(//div[contains(text(), '递交入党申请书')])[31]", xpath2= "(//div[contains(text(), '递交入党申请书')])[2]", timewait = 1)
+                card2a = wait_return_subelement_absolute_notmust_v1(driver, wait, time_w=0.5, xpath="(//div[contains(text(), '党组织派人谈话')])", times=1) 
+                card3a = wait_return_subelement_absolute_notmust_v1(driver, wait, time_w=0.5, xpath="(//div[contains(text(), '推荐和确定入党积极分子')])", times=1) 
+                card4a = wait_return_subelement_absolute_notmust_v1(driver, wait, time_w=0.5, xpath="(//div[contains(text(), '入党积极分子公示和备案')])", times=1) 
+                card5a = wait_return_subelement_absolute_notmust_v1(driver, wait, time_w=0.5, xpath="(//div[contains(text(), '指定培养联系人')])", times=1) 
+                card6a = wait_return_subelement_absolute_notmust_v1(driver, wait, time_w=0.5, xpath="(//div[contains(text(), '入党积极分子培养教育考察')])", times=1) 
+                card7a = wait_return_subelement_absolute_notmust_v1(driver, wait, time_w=0.5, xpath="(//div[contains(text(), '确定发展对象人选')])", times=1)
 
 
-                card1b = wait_return_subelement_absolute_notmust(wait, time_w=0.5, xpath="(//div[contains(text(), '递交入党申请书')])", times=1) 
-                card2b = wait_return_subelement_absolute_notmust(wait, time_w=0.5, xpath="(//div[contains(text(), '党组织派人谈话')])[2]", times=1)
-                card3b = wait_return_subelement_absolute_notmust(wait, time_w=0.5, xpath="(//div[contains(text(), '推荐和确定入党积极分子')])", times=1) 
-                card4b = wait_return_subelement_absolute_notmust(wait, time_w=0.5, xpath="(//div[contains(text(), '入党积极分子公示和备案')])", times=1) 
-                card5b = wait_return_subelement_absolute_notmust(wait, time_w=0.5, xpath="(//div[contains(text(), '指定培养联系人')])", times=1) 
-                card6b = wait_return_subelement_absolute_notmust(wait, time_w=0.5, xpath="(//div[contains(text(), '入党积极分子培养教育考察')])", times=1) 
-                card7b = wait_return_subelement_absolute_notmust(wait, time_w=0.5, xpath="(//div[contains(text(), '确定发展对象人选')])", times=1) 
-                if None not in [card1a, card2a, card3a, card4a, card5a, card6a, card7a]:
+                card1b = wait_return_subelement_absolute_notmust_v1(driver, wait, time_w=0.5, xpath="(//div[contains(text(), '递交入党申请书')])", times=1) 
+                card2b = wait_return_element_two_xpath(driver, xpath1= "(//div[contains(text(), '党组织派人谈话')])[31]", xpath2= "(//div[contains(text(), '党组织派人谈话')])[2]", timewait = 1)
+                card3b = wait_return_subelement_absolute_notmust_v1(driver, wait, time_w=0.5, xpath="(//div[contains(text(), '推荐和确定入党积极分子')])", times=1) 
+                card4b = wait_return_subelement_absolute_notmust_v1(driver, wait, time_w=0.5, xpath="(//div[contains(text(), '入党积极分子公示和备案')])", times=1) 
+                card5b = wait_return_subelement_absolute_notmust_v1(driver, wait, time_w=0.5, xpath="(//div[contains(text(), '指定培养联系人')])", times=1) 
+                card6b = wait_return_subelement_absolute_notmust_v1(driver, wait, time_w=0.5, xpath="(//div[contains(text(), '入党积极分子培养教育考察')])", times=1) 
+                card7b = wait_return_subelement_absolute_notmust_v1(driver, wait, time_w=0.5, xpath="(//div[contains(text(), '确定发展对象人选')])", times=1) 
+                if all(value is not None and value is not False for value in [card1a, card2a, card3a, card4a, card5a, card6a, card7a]):
                     card1 = card1a
                     card2 = card2a
                     card3 = card3a
                     card4 = card4a
                     card5 = card5a
-                    card6 = card6a
+                    card6 = card6b
                     card7 = card7a
-                elif None not in [card1b, card2b, card3b, card4b, card5b, card6b, card7b]:
+                elif all(value is not None and value is not False for value in [card1b, card2b, card3b, card4b, card5b, card6b, card7b]):
                     card1 = card1b
                     card2 = card2b
                     card3 = card3b
@@ -238,56 +243,67 @@ def main():
                 cursor.input_text(wait, driver, xpath="//input[@placeholder = '请输入姓名']", text=applicant_info[person]['姓名'])
                 cursor.input_text(wait, driver, xpath="//input[@placeholder = '请输入公民身份号码']", text=applicant_info[person]['公民身份证号码'])
                 wait_click_xpath(wait, time_w = 0.5, xpath = '(//span[contains(text(), "查询")])[3]')
-                wait_click_xpath(wait, time_w = 0.5, xpath = '//tbody[1]/tr[1]/td[2]//span')
+                click_button_until_specifyxpath_appear_except(wait, driver, specifyxpath = "//span[contains(text(), '模板下载')]", buttonxpath = "//tbody[1]/tr[1]/td[2]//span", time_w=5, times=2)
                 #click_button_until_specifyxpath_appear(wait, driver, "//span[contains(text(), '模板下载')]", "//tbody[1]/tr[1]/td[2]//span")
             #输入身份证号查询
             #点击此人进入发展流程
             #获得‘提交入党申请书’元素，检查css (//div[contains(text(), '递交入党申请书')])[10]
                 jijifenzi(wait, driver, org_tree, job_tree, education_tree, person, jg)
-
+    person_old = person
     input("按任意键结束")
 
 
 
 def jijifenzi(wait, driver, org_tree, job_tree, education_tree, person, jg):
     
-    card1c = wait_return_subelement_absolute_notmust(wait, time_w=0.5, xpath="(//div[contains(text(), '递交入党申请书')])", times=1) 
-    card2c = wait_return_subelement_absolute_notmust(wait, time_w=0.5, xpath="(//div[contains(text(), '党组织派人谈话')])", times=1) 
-    card3c = wait_return_subelement_absolute_notmust(wait, time_w=0.5, xpath="(//div[contains(text(), '推荐和确定入党积极分子')])[2]", times=1) 
-    card4c = wait_return_subelement_absolute_notmust(wait, time_w=0.5, xpath="(//div[contains(text(), '入党积极分子公示和备案')])", times=1) 
-    card5c = wait_return_subelement_absolute_notmust(wait, time_w=0.5, xpath="(//div[contains(text(), '指定培养联系人')])", times=1) 
-    card6c = wait_return_subelement_absolute_notmust(wait, time_w=0.5, xpath="(//div[contains(text(), '入党积极分子培养教育考察')])", times=1) 
-    card7c = wait_return_subelement_absolute_notmust(wait, time_w=0.5, xpath="(//div[contains(text(), '确定发展对象人选')])", times=1)
+    card1c = wait_return_subelement_absolute_notmust_v1(driver, wait, time_w=1, xpath="(//div[contains(text(), '递交入党申请书')])", times=3) 
+    card2c = wait_return_subelement_absolute_notmust_v1(driver, wait, time_w=0.5, xpath="(//div[contains(text(), '党组织派人谈话')])", times=1) 
+    card3c = wait_return_element_two_xpath(driver, xpath1= "(//div[contains(text(), '推荐和确定入党积极分子')])[31]", xpath2= "(//div[contains(text(), '推荐和确定入党积极分子')])[2]", timewait = 1)
+    card4c = wait_return_subelement_absolute_notmust_v1(driver, wait, time_w=0.5, xpath="(//div[contains(text(), '入党积极分子公示和备案')])", times=1) 
+    card5c = wait_return_subelement_absolute_notmust_v1(driver, wait, time_w=0.5, xpath="(//div[contains(text(), '指定培养联系人')])", times=1) 
+    card6c = wait_return_subelement_absolute_notmust_v1(driver, wait, time_w=0.5, xpath="(//div[contains(text(), '入党积极分子培养教育考察')])", times=1) 
+    card7c = wait_return_subelement_absolute_notmust_v1(driver, wait, time_w=0.5, xpath="(//div[contains(text(), '确定发展对象人选')])", times=1)
 
 
-    card1d = wait_return_subelement_absolute_notmust(wait, time_w=0.5, xpath="(//div[contains(text(), '递交入党申请书')])", times=1) 
-    card2d = wait_return_subelement_absolute_notmust(wait, time_w=0.5, xpath="(//div[contains(text(), '党组织派人谈话')])", times=1) 
-    card3d = wait_return_subelement_absolute_notmust(wait, time_w=0.5, xpath="(//div[contains(text(), '推荐和确定入党积极分子')])", times=1) 
-    card4d = wait_return_subelement_absolute_notmust(wait, time_w=0.5, xpath="(//div[contains(text(), '入党积极分子公示和备案')])[2]", times=1) 
-    card5d = wait_return_subelement_absolute_notmust(wait, time_w=0.5, xpath="(//div[contains(text(), '指定培养联系人')])", times=1) 
-    card6d = wait_return_subelement_absolute_notmust(wait, time_w=0.5, xpath="(//div[contains(text(), '入党积极分子培养教育考察')])", times=1) 
-    card7d = wait_return_subelement_absolute_notmust(wait, time_w=0.5, xpath="(//div[contains(text(), '确定发展对象人选')])", times=1) 
+    card1d = wait_return_subelement_absolute_notmust_v1(driver, wait, time_w=0.5, xpath="(//div[contains(text(), '递交入党申请书')])", times=1) 
+    card2d = wait_return_subelement_absolute_notmust_v1(driver, wait, time_w=0.5, xpath="(//div[contains(text(), '党组织派人谈话')])", times=1) 
+    card3d = wait_return_subelement_absolute_notmust_v1(driver, wait, time_w=0.5, xpath="(//div[contains(text(), '推荐和确定入党积极分子')])", times=1) 
+    card4d = wait_return_element_two_xpath(driver, xpath1= "(//div[contains(text(), '入党积极分子公示和备案')])[1]", xpath2= "(//div[contains(text(), '入党积极分子公示和备案')])[31]", timewait = 1)
+    card5d = wait_return_subelement_absolute_notmust_v1(driver, wait, time_w=0.5, xpath="(//div[contains(text(), '指定培养联系人')])", times=1) 
+    card6d = wait_return_subelement_absolute_notmust_v1(driver, wait, time_w=0.5, xpath="(//div[contains(text(), '入党积极分子培养教育考察')])", times=1) 
+    card7d = wait_return_subelement_absolute_notmust_v1(driver, wait, time_w=0.5, xpath="(//div[contains(text(), '确定发展对象人选')])", times=1) 
 
 
-    card1e = wait_return_subelement_absolute_notmust(wait, time_w=0.5, xpath="(//div[contains(text(), '递交入党申请书')])", times=1) 
-    card2e = wait_return_subelement_absolute_notmust(wait, time_w=0.5, xpath="(//div[contains(text(), '党组织派人谈话')])", times=1) 
-    card3e = wait_return_subelement_absolute_notmust(wait, time_w=0.5, xpath="(//div[contains(text(), '推荐和确定入党积极分子')])", times=1) 
-    card4e = wait_return_subelement_absolute_notmust(wait, time_w=0.5, xpath="(//div[contains(text(), '入党积极分子公示和备案')])", times=1) 
-    card5e = wait_return_subelement_absolute_notmust(wait, time_w=0.5, xpath="(//div[contains(text(), '指定培养联系人')])[2]", times=1) 
-    card6e = wait_return_subelement_absolute_notmust(wait, time_w=0.5, xpath="(//div[contains(text(), '入党积极分子培养教育考察')])", times=1) 
-    card7e = wait_return_subelement_absolute_notmust(wait, time_w=0.5, xpath="(//div[contains(text(), '确定发展对象人选')])", times=1) 
+    card1e = wait_return_subelement_absolute_notmust_v1(driver, wait, time_w=0.5, xpath="(//div[contains(text(), '递交入党申请书')])", times=1) 
+    card2e = wait_return_subelement_absolute_notmust_v1(driver, wait, time_w=0.5, xpath="(//div[contains(text(), '党组织派人谈话')])", times=1) 
+    card3e = wait_return_subelement_absolute_notmust_v1(driver, wait, time_w=0.5, xpath="(//div[contains(text(), '推荐和确定入党积极分子')])", times=1) 
+    card4e = wait_return_subelement_absolute_notmust_v1(driver, wait, time_w=0.5, xpath="(//div[contains(text(), '入党积极分子公示和备案')])", times=1) 
+    card5e = wait_return_element_two_xpath(driver, xpath1= "(//div[contains(text(), '指定培养联系人')])[31]", xpath2= "(//div[contains(text(), '指定培养联系人')])[2]", timewait = 1)
+    card6e = wait_return_subelement_absolute_notmust_v1(driver, wait, time_w=0.5, xpath="(//div[contains(text(), '入党积极分子培养教育考察')])", times=1) 
+    card7e = wait_return_subelement_absolute_notmust_v1(driver, wait, time_w=0.5, xpath="(//div[contains(text(), '确定发展对象人选')])", times=1) 
 
     
-    card1f = wait_return_subelement_absolute_notmust(wait, time_w=0.5, xpath="(//div[contains(text(), '递交入党申请书')])", times=1) 
-    card2f = wait_return_subelement_absolute_notmust(wait, time_w=0.5, xpath="(//div[contains(text(), '党组织派人谈话')])", times=1) 
-    card3f = wait_return_subelement_absolute_notmust(wait, time_w=0.5, xpath="(//div[contains(text(), '推荐和确定入党积极分子')])", times=1) 
-    card4f = wait_return_subelement_absolute_notmust(wait, time_w=0.5, xpath="(//div[contains(text(), '入党积极分子公示和备案')])", times=1) 
-    card5f = wait_return_subelement_absolute_notmust(wait, time_w=0.5, xpath="(//div[contains(text(), '指定培养联系人')])", times=1) 
-    card6f = wait_return_subelement_absolute_notmust(wait, time_w=0.5, xpath="(//div[contains(text(), '入党积极分子培养教育考察')])[2]", times=1) 
-    card7f = wait_return_subelement_absolute_notmust(wait, time_w=0.5, xpath="(//div[contains(text(), '确定发展对象人选')])", times=1) 
+    card1f = wait_return_subelement_absolute_notmust_v1(driver, wait, time_w=0.5, xpath="(//div[contains(text(), '递交入党申请书')])", times=1) 
+    card2f = wait_return_subelement_absolute_notmust_v1(driver, wait, time_w=0.5, xpath="(//div[contains(text(), '党组织派人谈话')])", times=1) 
+    card3f = wait_return_subelement_absolute_notmust_v1(driver, wait, time_w=0.5, xpath="(//div[contains(text(), '推荐和确定入党积极分子')])", times=1) 
+    card4f = wait_return_subelement_absolute_notmust_v1(driver, wait, time_w=0.5, xpath="(//div[contains(text(), '入党积极分子公示和备案')])", times=1) 
+    card5f = wait_return_subelement_absolute_notmust_v1(driver, wait, time_w=0.5, xpath="(//div[contains(text(), '指定培养联系人')])", times=1) 
+    card6f = wait_return_element_two_xpath(driver, xpath1= "(//div[contains(text(), '入党积极分子培养教育考察')])[31]", xpath2= "(//div[contains(text(), '入党积极分子培养教育考察')])[2]", timewait = 1)
+    card7f = wait_return_subelement_absolute_notmust_v1(driver, wait, time_w=0.5, xpath="(//div[contains(text(), '确定发展对象人选')])", times=1) 
 
 
-    if None not in [card1c, card2c, card3c, card4c, card5c, card6c, card7c]:
+
+    card1g = wait_return_subelement_absolute_notmust_v1(driver, wait, time_w=0.5, xpath="(//div[contains(text(), '递交入党申请书')])", times=1) 
+    card2g = wait_return_subelement_absolute_notmust_v1(driver, wait, time_w=0.5, xpath="(//div[contains(text(), '党组织派人谈话')])", times=1) 
+    card3g = wait_return_subelement_absolute_notmust_v1(driver, wait, time_w=0.5, xpath="(//div[contains(text(), '推荐和确定入党积极分子')])", times=1) 
+    card4g = wait_return_subelement_absolute_notmust_v1(driver, wait, time_w=0.5, xpath="(//div[contains(text(), '入党积极分子公示和备案')])", times=1) 
+    card5g = wait_return_subelement_absolute_notmust_v1(driver, wait, time_w=0.5, xpath="(//div[contains(text(), '指定培养联系人')])", times=1) 
+    card6g = wait_return_subelement_absolute_notmust_v1(driver, wait, time_w=0.5, xpath="(//div[contains(text(), '入党积极分子培养教育考察')])", times=1) 
+    card7g = wait_return_element_two_xpath(driver, xpath1= "(//div[contains(text(), '确定发展对象人选')])[31]", xpath2= "(//div[contains(text(), '确定发展对象人选')])[2]", timewait = 1)
+
+
+
+    if all(value is not None and value is not False for value in [card1c, card2c, card3c, card4c, card5c, card6c, card7c]):
         card1 = card1c
         card2 = card2c
         card3 = card3c
@@ -295,15 +311,15 @@ def jijifenzi(wait, driver, org_tree, job_tree, education_tree, person, jg):
         card5 = card5c
         card6 = card6c
         card7 = card7c
-    elif None not in [card1d, card2d, card3d, card4d, card5d, card6d, card7d]:
+    elif all(value is not None and value is not False for value in [card1d, card2d, card3d, card4d, card5d, card6d, card7d]):
         card1 = card1d
         card2 = card2d
         card3 = card3d
-        card4 = card4d
+        card4 = card4e
         card5 = card5d
         card6 = card6d
         card7 = card7d
-    elif None not in [card1e, card2e, card3e, card4e, card5e, card6e, card7e]:
+    elif all(value is not None and value is not False for value in [card1e, card2e, card3e, card4e, card5e, card6e, card7e]):
         card1 = card1e
         card2 = card2e
         card3 = card3e
@@ -311,7 +327,7 @@ def jijifenzi(wait, driver, org_tree, job_tree, education_tree, person, jg):
         card5 = card5e
         card6 = card6e
         card7 = card7e
-    elif None not in [card1f, card2f, card3f, card4f, card5f, card6f, card7f]:
+    elif all(value is not None and value is not False for value in [card1f, card2f, card3f, card4f, card5f, card6f, card7f]):
         card1 = card1f
         card2 = card2f
         card3 = card3f
@@ -319,6 +335,7 @@ def jijifenzi(wait, driver, org_tree, job_tree, education_tree, person, jg):
         card5 = card5f
         card6 = card6f
         card7 = card7f
+
 
     
 
@@ -848,7 +865,7 @@ def step_5(driver, wait, data_dict, gmsfzhm):
     #现支部、其他支部#(//i[@class = 'el-select__caret el-input__icon el-icon-arrow-up'])[1]
     #选择联系人#(//i[@class = 'el-select__caret el-input__icon el-icon-arrow-up'])[1]#(//ul[@class = 'el-scrollbar__view el-select-dropdown__list'])[2]
     cursor.commen_button(wait, driver, xpath="(//i[@class = 'el-select__caret el-input__icon el-icon-arrow-up'])[2]")
-    cursor.select_background(wait, driver, element_xpath="(//ul[@class = 'el-scrollbar__view el-select-dropdown__list'])[2]", label='span', value=data_dict[gmsfzhm]["培养联系人"])
+    cursor.select_background_v1(wait, driver, element_xpath="(//ul[@class = 'el-scrollbar__view el-select-dropdown__list'])[2]", label='span', value=data_dict[gmsfzhm]["培养联系人"])
     #选择联系人（其他支部）#//input[@placeholder='请输入']
     #入党日期(现支部不需)#(//input[@placeholder='选择日期'])[1]
     #学历(现支部不需)#(//input[@placeholder='请选择字段项'])

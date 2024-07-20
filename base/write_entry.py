@@ -1,4 +1,4 @@
-import base.waitclick as wc
+from selenium.common.exceptions import TimeoutException
 from selenium.webdriver.support import expected_conditions as EC
 from selenium.webdriver.common.by import By
 import traceback
@@ -9,6 +9,25 @@ from base.waitclick import wait_return_subelement_absolute_notmust_visiable
 import pandas as pd
 import os
 import time
+
+
+
+
+from selenium.webdriver.support.ui import WebDriverWait
+
+
+
+def click_button_until_specifyxpath_appear(wait, driver, specifyxpath, buttonxpath):
+    while True:
+        # 查找并点击按钮
+        button = driver.find_element(By.XPATH, buttonxpath)
+        button.click()
+        try:
+            # 等待目标元素出现
+            wait.until(EC.presence_of_element_located((By.XPATH, specifyxpath)))
+            break
+        except:
+            pass
 
 @dataclass
 class DATE:
@@ -84,6 +103,14 @@ def select_background(wait, driver, element_xpath, label='span', value='汉族')
     except Exception:
         traceback.print_exc()
 
+#点选列表（单个）
+def select_background_v1(wait, driver, element_xpath, label='span', value='汉族'):
+    try:
+        path = f'{element_xpath}//{label}[contains(text(), "{value}")]/..'
+        wait_click_xpath(wait, time_w = 0.5, xpath = path)
+    except Exception:
+        traceback.print_exc()
+
 
 
 
@@ -153,7 +180,6 @@ def click_button_until_specifyxpath_appear(wait, driver, specifyxpath, buttonxpa
         # 查找并点击按钮
         button = driver.find_element(By.XPATH, buttonxpath)
         button.click()
-        
         try:
             # 等待目标元素出现
             wait.until(EC.presence_of_element_located((By.XPATH, specifyxpath)))
@@ -161,6 +187,26 @@ def click_button_until_specifyxpath_appear(wait, driver, specifyxpath, buttonxpa
         except:
             pass
 
+
+def click_button_until_specifyxpath_appear_except(wait, driver, specifyxpath, buttonxpath, time_w, times):
+    
+    i = 1
+    while True:
+        if i >= times:
+            raise TimeoutException("主动抛出超时异常")
+        # 查找并点击按钮
+        try:
+            button = WebDriverWait(driver, 4).until(EC.element_to_be_clickable((By.XPATH, buttonxpath)))
+            button.click()
+        except:
+            pass
+        try:
+            # 等待目标元素出现
+            WebDriverWait(driver, time_w).until(EC.presence_of_element_located((By.XPATH, specifyxpath)))
+            break
+        except:
+            i = i +1
+            
 
 #等待某个xpath出现，然后再消失
 def wait_specifyxpath_appear_disappear(wait, driver, xpath):
