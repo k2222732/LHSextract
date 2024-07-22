@@ -17,7 +17,7 @@ import dev_func
 from bs4 import BeautifulSoup
 from base.write_entry import *
 from selenium.webdriver.common.keys import Keys
-from goto import with_goto
+
 
 applicant_info = {}
 
@@ -511,6 +511,8 @@ def step_1(driver, wait, data_dict, gmsfzhm, org_tree, job_tree, education_tree)
     cursor.select_party_org(wait, driver, tree=education_tree, target=data_dict[gmsfzhm]['学历'], element_xpath="//div[@class = 'el-tree objectTree']", label_1 = 'span', label_2 = 'span')
     #递交入党申请书日期#(//input[@placeholder = '选择日期'])[2]
     cursor.input_text(wait, driver, xpath="(//input[@placeholder = '选择日期'])[2]", text=data_dict[gmsfzhm]['申请入党日期'])
+    t = wait_return_subelement_absolute(wait, time_w = 0.5, xpath = "(//input[@placeholder = '选择日期'])[2]")
+    t.send_keys(Keys.RETURN)
     #手机号码#(//input[@placeholder = '请输入联系方式'])[1]
     cursor.input_text(wait, driver, xpath="(//input[@placeholder = '请输入联系方式'])[1]", text=data_dict[gmsfzhm]['手机号码'])
     #家庭住址#(//input[@placeholder = '请输入内容'])[2]
@@ -687,6 +689,7 @@ def step_3(driver, wait, data_dict, gmsfzhm, jg):
     cursor.input_text(wait, driver, xpath="(//input[contains(@placeholder, '请输入内容')])[5]", text=data_dict[gmsfzhm]["积极分子确定会议应到人数"] - data_dict[gmsfzhm]["积极分子确定会议实到人数"])
     #会议类型#(//input[@placeholder = '请选择字段项'])[1]
     cursor.commen_button(wait, driver, xpath = "(//input[@placeholder = '请选择字段项'])[2]")
+    cursor.select_background(wait, driver, "//div[@class = 'el-tree objectTree']", "span", "党员大会")
     #党支部书记#(//input[@placeholder = '请输入内容'])[3]
     cursor.input_text(wait, driver, xpath="(//input[@placeholder = '请输入内容'])[2]", text=data_dict[gmsfzhm]['党支部书记'])
     #列席组织员#(//input[@placeholder = '请输入内容'])[4]
@@ -763,6 +766,9 @@ def step_3_rebuild(driver, wait, data_dict, gmsfzhm, jg):
     cursor.input_text(wait, driver, xpath="(//input[contains(@placeholder, '请输入内容')])[5]", text=data_dict[gmsfzhm]["积极分子确定会议应到人数"] - data_dict[gmsfzhm]["积极分子确定会议实到人数"])
     #会议类型#(//input[@placeholder = '请选择字段项'])[1]
     cursor.commen_button(wait, driver, xpath = "(//input[@placeholder = '请选择字段项'])[2]")
+    cursor.select_background(wait, driver, "//div[@class = 'el-tree objectTree']", "span", "党员大会")
+    
+    
     #党支部书记#(//input[@placeholder = '请输入内容'])[3]
     cursor.input_text(wait, driver, xpath="(//input[@placeholder = '请输入内容'])[2]", text=data_dict[gmsfzhm]['党支部书记'])
     #列席组织员#(//input[@placeholder = '请输入内容'])[4]
