@@ -9,6 +9,9 @@ import time
 import os
 import configparser
 import threading
+from openpyxl import load_workbook
+import openpyxl
+
 
 
 stop_event = threading.Event()
@@ -96,7 +99,7 @@ def switch_item_org(wait):
             item_org = wait.until(EC.element_to_be_clickable((By.XPATH, '//*[contains(text(), "党组织管理")]/..')))
     while(1):
         try:
-            org_info = wait.until(EC.element_to_be_clickable((By.XPATH, '(//*[contains(text(), "信息管理")]/..)[2]')))
+            org_info = wait.until(EC.element_to_be_clickable((By.XPATH, '(//*[contains(text(), "信息管理")]/..)[3]')))
             break
         except:
             time.sleep(0.1)
@@ -105,7 +108,7 @@ def switch_item_org(wait):
             org_info.click()
             break
         except:
-            org_info = wait.until(EC.element_to_be_clickable((By.XPATH, '(//*[contains(text(), "信息管理")]/..)[2]')))
+            org_info = wait.until(EC.element_to_be_clickable((By.XPATH, '(//*[contains(text(), "信息管理")]/..)[3]')))
 
 
 
@@ -153,10 +156,12 @@ def new_excel(wait, driver):
             , "新经济行业", "经济行业", "经济类型", "新经济类型", "成立日期", "注册地行政区划", "注册地址", "组织机构代码", "上级主管部门名称", "单位隶属关系"]
 
 
-        #创建一个dataframe表头为columns_base_info中的元素
-        df = pd.DataFrame(columns = columns_base_info)
-        #dataframe导出到excel
-        df.to_excel(excel_file_path, index = False)
+        wb = openpyxl.Workbook()
+        ws = wb.active
+        ws.title = "sheet1"
+        for i, value in enumerate(columns_base_info, start=1):
+            ws.cell(row=1, column = i, value=value)
+        wb.save(excel_file_path)
         #使用openpyxl库来加载一个已存在的Excel工作簿
         org_excel = load_workbook(excel_file_path)
         #打印调试信息
@@ -197,10 +202,28 @@ def rebuild(excel_file_path, wait, org_total_amount, org_excel, org_excel_path):
 
 
 def init_complete_amount(excel_file_path):
-    global amount_that_complete
     df = pd.read_excel(excel_file_path, sheet_name=0)
-    row_count = df.dropna(how='all').shape[0]
+    row_count = count_non_empty_rows(excel_file_path, sheet_name=0)
     amount_that_complete = row_count - 1
+    return amount_that_complete
+
+
+
+def count_non_empty_rows(excel_file_path, sheet_name=0):
+    # 加载Excel工作簿
+    workbook = load_workbook(filename=excel_file_path, data_only=True)
+    # 获取工作表（可以通过名称或索引获取）
+    if isinstance(sheet_name, int):
+        sheet = workbook.worksheets[sheet_name]
+    else:
+        sheet = workbook[sheet_name]
+    non_empty_row_count = 0
+    # 逐行检查是否有数据
+    for row in sheet.iter_rows():
+        if any(cell.value is not None for cell in row):
+            non_empty_row_count += 1
+    return non_empty_row_count
+
 
 
 
@@ -224,7 +247,9 @@ def synchronizing(wait, org_excel, org_excel_path, driver):
     downloading(file = org_excel, wait = wait, driver = driver, path = org_excel_path)
 
 
-    #获取根节点结构体//div[@class = "tree_wrapper"]//div[@role = "treeitem"]/div[@role = "group"]到tree_root
+    #获取根节点结构体//div[@class = "tre
+    # 
+    # e_wrapper"]//div[@role = "treeitem"]/div[@role = "group"]到tree_root
     while(1):
         try:
             tree_root = wait.until(EC.visibility_of_element_located((By.XPATH, "//div[@class = 'tree_wrapper']//div[@role = 'treeitem']/div[@role = 'group']")))
@@ -257,12 +282,10 @@ def recursion(tree_root, file, wait, driver, path):
         # 采集党组织信息
         downloading(file, wait, driver, path)
         # 查看元素下面是否有//span[@class = "is-leaf fs-tree-node__expand-icon fs-icon-caret-right"]
-
         ##在这里检查线程关闭信号
 
         if stop_event.is_set():
             break
-
         item_html = item.get_attribute('outerHTML')
         soup = BeautifulSoup(item_html, 'html.parser')
         first_child = soup.find()
@@ -614,6 +637,7 @@ def downloading(file, wait, driver, path):
     
     print("填写第",count,"个党组织",name_temp,"信息成功") 
     amount_that_complete = amount_that_complete + 1
+
 
 
 
