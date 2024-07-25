@@ -23,23 +23,19 @@ class ClientApp:
         self.label_password.grid(row=1, sticky=tk.E, pady=5)
         self.entry_username.grid(row=0, column=1, pady=5)
         self.entry_password.grid(row=1, column=1, pady=5)
-
         self.forget_password = tk.Label(self.root, text="忘记密码", cursor="hand2", foreground="blue")
         self.forget_password.bind("<Button-1>", self.forget_password_func)
-
         self.login_button = tk.Button(root, text="登录", command=self.login)
         self.register_button = tk.Button(root, text="注册", command=self.register)
         self.forget_password.grid(row=2, column=1, sticky=tk.EW)
         self.login_button.grid(row=2, column=1, sticky=tk.E, pady=5)
         self.register_button.grid(row=2, column=2, sticky=tk.W, pady=5)
-        
         self.remaining_time = tk.StringVar(self.root)
 
     def forget_password_func(self, event=None):
         self.root.withdraw()
         self.password_restore = tk.Toplevel(self.root)
         self.password_restore.protocol("WM_DELETE_WINDOW", self.show_login_window_forget)
-
         self.label_phonenum_card2 = tk.Label(self.password_restore, text="手机号码:")
         self.phone_number_card2 = tk.Entry(self.password_restore, width = 15)
         self.send_validate_code_card2 = tk.Button(self.password_restore, text="发送验证码", command=lambda: self.call_validate_code_w(self.phone_number_card2, self.send_validate_code_card2, self.remaining_time, self.password_restore))

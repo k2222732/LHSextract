@@ -29,13 +29,13 @@ from selenium.webdriver.common.keys import Keys
 from datetime import datetime
 from openpyxl import load_workbook
 import openpyxl
-import do_upload_dkt
+import app.do_upload_dkt
 
 ztdr = []
 dkt = []
 quanti = []
-kssj = '2024-06'#开始时间
-jssj = '2024-06'#结束时间
+kssj = '2024-04'#开始时间
+jssj = '2024-04'#结束时间
 
 def main():
     global ztdr
@@ -49,7 +49,7 @@ def main():
     commen_button(wait, driver, xpath="(//span[contains(text(), '人员信息')])[1]")
     #(//span[contains(text(), '人员信息')])[1]
     org_tree = TreeNode()
-    do_upload_dkt.synchronizing_org(wait, driver, input_node=org_tree)
+    app.do_upload_dkt.synchronizing_org(wait, driver, input_node=org_tree)
     org_tree.copy_to_list(quanti)
     try:
         for handle in driver.window_handles:

@@ -15,6 +15,10 @@ import dev_func
 import login
 import vip_struct
 import ui_button_func
+import app.upload_activator
+import app.checkout
+import app.do_upload_dkt
+import app.do_upload_ztdr
 
 role_name_mem = ""
 role_name_org = ""
@@ -26,6 +30,11 @@ class MainApp:
         self.mem_thread = None
         self.org_thread = None
         self.dev_thread = None
+        self.upload_activitist_thread = None
+        self.upload_checkout_thread = None
+        self.upload_upload_dkt = None
+        self.upload_upload_ztdr = None
+
 
         self.config_file = 'config.ini'
         self.config = configparser.ConfigParser()
@@ -348,28 +357,45 @@ class MainApp:
                 for slave in slaves:
                     slave.destroy()
                 n = n + 1
-            self.var = tk.StringVar(master=self.tab4)
-            self.radio_button1 = tk.Radiobutton(self.tab4, text="主题党日", variable=self.var, value="选项1")          
-            self.radio_button2 = tk.Radiobutton(self.tab4, text="灯塔大课堂", variable=self.var, value="选项2")           
-            self.radio_button3 = tk.Radiobutton(self.tab4, text="主题党日+灯塔大课堂", variable=self.var, value="选项3")    
+                
             self.label_instruction = tk.Label(self.tab4, text="在此输入文字版会议纪录：")        
             self.role_to_up_load_ztdr = tk.Text(self.tab4, state="normal", width=20, height = 13)         
             self.click_generate = ttk.Button(self.tab4, text="一键生成会议纪录", command=self.generate_txt)           
-            self.click_start = ttk.Button(self.tab4, text="点击启动", command=self.start_upload_solo)            
-            self.label_instruction2 = tk.Label(self.tab4, text="说明：批量上传将自动检测未上\n传本月主题党日和灯塔大课堂\n的支部，并自动上传。")
-            self.radio_button1.grid(row=1, column=0, columnspan=1, sticky="w", pady=0, padx=(10, 0))
-            self.radio_button2.grid(row=2, column=0, columnspan=1, sticky="w", pady=(0, 10), padx=(10, 0))
-            self.radio_button3.grid(row=3, column=0, columnspan=1, sticky="w", pady=0, padx=(10, 0))
+            self.click_checkout = ttk.Button(self.tab4, text="查看未上传支部", command=self.start_upload_checkout)            
+            self.click_uploadztdr = ttk.Button(self.tab4, text="批量上传主题党日", command=self.start_upload_ztdr)            
+            self.click_uploaddkt = ttk.Button(self.tab4, text="批量上传灯塔大课堂", command=self.start_upload_dkt)            
+            
             self.label_instruction.grid(row=0, column=2, columnspan=2, sticky="w", pady=0, padx=(10, 0))
             self.role_to_up_load_ztdr.grid(row=1, column=2, columnspan=1, rowspan=3, sticky="w", pady=0, padx=(10, 0))
-            self.click_generate.grid(row=6, column=2, rowspan=2, pady=0, padx=(10, 0))
-            self.click_start.grid(row=0, column=3, rowspan=1, pady=(10,0), padx=(15, 0), sticky="e")
-            self.label_instruction2.grid(row=1, column=3, columnspan=2, sticky="w", pady=0, padx=(10, 0))
+            self.click_generate.grid(row=2, column=2, rowspan=2, pady=0, padx=(10, 0))
+            self.click_checkout.grid(row=1, column=3, rowspan=2, pady=0, padx=(10, 0))
+            self.click_uploadztdr.grid(row=2, column=3, rowspan=2, pady=0, padx=(10, 0))
+            self.click_uploaddkt.grid(row=3, column=3, rowspan=2, pady=0, padx=(10, 0))
 
 
+    def start_upload_checkout(self):
+        if self.upload_checkout_thread is None or not self.upload_checkout_thread.is_alive():
+            self.upload_checkout_thread = threading.Thread(target=app.checkout.main)
+            self.upload_checkout_thread.start()
+        else:
+            print("党组织信息同步子程序正在运行。")
 
-    def start_upload_solo(self):
-        pass
+
+    def start_upload_ztdr(self):
+        if self.upload_upload_ztdr is None or not self.upload_upload_ztdr.is_alive():
+            self.upload_upload_ztdr = threading.Thread(target=app.do_upload_ztdr.main)
+            self.upload_upload_ztdr.start()
+        else:
+            print("党组织信息同步子程序正在运行。")
+
+
+    def start_upload_dkt(self):
+        if self.upload_upload_dkt is None or not self.upload_upload_dkt.is_alive():
+            self.upload_upload_dkt = threading.Thread(target=app.do_upload_dkt.main)
+            self.upload_upload_dkt.start()
+        else:
+            print("党组织信息同步子程序正在运行。")
+
 
     def generate_txt(self):
         pass
@@ -386,47 +412,30 @@ class MainApp:
 
 
     def setup_tab5(self):
-        self.label_instruction1 = tk.Label(self.tab5, text="请选择需上传到哪个阶段")  
-        self.label_instruction1.grid(row=0, column=0, columnspan=2, sticky="w", pady=0, padx=(10, 0))
-        self.combo_box_dev = ttk.Combobox(self.tab5, values=["1、上传到积极分子阶段", "2、上传到发展对象阶段", "3、上传到预备党员阶段"], width=18)
-        self.combo_box_dev.grid(row=1, column=0, columnspan=2, sticky="w", pady=0, padx=(10, 0))
-        self.combo_box_dev.bind("<<ComboboxSelected>>", self.show_layout_upload_dev)
+        # self.label_instruction1 = tk.Label(self.tab5, text="请选择需上传到哪个阶段")  
+        # self.label_instruction1.grid(row=0, column=0, columnspan=2, sticky="w", pady=0, padx=(10, 0))
+        # self.combo_box_dev = ttk.Combobox(self.tab5, values=["1、上传到积极分子阶段", "2、上传到发展对象阶段", "3、上传到预备党员阶段"], width=18)
+        # self.combo_box_dev.grid(row=1, column=0, columnspan=2, sticky="w", pady=0, padx=(10, 0))
+        # self.combo_box_dev.bind("<<ComboboxSelected>>", self.show_layout_upload_dev)
 
         self.tab5_frame1 = ttk.Frame(self.tab5)
         self.tab5_frame1.grid(row=3, column=0, columnspan=2, sticky="ew", pady=5, padx=(10, 0))
-        self.label_instruction2 = tk.Label(self.tab5_frame1, text="1、第一步:创建模板")  
+        self.label_instruction2 = tk.Label(self.tab5_frame1, text="1、第一步:选择模板目录")  
         self.label_instruction2.grid(row=0, column=0, columnspan=1, sticky="w", pady=0, padx=(10, 0))
         self.excel_template_path = ttk.Entry(self.tab5_frame1, state="normal")
         self.excel_template_path.grid(row=1, column=0)
-        self.excel_template_path.insert(0, self.config.get('tab5_path1', 'activist_info_path', fallback=''))
+        self.excel_template_path.insert(0, self.config.get('tab5_path1', 'activist_template_path', fallback=''))
         self.tab5_button_choose_dir_1 = ttk.Button(self.tab5_frame1, text="选择目录", command=self.tab5_button_func_1, width = 8)
         self.tab5_button_choose_dir_1.grid(row=1, column=1, padx=(10, 0))
-        self.tab5_button_1 = ttk.Button(self.tab5_frame1, text="点击生成积极分子信息采集模板", command=self.tab5_button_func_2, width = 31)
-        self.tab5_button_1.grid(row=2, column=0, columnspan=2, sticky="w")
+        # self.tab5_button_1 = ttk.Button(self.tab5_frame1, text="点击生成积极分子信息采集模板", command=self.tab5_button_func_2, width = 31)
+        # self.tab5_button_1.grid(row=2, column=0, columnspan=2, sticky="w")
 
         self.tab5_frame2 = ttk.Frame(self.tab5)
         self.tab5_frame2.grid(row=4, column=0, columnspan=2, sticky="w", pady=5, padx=(10, 0))
-        self.label_instruction3 = tk.Label(self.tab5_frame2, text="2、第二步:请打开模板，并按行输入积极分子个人信息。\n     请保证该文件夹下只有一个模板文件", justify="left")  
+        self.label_instruction3 = tk.Label(self.tab5_frame2, text="2、第二步:点击启动", justify="left")  
         self.label_instruction3.grid(row=0, column=0, columnspan=1, sticky="w", padx=(10, 0))
-        self.tab5_button_2 = ttk.Button(self.tab5_frame2, text="打开模板目录", command=self.tab5_button_func_3, width = 31)
+        self.tab5_button_2 = ttk.Button(self.tab5_frame2, text="开始上传", command=self.tab5_button_func_5, width = 31)
         self.tab5_button_2.grid(row=1, column=0, columnspan=2, sticky="w")
-
-        self.tab5_frame3 = ttk.Frame(self.tab5)
-        self.tab5_frame3.grid(row=5, column=0, sticky="w", pady=5, padx=(10, 0))
-        self.label_instruction4 = tk.Label(self.tab5_frame3, text="3、第三步:选择积极分子纸质材料照片的文件夹路径。请\n严格按格式命名文件夹、放置材料图片，小程序会自动识\n别身份证号码与第一步excel模板条目对应", justify="left")  
-        self.label_instruction4.grid(row=0, column=0, columnspan=2, sticky="w", padx=(10, 0))
-        self.tab5_entry_2 = ttk.Entry(self.tab5_frame3, state="normal")
-        self.tab5_entry_2.grid(row=1, column=0, sticky="w", columnspan=2)
-        self.tab5_entry_2.insert(0, self.config.get('tab5_path2', 'activist_pic_path', fallback=''))
-        self.tab5_button_3 = ttk.Button(self.tab5_frame3, text="选择目录", command=self.tab5_button_func_4, width = 8)
-        self.tab5_button_3.grid(row=1, column=1, sticky="w", padx=(65, 0))
-
-        self.tab5_frame4 = ttk.Frame(self.tab5)
-        self.tab5_frame4.grid(row=6, column=0, sticky="w", pady=5, padx=(10, 0))
-        self.label_instruction5 = tk.Label(self.tab5_frame4, text="4、第四步:开始上传", justify="left")  
-        self.label_instruction5.grid(row=0, column=0, columnspan=2, sticky="w", padx=(10, 0))
-        self.tab5_button_4 = ttk.Button(self.tab5_frame4, text="开始上传", command=self.tab5_button_func_5, width = 8)
-        self.tab5_button_4.grid(row=1, column=0, sticky="w", padx=(10, 0))
         
 
     def tab5_button_func_1(self):
@@ -434,7 +443,7 @@ class MainApp:
         self.excel_template_path.delete(0, tk.END)
         self.excel_template_path.insert(0, path)
         self.config['tab5_path1'] = {
-                    'activist_info_path': self.excel_template_path.get()
+                    'activist_template_path': self.excel_template_path.get()
                 }
         with open(self.config_file, 'w') as configfile:
             self.config.write(configfile)
@@ -464,7 +473,12 @@ class MainApp:
         pass
 
     def tab5_button_func_5(self):
-        pass
+        if self.upload_activitist_thread is None or not self.upload_activitist_thread.is_alive():
+            self.upload_activitist_thread = threading.Thread(target=app.upload_activator.main)
+            self.upload_activitist_thread.start()
+        else:
+            print("党组织信息同步子程序正在运行。")
+
 
     def show_layout_upload_dev(self, event = None):
         selected_item = self.combo_box_dev.get()
@@ -485,39 +499,22 @@ class MainApp:
             pass
             self.tab5_frame1 = ttk.Frame(self.tab5)
             self.tab5_frame1.grid(row=3, column=0, columnspan=2, sticky="ew", pady=5, padx=(10, 0))
-            self.label_instruction2 = tk.Label(self.tab5_frame1, text="1、第一步:创建模板")  
+            self.label_instruction2 = tk.Label(self.tab5_frame1, text="1、第一步:选择模板目录")  
             self.label_instruction2.grid(row=0, column=0, columnspan=1, sticky="w", pady=0, padx=(10, 0))
             self.excel_template_path = ttk.Entry(self.tab5_frame1, state="normal")
             self.excel_template_path.grid(row=1, column=0)
-            self.excel_template_path.insert(0, self.config.get('tab5_path1', 'activist_info_path', fallback=''))
+            self.excel_template_path.insert(0, self.config.get('tab5_path1', 'activist_template_path', fallback=''))
             self.tab5_button_choose_dir_1 = ttk.Button(self.tab5_frame1, text="选择目录", command=self.tab5_button_func_1, width = 8)
             self.tab5_button_choose_dir_1.grid(row=1, column=1, padx=(10, 0))
-            self.tab5_button_1 = ttk.Button(self.tab5_frame1, text="点击生成积极分子信息采集模板", command=ui_button_func.tab5_button_func_2, width = 31)
-            self.tab5_button_1.grid(row=2, column=0, columnspan=2, sticky="w")
+            # self.tab5_button_1 = ttk.Button(self.tab5_frame1, text="点击生成积极分子信息采集模板", command=self.tab5_button_func_2, width = 31)
+            # self.tab5_button_1.grid(row=2, column=0, columnspan=2, sticky="w")
 
             self.tab5_frame2 = ttk.Frame(self.tab5)
             self.tab5_frame2.grid(row=4, column=0, columnspan=2, sticky="w", pady=5, padx=(10, 0))
-            self.label_instruction3 = tk.Label(self.tab5_frame2, text="2、第二步:请打开模板，并按行输入积极分子个人信息。\n     请保证该文件夹下只有一个模板文件", justify="left")  
+            self.label_instruction3 = tk.Label(self.tab5_frame2, text="2、第二步:点击启动", justify="left")  
             self.label_instruction3.grid(row=0, column=0, columnspan=1, sticky="w", padx=(10, 0))
-            self.tab5_button_2 = ttk.Button(self.tab5_frame2, text="打开模板目录", command=self.tab5_button_func_3, width = 31)
+            self.tab5_button_2 = ttk.Button(self.tab5_frame2, text="开始上传", command=self.tab5_button_func_5, width = 31)
             self.tab5_button_2.grid(row=1, column=0, columnspan=2, sticky="w")
-
-            self.tab5_frame3 = ttk.Frame(self.tab5)
-            self.tab5_frame3.grid(row=5, column=0, sticky="w", pady=5, padx=(10, 0))
-            self.label_instruction4 = tk.Label(self.tab5_frame3, text="3、第三步:选择积极分子纸质材料照片的文件夹路径。请\n严格按格式命名文件夹、放置材料图片，小程序会自动识\n别身份证号码与第一步excel模板条目对应", justify="left")  
-            self.label_instruction4.grid(row=0, column=0, columnspan=2, sticky="w", padx=(10, 0))
-            self.tab5_entry_2 = ttk.Entry(self.tab5_frame3, state="normal")
-            self.tab5_entry_2.grid(row=1, column=0, sticky="w", columnspan=2)
-            self.tab5_entry_2.insert(0, self.config.get('tab5_path2', 'activist_pic_path', fallback=''))
-            self.tab5_button_3 = ttk.Button(self.tab5_frame3, text="选择目录", command=self.tab5_button_func_4, width = 8)
-            self.tab5_button_3.grid(row=1, column=1, sticky="w", padx=(65, 0))
-
-            self.tab5_frame4 = ttk.Frame(self.tab5)
-            self.tab5_frame4.grid(row=6, column=0, sticky="w", pady=5, padx=(10, 0))
-            self.label_instruction5 = tk.Label(self.tab5_frame4, text="4、第四步:开始上传", justify="left")  
-            self.label_instruction5.grid(row=0, column=0, columnspan=2, sticky="w", padx=(10, 0))
-            self.tab5_button_4 = ttk.Button(self.tab5_frame4, text="开始上传", command=self.tab5_button_func_5, width = 8)
-            self.tab5_button_4.grid(row=1, column=0, sticky="w", padx=(10, 0))
         elif selected_item == "2、上传到发展对象阶段":
             num_columns, num_rows = self.tab5.grid_size()
             slave02 = self.tab5.grid_slaves(row=1, column=2)
