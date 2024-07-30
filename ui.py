@@ -243,139 +243,208 @@ class MainApp:
 
 
     def setup_tab4(self):
-        self.combo_box = ttk.Combobox(self.tab4, values=["单支部上传", "多支部批量上传"], width=18)
-        self.combo_box.grid(row=0, column=0, columnspan=2, sticky="w", pady=0, padx=(10, 0))
-        self.combo_box.bind("<<ComboboxSelected>>", self.show_layout)
+        # self.combo_box = ttk.Combobox(self.tab4, values=["单支部上传", "多支部批量上传"], width=18)
+        # self.combo_box.grid(row=0, column=0, columnspan=2, sticky="w", pady=0, padx=(10, 0))
+        # self.combo_box.bind("<<ComboboxSelected>>", self.show_layout)
         ##单支部上传控件创建##
-        self.role_to_up_load_ztdr = ttk.Entry(self.tab4, state="normal", width=20)
-        self.role_to_up_load_ztdr.grid(row=1, column=0, columnspan=2, sticky="w", pady=5, padx=(10, 0))
-        self.label_instruction = tk.Label(self.tab4, text="请输入角色名称")
-        self.label_instruction.grid(row=2, column=0, columnspan=2, sticky="w", pady=0, padx=(10, 0))
-        self.var = tk.StringVar(master=self.tab4)
-        self.radio_button1 = tk.Radiobutton(self.tab4, text="主题党日", variable=self.var, value="选项1")
-        self.radio_button2 = tk.Radiobutton(self.tab4, text="灯塔大课堂", variable=self.var, value="选项2")
-        self.radio_button3 = tk.Radiobutton(self.tab4, text="主题党日+灯塔大课堂", variable=self.var, value="选项3")
-        self.radio_button4 = tk.Radiobutton(self.tab4, text="组织生活会", variable=self.var, value="选项4")
-        self.radio_button5 = tk.Radiobutton(self.tab4, text="民主生活会", variable=self.var, value="选项5")
-        self.var0 = tk.StringVar(master=self.tab4)
-        self.radio_button1_way = tk.Radiobutton(self.tab4, text="以文本形式上传", variable=self.var0, value="文本")
-        self.label_instruction = tk.Label(self.tab4, text="在此输入文字版会议纪录：")
-        self.role_to_up_load_ztdr = tk.Text(self.tab4, state="normal", width=20, height = 13)
-        self.button_generate = ttk.Button(self.tab4, text="一键生成会议纪录", command=self.generate_txt)
-        self.radio_button2_way = tk.Radiobutton(self.tab4, text="以照片形式上传", variable=self.var0, value="照片")
-        self.pictures_dir = ttk.Label(self.tab4, text="请选择图片所在目录")
-        self.pictures_path = ttk.Entry(self.tab4, state="normal", width = 15)
-        self.button_choose_dir = ttk.Button(self.tab4, text="选择目录", command=self.choose_pictures_path, width = 8)
-        self.button_start = ttk.Button(self.tab4, text="点击启动", command=self.start_upload_solo)
-        #单支部布局
-        self.radio_button1.grid(row=3, column=0, columnspan=2, sticky="w", pady=0, padx=(10, 0))
-        self.radio_button2.grid(row=4, column=0, columnspan=2, sticky="w", pady=0, padx=(10, 0))
-        self.radio_button3.grid(row=5, column=0, columnspan=2, sticky="w", pady=0, padx=(10, 0))
-        self.radio_button4.grid(row=6, column=0, columnspan=2, sticky="w", pady=3, padx=(10, 0))
-        self.radio_button5.grid(row=7, column=0, columnspan=2, sticky="w", pady=3, padx=(10, 0))
-        self.radio_button1_way.grid(row=0, column=2, columnspan=2, sticky="w", pady=0, padx=(10, 0))
-        self.label_instruction.grid(row=1, column=2, columnspan=2, sticky="w", pady=0, padx=(10, 0))
-        self.role_to_up_load_ztdr.grid(row=2, column=2, columnspan=1, rowspan=5, sticky="w", pady=0, padx=(10, 0))
-        self.button_generate.grid(row=7, column=2, rowspan=2, pady=0, padx=(10, 0))
-        self.radio_button2_way.grid(row=0, column=3, columnspan=1, sticky="w", pady=0, padx=(10, 0))
-        self.pictures_dir.grid(row=1, column=3, sticky="w", pady=0, padx=(15, 0))
-        self.pictures_path.grid(row=2, column=3, columnspan=2, sticky="w", pady=5, padx=(15, 0))
-        self.pictures_path.insert(0, self.config.get('tab4_path1', 'ztdr_pic_path', fallback=''))
-        self.button_choose_dir.grid(row=3, column=3, pady=0, padx=(15, 0), sticky="w")
-        self.button_start.grid(row=4, column=3, rowspan=1, pady=0, padx=(15, 0), sticky="w")
+        # self.role_to_up_load_ztdr = ttk.Entry(self.tab4, state="normal", width=20)
+        # self.role_to_up_load_ztdr.grid(row=1, column=0, columnspan=2, sticky="w", pady=5, padx=(10, 0))
+        # self.label_instruction = tk.Label(self.tab4, text="请输入角色名称")
+        # self.label_instruction.grid(row=2, column=0, columnspan=2, sticky="w", pady=0, padx=(10, 0))
+        # self.var = tk.StringVar(master=self.tab4)
+        # self.radio_button1 = tk.Radiobutton(self.tab4, text="主题党日", variable=self.var, value="选项1")
+        # self.radio_button2 = tk.Radiobutton(self.tab4, text="灯塔大课堂", variable=self.var, value="选项2")
+        # self.radio_button3 = tk.Radiobutton(self.tab4, text="主题党日+灯塔大课堂", variable=self.var, value="选项3")
+        # self.radio_button4 = tk.Radiobutton(self.tab4, text="组织生活会", variable=self.var, value="选项4")
+        # self.radio_button5 = tk.Radiobutton(self.tab4, text="民主生活会", variable=self.var, value="选项5")
+        # self.var0 = tk.StringVar(master=self.tab4)
+        # self.radio_button1_way = tk.Radiobutton(self.tab4, text="以文本形式上传", variable=self.var0, value="文本")
+        # self.label_instruction = tk.Label(self.tab4, text="在此输入文字版会议纪录：")
+        # self.role_to_up_load_ztdr = tk.Text(self.tab4, state="normal", width=20, height = 13)
+        # self.button_generate = ttk.Button(self.tab4, text="一键生成会议纪录", command=self.generate_txt)
+        # self.radio_button2_way = tk.Radiobutton(self.tab4, text="以照片形式上传", variable=self.var0, value="照片")
+        # self.pictures_dir = ttk.Label(self.tab4, text="请选择图片所在目录")
+        # self.pictures_path = ttk.Entry(self.tab4, state="normal", width = 15)
+        # self.button_choose_dir = ttk.Button(self.tab4, text="选择目录", command=self.choose_pictures_path, width = 8)
+        # self.button_start = ttk.Button(self.tab4, text="点击启动", command=self.start_upload_solo)
+        # #单支部布局
+        # self.radio_button1.grid(row=3, column=0, columnspan=2, sticky="w", pady=0, padx=(10, 0))
+        # self.radio_button2.grid(row=4, column=0, columnspan=2, sticky="w", pady=0, padx=(10, 0))
+        # self.radio_button3.grid(row=5, column=0, columnspan=2, sticky="w", pady=0, padx=(10, 0))
+        # self.radio_button4.grid(row=6, column=0, columnspan=2, sticky="w", pady=3, padx=(10, 0))
+        # self.radio_button5.grid(row=7, column=0, columnspan=2, sticky="w", pady=3, padx=(10, 0))
+        # self.radio_button1_way.grid(row=0, column=2, columnspan=2, sticky="w", pady=0, padx=(10, 0))
+        # self.label_instruction.grid(row=1, column=2, columnspan=2, sticky="w", pady=0, padx=(10, 0))
+        # self.role_to_up_load_ztdr.grid(row=2, column=2, columnspan=1, rowspan=5, sticky="w", pady=0, padx=(10, 0))
+        # self.button_generate.grid(row=7, column=2, rowspan=2, pady=0, padx=(10, 0))
+        # self.radio_button2_way.grid(row=0, column=3, columnspan=1, sticky="w", pady=0, padx=(10, 0))
+        # self.pictures_dir.grid(row=1, column=3, sticky="w", pady=0, padx=(15, 0))
+        # self.pictures_path.grid(row=2, column=3, columnspan=2, sticky="w", pady=5, padx=(15, 0))
+        # self.pictures_path.insert(0, self.config.get('tab4_path1', 'ztdr_pic_path', fallback=''))
+        # self.button_choose_dir.grid(row=3, column=3, pady=0, padx=(15, 0), sticky="w")
+        # self.button_start.grid(row=4, column=3, rowspan=1, pady=0, padx=(15, 0), sticky="w")
         ##多支部批量上传控件创建##
+        # num_columns, num_rows = self.tab4.grid_size()
+        # slave02 = self.tab4.grid_slaves(row=0, column=2)
+        # slave03 = self.tab4.grid_slaves(row=0, column=3)
+        # for slave in slave02:
+        #     slave.destroy()
+        # for slave in slave03:
+        #     slave.destroy()
+        # while n <= num_rows:
+        #     slaves = self.tab4.grid_slaves(row=n)
+        #     for slave in slaves:
+        #         slave.destroy()
+        #     n = n + 1
+        self.tab4_frame1 = ttk.Frame(self.tab4)
+        self.tab4_frame1.grid(row=1, column=1, columnspan=2, rowspan=9, sticky="ew", pady=5, padx=(10, 0))
+        self.label_instruction = tk.Label(self.tab4_frame1, text="在此输入文字版会议纪录：")        
+        self.label_instruction.grid(row=1, column=1, columnspan=2, sticky="w", pady=0, padx=(10, 0))
+        self.role_to_up_load_ztdr = tk.Text(self.tab4_frame1, state="normal", width=20, height = 30)         
+        self.role_to_up_load_ztdr.grid(row=2, column=1, columnspan=4, rowspan=3, sticky="w", pady=0, padx=(10, 0))
+        self.click_generate = ttk.Button(self.tab4_frame1, text="一键生成会议纪录", command=self.generate_txt)           
+        self.click_generate.grid(row=7, column=1, rowspan=4, pady=(6,0), padx=(10, 0))
+        
+
+
+        self.tab4_frame2 = ttk.Frame(self.tab4)
+        self.tab4_frame2.grid(row=2, column=3, columnspan=3, rowspan=4, sticky="ew", padx=(10, 0))
+        self.click_checkout = ttk.Button(self.tab4_frame2, text="查看未上传支部", command=self.start_upload_checkout)            
+        self.click_checkout.grid(row=1, column=1, pady=(10, 0))
+        self.label_instruction2 = tk.Label(self.tab4_frame2, text="选择结果输出目录：") 
+        self.label_instruction2.grid(row=1, column=2, sticky="w", padx=(10, 0), pady=(10, 10))
+        self.checkout_result_outputdir = ttk.Entry(self.tab4_frame2, state="normal")
+        self.checkout_result_outputdir.grid(row=2, column=2, pady=(0, 0), padx=(10, 0))
+        self.checkout_result_outputdir.insert(0, self.config.get('tab4_path', 'tab4_path_checkout', fallback=''))
+        self.tab4_button_choose_dir_1 = ttk.Button(self.tab4_frame2, text="选择目录", command=self.tab4_button_func_1, width = 8)
+        self.tab4_button_choose_dir_1.grid(row=2, column=3, padx=(10, 0), pady=(0, 0))
+        self.label_instruction3 = tk.Label(self.tab4_frame2, text="月份：") 
+        self.label_instruction3.grid(row=3, column=2, sticky="w", padx=(10, 0))
+        self.checkout_time_entry = ttk.Entry(self.tab4_frame2, state="normal")
+        self.checkout_time_entry.grid(row=4, column=2, sticky="w", padx=(10, 0), pady=(0, 5))
+        
+
+        self.tab4_frame3 = ttk.Frame(self.tab4)
+        self.tab4_frame3.grid(row=6, column=3, columnspan=3, rowspan=2, sticky="ew", padx=(10, 0), pady=(0, 20))
+        self.click_uploadztdr = ttk.Button(self.tab4_frame3, text="批量上传主题\n党日", command=self.start_upload_ztdr)            
+        self.click_uploadztdr.grid(row=8, column=0, rowspan=2, pady=(13,0), padx=(0, 0))
+        self.label_instruction4 = tk.Label(self.tab4_frame3, text="活动主题：") 
+        self.label_instruction4.grid(row=8, column=2, sticky="w", padx=(10, 0), pady=(10, 0))
+        self.hdzt_entry = ttk.Entry(self.tab4_frame3, state="normal")
+        self.hdzt_entry.grid(row=9, column=2, sticky="w", padx=(10, 0), pady=(0, 0))
+        self.label_instruction5 = tk.Label(self.tab4_frame3, text='活动时间：\n("开始时间":"2024-07-01 00:00", \n"结束时间":"2024-07-01 00:30")', anchor='w', justify='left') 
+        self.label_instruction5.grid(row=10, column=2, sticky="w", padx=(10, 0), pady=(10, 0))
+        self.hdsj_entry = ttk.Entry(self.tab4_frame3, state="normal")
+        self.hdsj_entry.insert(0,'"开始时间":"2024-07-01 00:00", "结束时间":"2024-07-01 00:30"')
+        self.hdsj_entry.grid(row=11, column=2, sticky="w", padx=(10, 0), pady=(0, 0))
+        
+
+        self.tab4_frame4 = ttk.Frame(self.tab4)
+        self.tab4_frame4.grid(row=8, column=3, columnspan=3, sticky="ew", padx=(10, 0))
+        self.click_uploaddkt = ttk.Button(self.tab4_frame4, text="批量上传灯塔大\n课堂", command=self.start_upload_dkt)            
+        self.click_uploaddkt.grid(row=2, column=1, rowspan=2, pady=0, padx=(0, 0))
+        self.label_instruction5 = tk.Label(self.tab4_frame4, text="期次：\n 例：202406  “请党放心 强国有我”", anchor='w', justify='left') 
+        self.label_instruction5.grid(row=2, column=2, sticky="w", padx=(10, 0), pady=(10, 0))
+        self.hdqc_entry = ttk.Entry(self.tab4_frame4, state="normal")
+        self.hdqc_entry.grid(row=3, column=2, sticky="w", padx=(10, 0), pady=(0, 0))
+        self.label_instruction6 = tk.Label(self.tab4_frame4, text='活动时间：\n("开始时间":"2024-07-01 00:00",\n "结束时间":"2024-07-01 00:30")', anchor='w', justify='left') 
+        self.label_instruction6.grid(row=4, column=2, sticky="w", padx=(10, 0), pady=(10, 0))
+        self.hdsj_entry1 = ttk.Entry(self.tab4_frame4, state="normal")
+        self.hdsj_entry1.insert(0, '"开始时间":"2024-07-01 00:00", "结束时间":"2024-07-01 00:30"')
+        self.hdsj_entry1.grid(row=5, column=2, sticky="w", padx=(10, 0), pady=(0, 20))
         
         
         
         
 
 
-    def show_layout(self, event = None):
-        selected_item = self.combo_box.get()
-        n = 1
-        if selected_item == "单支部上传":
-            num_columns, num_rows = self.tab4.grid_size()
-            slave02 = self.tab4.grid_slaves(row=0, column=2)
-            slave03 = self.tab4.grid_slaves(row=0, column=3)
-            for slave in slave02:
-                slave.destroy()
-            for slave in slave03:
-                slave.destroy()
-            while n <= num_rows:
-                slaves = self.tab4.grid_slaves(row=n)
-                for slave in slaves:
-                    slave.destroy()
-                n = n + 1
-        #单支部布局
-            self.role_to_up_load_ztdr = ttk.Entry(self.tab4, state="normal", width=20)
-            self.role_to_up_load_ztdr.grid(row=1, column=0, columnspan=2, sticky="w", pady=5, padx=(10, 0))
-            self.label_instruction = tk.Label(self.tab4, text="请输入角色名称")
-            self.label_instruction.grid(row=2, column=0, columnspan=2, sticky="w", pady=0, padx=(10, 0))
-            self.var = tk.StringVar(master=self.tab4)
-            self.radio_button1 = tk.Radiobutton(self.tab4, text="主题党日", variable=self.var, value="选项1")
-            self.radio_button2 = tk.Radiobutton(self.tab4, text="灯塔大课堂", variable=self.var, value="选项2")
-            self.radio_button3 = tk.Radiobutton(self.tab4, text="主题党日+灯塔大课堂", variable=self.var, value="选项3")
-            self.radio_button4 = tk.Radiobutton(self.tab4, text="组织生活会", variable=self.var, value="选项4")
-            self.radio_button5 = tk.Radiobutton(self.tab4, text="民主生活会", variable=self.var, value="选项5")
-            self.var0 = tk.StringVar(master=self.tab4)
-            self.radio_button1_way = tk.Radiobutton(self.tab4, text="以文本形式上传", variable=self.var0, value="文本")
-            self.label_instruction = tk.Label(self.tab4, text="在此输入文字版会议纪录：")
-            self.role_to_up_load_ztdr = tk.Text(self.tab4, state="normal", width=20, height = 13)
-            self.button_generate = ttk.Button(self.tab4, text="一键生成会议纪录", command=self.generate_txt)
-            self.radio_button2_way = tk.Radiobutton(self.tab4, text="以照片形式上传", variable=self.var0, value="照片")
-            self.pictures_dir = ttk.Label(self.tab4, text="请选择图片所在目录")
-            self.pictures_path = ttk.Entry(self.tab4, state="normal", width = 15)
-            self.button_choose_dir = ttk.Button(self.tab4, text="选择目录", command=self.choose_pictures_path, width = 8)
-            self.button_start = ttk.Button(self.tab4, text="点击启动", command=self.start_upload_solo)
-            #单支部布局
-            self.radio_button1.grid(row=3, column=0, columnspan=2, sticky="w", pady=0, padx=(10, 0))
-            self.radio_button2.grid(row=4, column=0, columnspan=2, sticky="w", pady=0, padx=(10, 0))
-            self.radio_button3.grid(row=5, column=0, columnspan=2, sticky="w", pady=0, padx=(10, 0))
-            self.radio_button4.grid(row=6, column=0, columnspan=2, sticky="w", pady=3, padx=(10, 0))
-            self.radio_button5.grid(row=7, column=0, columnspan=2, sticky="w", pady=3, padx=(10, 0))
-            self.radio_button1_way.grid(row=0, column=2, columnspan=2, sticky="w", pady=0, padx=(10, 0))
-            self.label_instruction.grid(row=1, column=2, columnspan=2, sticky="w", pady=0, padx=(10, 0))
-            self.role_to_up_load_ztdr.grid(row=2, column=2, columnspan=1, rowspan=5, sticky="w", pady=0, padx=(10, 0))
-            self.button_generate.grid(row=7, column=2, rowspan=2, pady=0, padx=(10, 0))
-            self.radio_button2_way.grid(row=0, column=3, columnspan=1, sticky="w", pady=0, padx=(10, 0))
-            self.pictures_dir.grid(row=1, column=3, sticky="w", pady=0, padx=(15, 0))
-            self.pictures_path.grid(row=2, column=3, columnspan=2, sticky="w", pady=5, padx=(15, 0))
-            self.pictures_path.insert(0, self.config.get('tab4_path1', 'ztdr_pic_path', fallback=''))
-            self.button_choose_dir.grid(row=3, column=3, pady=0, padx=(15, 0), sticky="w")
-            self.button_start.grid(row=4, column=3, rowspan=1, pady=0, padx=(15, 0), sticky="w")
-        #多支部布局
-        elif selected_item == "多支部批量上传":
-            num_columns, num_rows = self.tab4.grid_size()
-            slave02 = self.tab4.grid_slaves(row=0, column=2)
-            slave03 = self.tab4.grid_slaves(row=0, column=3)
-            for slave in slave02:
-                slave.destroy()
-            for slave in slave03:
-                slave.destroy()
-            while n <= num_rows:
-                slaves = self.tab4.grid_slaves(row=n)
-                for slave in slaves:
-                    slave.destroy()
-                n = n + 1
+    # def show_layout(self, event = None):
+    #     selected_item = self.combo_box.get()
+    #     n = 1
+    #     if selected_item == "单支部上传":
+    #         num_columns, num_rows = self.tab4.grid_size()
+    #         slave02 = self.tab4.grid_slaves(row=0, column=2)
+    #         slave03 = self.tab4.grid_slaves(row=0, column=3)
+    #         for slave in slave02:
+    #             slave.destroy()
+    #         for slave in slave03:
+    #             slave.destroy()
+    #         while n <= num_rows:
+    #             slaves = self.tab4.grid_slaves(row=n)
+    #             for slave in slaves:
+    #                 slave.destroy()
+    #             n = n + 1
+    #     #单支部布局
+    #         self.role_to_up_load_ztdr = ttk.Entry(self.tab4, state="normal", width=20)
+    #         self.role_to_up_load_ztdr.grid(row=1, column=0, columnspan=2, sticky="w", pady=5, padx=(10, 0))
+    #         self.label_instruction = tk.Label(self.tab4, text="请输入角色名称")
+    #         self.label_instruction.grid(row=2, column=0, columnspan=2, sticky="w", pady=0, padx=(10, 0))
+    #         self.var = tk.StringVar(master=self.tab4)
+    #         self.radio_button1 = tk.Radiobutton(self.tab4, text="主题党日", variable=self.var, value="选项1")
+    #         self.radio_button2 = tk.Radiobutton(self.tab4, text="灯塔大课堂", variable=self.var, value="选项2")
+    #         self.radio_button3 = tk.Radiobutton(self.tab4, text="主题党日+灯塔大课堂", variable=self.var, value="选项3")
+    #         self.radio_button4 = tk.Radiobutton(self.tab4, text="组织生活会", variable=self.var, value="选项4")
+    #         self.radio_button5 = tk.Radiobutton(self.tab4, text="民主生活会", variable=self.var, value="选项5")
+    #         self.var0 = tk.StringVar(master=self.tab4)
+    #         self.radio_button1_way = tk.Radiobutton(self.tab4, text="以文本形式上传", variable=self.var0, value="文本")
+    #         self.label_instruction = tk.Label(self.tab4, text="在此输入文字版会议纪录：")
+    #         self.role_to_up_load_ztdr = tk.Text(self.tab4, state="normal", width=20, height = 13)
+    #         self.button_generate = ttk.Button(self.tab4, text="一键生成会议纪录", command=self.generate_txt)
+    #         self.radio_button2_way = tk.Radiobutton(self.tab4, text="以照片形式上传", variable=self.var0, value="照片")
+    #         self.pictures_dir = ttk.Label(self.tab4, text="请选择图片所在目录")
+    #         self.pictures_path = ttk.Entry(self.tab4, state="normal", width = 15)
+    #         self.button_choose_dir = ttk.Button(self.tab4, text="选择目录", command=self.choose_pictures_path, width = 8)
+    #         self.button_start = ttk.Button(self.tab4, text="点击启动", command=self.start_upload_solo)
+    #         #单支部布局
+    #         self.radio_button1.grid(row=3, column=0, columnspan=2, sticky="w", pady=0, padx=(10, 0))
+    #         self.radio_button2.grid(row=4, column=0, columnspan=2, sticky="w", pady=0, padx=(10, 0))
+    #         self.radio_button3.grid(row=5, column=0, columnspan=2, sticky="w", pady=0, padx=(10, 0))
+    #         self.radio_button4.grid(row=6, column=0, columnspan=2, sticky="w", pady=3, padx=(10, 0))
+    #         self.radio_button5.grid(row=7, column=0, columnspan=2, sticky="w", pady=3, padx=(10, 0))
+    #         self.radio_button1_way.grid(row=0, column=2, columnspan=2, sticky="w", pady=0, padx=(10, 0))
+    #         self.label_instruction.grid(row=1, column=2, columnspan=2, sticky="w", pady=0, padx=(10, 0))
+    #         self.role_to_up_load_ztdr.grid(row=2, column=2, columnspan=1, rowspan=5, sticky="w", pady=0, padx=(10, 0))
+    #         self.button_generate.grid(row=7, column=2, rowspan=2, pady=0, padx=(10, 0))
+    #         self.radio_button2_way.grid(row=0, column=3, columnspan=1, sticky="w", pady=0, padx=(10, 0))
+    #         self.pictures_dir.grid(row=1, column=3, sticky="w", pady=0, padx=(15, 0))
+    #         self.pictures_path.grid(row=2, column=3, columnspan=2, sticky="w", pady=5, padx=(15, 0))
+    #         self.pictures_path.insert(0, self.config.get('tab4_path1', 'ztdr_pic_path', fallback=''))
+    #         self.button_choose_dir.grid(row=3, column=3, pady=0, padx=(15, 0), sticky="w")
+    #         self.button_start.grid(row=4, column=3, rowspan=1, pady=0, padx=(15, 0), sticky="w")
+    #     #多支部布局
+    #     elif selected_item == "多支部批量上传":
+    #         num_columns, num_rows = self.tab4.grid_size()
+    #         slave02 = self.tab4.grid_slaves(row=0, column=2)
+    #         slave03 = self.tab4.grid_slaves(row=0, column=3)
+    #         for slave in slave02:
+    #             slave.destroy()
+    #         for slave in slave03:
+    #             slave.destroy()
+    #         while n <= num_rows:
+    #             slaves = self.tab4.grid_slaves(row=n)
+    #             for slave in slaves:
+    #                 slave.destroy()
+    #             n = n + 1
                 
-            self.label_instruction = tk.Label(self.tab4, text="在此输入文字版会议纪录：")        
-            self.role_to_up_load_ztdr = tk.Text(self.tab4, state="normal", width=20, height = 13)         
-            self.click_generate = ttk.Button(self.tab4, text="一键生成会议纪录", command=self.generate_txt)           
-            self.click_checkout = ttk.Button(self.tab4, text="查看未上传支部", command=self.start_upload_checkout)            
-            self.click_uploadztdr = ttk.Button(self.tab4, text="批量上传主题党日", command=self.start_upload_ztdr)            
-            self.click_uploaddkt = ttk.Button(self.tab4, text="批量上传灯塔大课堂", command=self.start_upload_dkt)            
+    #         self.label_instruction = tk.Label(self.tab4, text="在此输入文字版会议纪录：")        
+    #         self.role_to_up_load_ztdr = tk.Text(self.tab4, state="normal", width=20, height = 13)         
+    #         self.click_generate = ttk.Button(self.tab4, text="一键生成会议纪录", command=self.generate_txt)           
+    #         self.click_checkout = ttk.Button(self.tab4, text="查看未上传支部", command=self.start_upload_checkout)            
+    #         self.click_uploadztdr = ttk.Button(self.tab4, text="批量上传主题党日", command=self.start_upload_ztdr)            
+    #         self.click_uploaddkt = ttk.Button(self.tab4, text="批量上传灯塔大课堂", command=self.start_upload_dkt)            
             
-            self.label_instruction.grid(row=0, column=2, columnspan=2, sticky="w", pady=0, padx=(10, 0))
-            self.role_to_up_load_ztdr.grid(row=1, column=2, columnspan=1, rowspan=3, sticky="w", pady=0, padx=(10, 0))
-            self.click_generate.grid(row=2, column=2, rowspan=2, pady=0, padx=(10, 0))
-            self.click_checkout.grid(row=1, column=3, rowspan=2, pady=0, padx=(10, 0))
-            self.click_uploadztdr.grid(row=2, column=3, rowspan=2, pady=0, padx=(10, 0))
-            self.click_uploaddkt.grid(row=3, column=3, rowspan=2, pady=0, padx=(10, 0))
+    #         self.label_instruction.grid(row=0, column=2, columnspan=2, sticky="w", pady=0, padx=(10, 0))
+    #         self.role_to_up_load_ztdr.grid(row=1, column=2, columnspan=1, rowspan=3, sticky="w", pady=0, padx=(10, 0))
+    #         self.click_generate.grid(row=2, column=2, rowspan=2, pady=0, padx=(10, 0))
+    #         self.click_checkout.grid(row=1, column=3, rowspan=2, pady=0, padx=(10, 0))
+    #         self.click_uploadztdr.grid(row=2, column=3, rowspan=2, pady=0, padx=(10, 0))
+    #         self.click_uploaddkt.grid(row=3, column=3, rowspan=2, pady=0, padx=(10, 0))
 
 
     def start_upload_checkout(self):
         if self.upload_checkout_thread is None or not self.upload_checkout_thread.is_alive():
-            self.upload_checkout_thread = threading.Thread(target=app.checkout.main)
+            mounthtocheckout = self.checkout_time_entry.get()
+            self.upload_checkout_thread = threading.Thread(target=app.checkout.main, args=(mounthtocheckout,))
             self.upload_checkout_thread.start()
         else:
             print("党组织信息同步子程序正在运行。")
@@ -383,7 +452,11 @@ class MainApp:
 
     def start_upload_ztdr(self):
         if self.upload_upload_ztdr is None or not self.upload_upload_ztdr.is_alive():
-            self.upload_upload_ztdr = threading.Thread(target=app.do_upload_ztdr.main)
+            hdzt = self.hdzt_entry.get()
+            hdsj = self.hdsj_entry.get()
+            text = self.role_to_up_load_ztdr.get("1.0", tk.END)
+            args = [hdzt,hdsj,text,]
+            self.upload_upload_ztdr = threading.Thread(target=app.do_upload_ztdr.main, args=(args, ))
             self.upload_upload_ztdr.start()
         else:
             print("党组织信息同步子程序正在运行。")
@@ -391,7 +464,11 @@ class MainApp:
 
     def start_upload_dkt(self):
         if self.upload_upload_dkt is None or not self.upload_upload_dkt.is_alive():
-            self.upload_upload_dkt = threading.Thread(target=app.do_upload_dkt.main)
+            qc = self.hdqc_entry.get()
+            hdsj = self.hdsj_entry1.get()
+            text = self.role_to_up_load_ztdr.get("1.0", tk.END)
+            args = [qc,hdsj,text,]
+            self.upload_upload_dkt = threading.Thread(target=app.do_upload_dkt.main, args=(args, ))
             self.upload_upload_dkt.start()
         else:
             print("党组织信息同步子程序正在运行。")
@@ -450,10 +527,16 @@ class MainApp:
         pass
 
 
-    def tab5_button_func_2(self):
-        
+    def tab4_button_func_1(self):
+        path = filedialog.askdirectory()
+        self.checkout_result_outputdir.delete(0, tk.END)
+        self.checkout_result_outputdir.insert(0, path)
+        self.config['tab4_path'] = {
+                    'tab4_path_checkout': self.excel_template_path.get()
+                }
+        with open(self.config_file, 'w') as configfile:
+            self.config.write(configfile)
 
-        pass
 
 
     def tab5_button_func_3(self):

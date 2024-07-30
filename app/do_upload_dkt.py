@@ -28,18 +28,39 @@ from base.mystruct import TreeNode
 from base.waitclick import *
 from base.write_entry import *
 from selenium.common.exceptions import NoSuchElementException
+import json
+from typing import List
 
 
 
-hdzt = "上传测试"#活动主题
+hdzt = "本月灯塔大课堂"#活动主题
 hdsj = {"开始时间":"2024-07-01 00:00", "结束时间":"2024-07-01 00:30"}#活动时间
 text = "测试测试测试测试测试测试测试测试测试测试测试测试"#三会一课内容
 zbordw = ""#支部还是党委
 qc = "202406  “请党放心 强国有我”——青年党员学习研讨"#期次
 excel_path = "G:\project\LHSextract\三会一课未上传\三会一课未上传名单.xlsx"#未上传名单的路径
 
+def init(args:list[str]):
+    global qc
+    global hdzt
+    global hdsj
+    global text
+    qc = hdzt = args[0]
+    hdsj = args[1]
+    json_str = "{" + hdsj + "}"
+    # 将 JSON 字符串转换为字典
+    try:
+        hdsj = json.loads(json_str)
+        print(hdsj)
+        # 输出: {'开始时间': '2024-07-01 00:00', '结束时间': '2024-07-01 00:30'}
+    except json.JSONDecodeError as e:
+        print(f"JSONDecodeError: {e}")
+    text = args[2]
 
-def main():
+
+
+def main(args:list[str]):
+    init(args)
     result = []
     driver = login._main()
     wait = WebDriverWait(driver, 2, 0.5)
@@ -47,7 +68,6 @@ def main():
     dev_func.switch_role(wait, driver)
     commen_button(wait, driver, xpath="(//span[contains(text(), '人员信息')])[1]")
     #(//span[contains(text(), '人员信息')])[1]
-
     org_tree = TreeNode()
     synchronizing_org(wait, driver, input_node=org_tree)
     try:
@@ -59,7 +79,7 @@ def main():
     except:
         time.sleep(1)
     middle.switch_role.access_e_shandong(driver, wait)
-    middle.switch_role.switch_role(wait)
+    middle.switch_role.switch_role_v1(wait)
     #//span[contains(text(), '党务管理')]
     commen_button(wait, driver, xpath="//span[contains(text(), '党务管理')]")
     #(//span[contains(text(), '支部活动')])[1]
@@ -119,9 +139,11 @@ def main():
         jlr = element_jlr.get_attribute('textContent')
         input_text(wait, driver, xpath="//input[@placeholder = '请输入记录人']", text=jlr)
         #//input[@placeholder = '开始时间']
-        input_text(wait, driver, xpath="//input[@placeholder = '开始时间']", text=hdsj['开始时间']+'\n')
+        
+        input_text_v1(wait, driver, xpath="//input[@placeholder = '开始时间']", text=hdsj['开始时间']+'\n', times=3)
         #//input[@placeholder = '结束时间']
-        input_text(wait, driver, xpath="//input[@placeholder = '结束时间']", text=hdsj['结束时间']+'\n')
+        input_text_v1(wait, driver, xpath="//input[@placeholder = '结束时间']", text=hdsj['结束时间']+'\n', times=3)
+        commen_button(wait, driver, xpath="(//span[contains(text(), '确定')]/..)[2]")
         #//input[@placeholder = '请输入活动地点']
         input_text(wait, driver, xpath="//input[@placeholder = '请输入活动地点']", text="单位党务活动室")
         #(//label[@class = 'fs-checkbox left-checkbox margin-right-10-px']//span[@class = 'fs-checkbox__input'])[1]   全选

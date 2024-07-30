@@ -39,3 +39,24 @@ def switch_role(wait):
                 pass
         except:
             time.sleep(1)
+
+def switch_role_v1(wait):
+    while 1:
+        try:
+            droplist = wait.until(EC.element_to_be_clickable((By.CSS_SELECTOR, '.avatar-wrapper.fs-dropdown-selfdefine')))
+            droplist.click()
+            print(f"进入角色下拉列表成功")
+            time.sleep(1)
+            config_file = 'config.ini'
+            config = configparser.ConfigParser()
+            config.read(config_file)
+            role_name_mem = config.get('role_e_name', 'name_role_e', fallback='')
+            role = wait.until(EC.element_to_be_clickable((By.XPATH, f"//SPAN[contains(text(), '{role_name_mem}')]/..")))
+            role.click()
+            t = wait.until(EC.element_to_be_clickable((By.CSS_SELECTOR, '.avatar-wrapper.fs-dropdown-selfdefine'))).get_attribute("textContent")
+            if  t == f"{role_name_mem}" or role_name_mem[1:14] in t:
+                break
+            else:
+                pass
+        except:
+            time.sleep(1)

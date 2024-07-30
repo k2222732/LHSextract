@@ -58,6 +58,15 @@ def input_text(wait, driver, xpath, text):
     except Exception:
         traceback.print_exc()
 
+def input_text_v1(wait, driver, xpath, text, times):
+    t = 1
+    while 1:
+        input_text(wait, driver, xpath=xpath, text=text)
+        time.sleep(1)
+        t = t+1
+        if t >=times:
+            break
+
 #单日期选择输入
 def select_date_single(wait, driver, xpath, date):
     try:

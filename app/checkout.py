@@ -37,10 +37,17 @@ quanti = []
 kssj = '2024-04'#开始时间
 jssj = '2024-04'#结束时间
 
-def main():
+def init(arg):
+    global kssj
+    global jssj
+    kssj = arg
+    jssj = arg
+
+def main(arg):
     global ztdr
     global dkt
     global quanti
+    init(arg)
     driver = login._main()
     wait = WebDriverWait(driver, 2, 0.5)
     #获取全体支部名单
@@ -59,7 +66,7 @@ def main():
     except:
         time.sleep(1)
     middle.switch_role.access_e_shandong(driver, wait)
-    middle.switch_role.switch_role(wait)
+    middle.switch_role.switch_role_v1(wait)
     commen_button(wait, driver, xpath="//span[contains(text(), '数据统计')]")
     commen_button(wait, driver, xpath="(//span[contains(text(), '支部活动情况')])[1]")
     while 1:
@@ -69,7 +76,6 @@ def main():
         except:
             time.sleep(1)
     commen_button(wait, driver, xpath="//span[contains(text(), '列表设置')]")
-
     commen_button(wait, driver, xpath="(//div[contains(text(), '其他学习内容')])[3]/../following-sibling::td//label")
     commen_button(wait, driver, xpath="(//div[contains(text(), '谈心谈话')])[3]/../following-sibling::td//label")
     commen_button(wait, driver, xpath="(//div[contains(text(), '民主评议党员')])[3]/../following-sibling::td//label")
@@ -128,9 +134,9 @@ def main():
     for i, value in enumerate(difference_ztdr, start=2):
         ws[f'C{i}'] = value
     # 保存 Excel 文件
-        ws['A1'] = "全体党支部名单"
-        ws['B1'] = "未上传大课堂的企业"
-        ws['C1'] = "未上传主题党日的企业"
+    ws['A1'] = "全体党支部名单"
+    ws['B1'] = "未上传大课堂的企业"
+    ws['C1'] = "未上传主题党日的企业"
     excel_file_path = os.path.abspath(os.getcwd())+"\三会一课未上传\三会一课未上传名单.xlsx"
     wb.save(excel_file_path)
 
