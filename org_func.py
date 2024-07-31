@@ -11,6 +11,8 @@ import configparser
 import threading
 from openpyxl import load_workbook
 import openpyxl
+from base.mystruct import TreeNode
+from base.boot import *
 
 
 
@@ -111,6 +113,11 @@ def switch_item_org(wait):
             org_info = wait.until(EC.element_to_be_clickable((By.XPATH, '(//*[contains(text(), "信息管理")]/..)[3]')))
 
 
+def rebuild(driver, wait, excel_file_path, org_excel):
+    org_tree = TreeNode()
+    synchronizing_org_v1(driver=driver, wait=wait, input_node=org_tree, xpath = "(//div[@class = 'fs-tree-node is-expanded is-current is-focusable']/div)[1]", xpath2 = "//div[@role = 'group' and @class = 'fs-tree-node__children']", xpath3 = ".//span[@class = 'fs-tree-node__expand-icon fs-icon-caret-right']", xpath4 = ".//div[@role = 'group']")
+    org_tree.dayin()
+
 
 def new_excel(wait, driver):
     global org_directory
@@ -121,10 +128,10 @@ def new_excel(wait, driver):
     excel_file_name = f"{today_date}党组织信息库.xlsx"
     excel_file_path = os.path.join(org_directory, excel_file_name)
     if os.path.isfile(excel_file_path):
-        #org_excel = load_workbook(excel_file_path)
-        #rebuild(excel_file_path, wait, org_excel, excel_file_path)
+        org_excel = load_workbook(excel_file_path)
+        rebuild(driver, wait, excel_file_path, org_excel)
 
-
+    else:
         #创建目录g:/project/LHSextract/database/database_org
         os.makedirs(org_directory, exist_ok=True)
         #设计党组织基本信息表头
