@@ -60,3 +60,9 @@ class TreeNode:
             else:
                 ret = child.value
                 list.append(ret)
+
+    def return_node_amount(self, num = 0):
+        num = num +1 
+        for child in self.children:
+            num = child.return_node_amount(num)
+        return num

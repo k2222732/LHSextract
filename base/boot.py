@@ -3,7 +3,7 @@ from selenium.webdriver.common.by import By
 from bs4 import BeautifulSoup
 from selenium.webdriver.support import expected_conditions as EC
 from base.mystruct import TreeNode
-from base.waitclick import wait_click_xpath, wait_click_xpath_relative, wait_return_subelement_relative, wait_return_subelement_absolute
+from base.waitclick import *
 
 
 
@@ -26,8 +26,10 @@ def synchronizing_org_v1(wait, driver, input_node:TreeNode, xpath, xpath2, xpath
     root_text = root_org.get_attribute('textContent')
     input_node.set_value(value=root_text)
     input_node.index = index
+    index = index +1
     #获取根节点结构体//div[@class = "tree_wrapper"]//div[@role = "treeitem"]/div[@role = "group"]到tree_root
     tree_root = wait_return_subelement_absolute(wait, time_w = 0.5, xpath = xpath2)
+    time.sleep(3)
     recursion_org_v1(tree_root = tree_root, wait = wait, driver = driver, root_node = input_node, index=index, xpath3=xpath3, xpath4=xpath4)
 
 
@@ -53,7 +55,8 @@ def recursion_org(tree_root, wait, driver, root_node:TreeNode):
 def recursion_org_v1(tree_root, wait, driver, root_node:TreeNode, index, xpath3, xpath4):
     
     org_items = []
-    org_items = tree_root.find_elements(By.XPATH, ".//div[@role = 'treeitem']")
+
+    org_items = wait_return_subelement_relative_v1(1, tree_root, xpath=".//div[@role = 'treeitem']")
     for item in org_items:
         node_text = item.get_attribute('textContent')
         new_node =TreeNode(node_text)

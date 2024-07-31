@@ -71,6 +71,15 @@ def wait_return_subelement_relative(time_w, element,xpath):
             traceback.print_exc()
             time.sleep(time_w)
 
+def wait_return_subelement_relative_v1(time_w, element,xpath):
+    while(1):
+        try:
+            target_element = element.find_elements(By.XPATH, xpath)
+            return target_element
+        except:
+            traceback.print_exc()
+            time.sleep(time_w)
+
 
 #鲁棒返回对象（绝对）
 def wait_return_subelement_absolute(wait, time_w, xpath):

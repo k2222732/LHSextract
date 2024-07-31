@@ -13,7 +13,8 @@ from openpyxl import load_workbook
 import openpyxl
 from base.mystruct import TreeNode
 from base.boot import *
-
+from base.waitclick import *
+from base.membase import *
 
 
 stop_event = threading.Event()
@@ -114,10 +115,32 @@ def switch_item_org(wait):
 
 
 def rebuild(driver, wait, excel_file_path, org_excel):
+    global amount_that_complete
     org_tree = TreeNode()
     synchronizing_org_v1(driver=driver, wait=wait, input_node=org_tree, xpath = "(//div[@class = 'fs-tree-node is-expanded is-current is-focusable']/div)[1]", xpath2 = "//div[@role = 'group' and @class = 'fs-tree-node__children']", xpath3 = ".//span[@class = 'fs-tree-node__expand-icon fs-icon-caret-right']", xpath4 = ".//div[@role = 'group']")
-    org_tree.dayin()
+    org_totol_amount = org_tree.return_node_amount()
+    amount_that_complete = init_complete_amount(excel_file_path)
 
+    for i in range(amount_that_complete, org_totol_amount):
+        current_node = org_tree.find_node_by_index(i)
+        current_node_text = current_node.value
+        path_to_node = current_node.path_to_root()
+        path_to_node = path_to_node[0:]
+        container = wait_return_subelement_absolute(wait, 1, xpath="//div[@class = 'tree_wrapper_div']")
+        for i, node_value in enumerate(path_to_node):
+            complete_path = wait_return_subelement_relative(1, container, xpath=f".//span[contains(text(), '{node_value}')]/../../..")
+            arrow = wait_return_subelement_relative(1, complete_path, xpath="./span")
+            html = complete_path.get_attribute("outerHTML")
+            soup_html = BeautifulSoup(html, 'html.parser')
+            span_element = soup_html.find('span')
+            if span_element and 'expanded' in span_element.get('class'):
+                continue
+            else:
+                arrow.click()
+        target = wait_return_subelement_relative(1, container, xpath=f".//span[contains(text(), '{current_node_text}')]/..")
+        target.click()
+        time.sleep(2)
+        downloading(file = org_excel, wait = wait, driver = driver, path = excel_file_path)
 
 def new_excel(wait, driver):
     global org_directory
@@ -128,31 +151,15 @@ def new_excel(wait, driver):
     excel_file_name = f"{today_date}党组织信息库.xlsx"
     excel_file_path = os.path.join(org_directory, excel_file_name)
     if os.path.isfile(excel_file_path):
+        time.sleep(3)
         org_excel = load_workbook(excel_file_path)
         rebuild(driver, wait, excel_file_path, org_excel)
 
     else:
-        #创建目录g:/project/LHSextract/database/database_org
-        os.makedirs(org_directory, exist_ok=True)
-        #设计党组织基本信息表头
-        columns_base_info = ["序号","党组织全称", "组织树", "党组织简称", "党内统计用党组织简称", "成立日期", "党组织编码", "党组织联系人", "联系电话", "组织类别", 
-            '是否具有"审批预备党员权限"', "功能型党组织", "党组织所在单位情况", "党组织所在行政区划", "批准成立的上级党组织", "是否为新业态", "驻外情况", 
-            "党组织曾用名", "单位名称（全称）", "UUID", "有无统一社会信用代码", "法人单位统一社会信用代码", "单位性质类别", 
-            "法人单位标识", "建立党组情况", "法人单位建立党组织情况", "在岗职工人数", "企业控制（控股）情况", "企业规模", "单位所在目录", "单位隶属关系", "单位所在行政区划", "单位名称(全称)", "机构类型", "法人单位统一社会信用代码"
-            , "新经济行业", "经济行业", "经济类型", "新经济类型", "成立日期", "注册地行政区划", "注册地址", "组织机构代码", "上级主管部门名称", "单位隶属关系"]
-
-
-        #创建一个dataframe表头为columns_base_info中的元素
-        df = pd.DataFrame(columns = columns_base_info)
-        #dataframe导出到excel
-        df.to_excel(excel_file_path, index = False)
-        #使用openpyxl库来加载一个已存在的Excel工作簿
-        org_excel = load_workbook(excel_file_path)
-        #打印调试信息
-        print(f"文件 '{excel_file_path}' 已成功创建。")
-        #启动同步
-        synchronizing(wait, org_excel, excel_file_path, driver)
-    else:
+        time.sleep(3)
+        org_tree = TreeNode()
+        synchronizing_org_v1(driver=driver, wait=wait, input_node=org_tree, xpath = "(//div[@class = 'fs-tree-node is-expanded is-current is-focusable']/div)[1]", xpath2 = "//div[@role = 'group' and @class = 'fs-tree-node__children']", xpath3 = ".//span[@class = 'fs-tree-node__expand-icon fs-icon-caret-right']", xpath4 = ".//div[@role = 'group']")
+        org_tree.dayin()
         #创建目录g:/project/LHSextract/database/database_org
         os.makedirs(org_directory, exist_ok=True)
         #设计党组织基本信息表头
@@ -174,7 +181,7 @@ def new_excel(wait, driver):
         #打印调试信息
         print(f"文件 '{excel_file_path}' 已成功创建。")
         #启动同步
-        synchronizing(wait, org_excel, excel_file_path, driver)
+        synchronizing(wait, org_excel, excel_file_path, driver, org_tree)
   
 
 
@@ -201,68 +208,61 @@ def access_info_page(wait, row):
 
 
 
-def rebuild(excel_file_path, wait, org_total_amount, org_excel, org_excel_path):
-    #先改变全局变量
-    init_complete_amount(excel_file_path)
-    synchronizing(wait, org_excel, org_excel_path)
 
 
 
-def init_complete_amount(excel_file_path):
-    df = pd.read_excel(excel_file_path, sheet_name=0)
-    row_count = count_non_empty_rows(excel_file_path, sheet_name=0)
-    amount_that_complete = row_count - 1
-    return amount_that_complete
-
-
-
-def count_non_empty_rows(excel_file_path, sheet_name=0):
-    # 加载Excel工作簿
-    workbook = load_workbook(filename=excel_file_path, data_only=True)
-    # 获取工作表（可以通过名称或索引获取）
-    if isinstance(sheet_name, int):
-        sheet = workbook.worksheets[sheet_name]
-    else:
-        sheet = workbook[sheet_name]
-    non_empty_row_count = 0
-    # 逐行检查是否有数据
-    for row in sheet.iter_rows():
-        if any(cell.value is not None for cell in row):
-            non_empty_row_count += 1
-    return non_empty_row_count
-
-
-
-
-def synchronizing(wait, org_excel, org_excel_path, driver):
+def synchronizing(wait, org_excel, org_excel_path, driver, org_tree):
+    org_totol_amount = org_tree.return_node_amount()
+    for i in range(1, org_totol_amount):
+        current_node = org_tree.find_node_by_index(i)
+        current_node_text = current_node.value
+        path_to_node = current_node.path_to_root()
+        path_to_node = path_to_node[0:]
+        container = wait_return_subelement_absolute(wait, 1, xpath="//div[@class = 'tree_wrapper_div']")
+        for i, node_value in enumerate(path_to_node):
+            complete_path = wait_return_subelement_relative(1, container, xpath=f".//span[contains(text(), '{node_value}')]/../../..")
+            arrow = wait_return_subelement_relative(1, complete_path, xpath="./span")
+            html = complete_path.get_attribute("outerHTML")
+            soup_html = BeautifulSoup(html, 'html.parser')
+            span_element = soup_html.find('span')
+            if span_element and 'expanded' in span_element.get('class'):
+                continue
+            else:
+                arrow.click()
+        target = wait_return_subelement_relative(1, container, xpath=f".//span[contains(text(), '{current_node_text}')]/..")
+        target.click()
+        time.sleep(2)
+        downloading(file = org_excel, wait = wait, driver = driver, path = org_excel_path)
+    
+    
     #递归遍历树状列表完成每一个党组织的信息采集。
-    #点击根组织(//div[@class = "tree_wrapper"]//div[@role = "treeitem"]/div[@class = "fs-tree-node__content"])[1]
-    while (1):
-        try:
-            root_org = wait.until(EC.element_to_be_clickable((By.XPATH, "(//div[@class = 'tree_wrapper']//div[@role = 'treeitem']/div[@class = 'fs-tree-node__content'])[1]")))
-            break
-        except:
-            time.sleep(0.5)
-    while(1):
-        try:
-            root_org.click()
-            break
-        except:
-            root_org = wait.until(EC.element_to_be_clickable((By.XPATH, "(//div[@class = 'tree_wrapper']//div[@role = 'treeitem']/div[@class = 'fs-tree-node__content'])[1]")))
-            time.sleep(0.5)
-    #采集根组织信息
-    downloading(file = org_excel, wait = wait, driver = driver, path = org_excel_path)
-
+######    #点击根组织(//div[@class = "tree_wrapper"]//div[@role = "treeitem"]/div[@class = "fs-tree-node__content"])[1]
+######    while (1):
+######        try:
+######            root_org = wait.until(EC.element_to_be_clickable((By.XPATH, "(//div[@class = 'tree_wrapper']//div[@role = 'treeitem']/div[@class = 'fs-tree-node__content'])[1]")))
+######            break
+######        except:
+######            time.sleep(0.5)
+######    while(1):
+######        try:
+######            root_org.click()
+######            break
+######        except:
+######            root_org = wait.until(EC.element_to_be_clickable((By.XPATH, "(//div[@class = 'tree_wrapper']//div[@role = 'treeitem']/div[@class = 'fs-tree-node__content'])[1]")))
+######            time.sleep(0.5)
+######    #采集根组织信息
+######    downloading(file = org_excel, wait = wait, driver = driver, path = org_excel_path)
+######
 
     #获取根节点结构体//div[@class = "tre
     # 
     # e_wrapper"]//div[@role = "treeitem"]/div[@role = "group"]到tree_root
-    while(1):
-        try:
-            tree_root = wait.until(EC.visibility_of_element_located((By.XPATH, "//div[@class = 'tree_wrapper']//div[@role = 'treeitem']/div[@role = 'group']")))
-            break
-        except:
-            time.sleep(0.5)
+    #####while(1):
+    #####    try:
+    #####        tree_root = wait.until(EC.visibility_of_element_located((By.XPATH, "//div[@class = 'tree_wrapper']//div[@role = 'treeitem']/div[@role = 'group']")))
+    #####        break
+    #####    except:
+    #####        time.sleep(0.5)
 
 
     #item_html = tree_root.get_attribute('outerHTML')
@@ -270,65 +270,65 @@ def synchronizing(wait, org_excel, org_excel_path, driver):
         #file0.write(item_html)
 
     #recursion(tree_root)
-    recursion(tree_root = tree_root, file = org_excel, wait = wait, driver = driver, path = org_excel_path)
-
-
-
-def recursion(tree_root, file, wait, driver, path):
-    org_items = []
-    org_items = tree_root.find_elements(By.XPATH, ".//div[@role = 'treeitem']")
-    
-    #item_html0 = org_items[0].get_attribute('outerHTML')
-    #with open('item_html0.txt', 'w', encoding = 'utf-8') as file0:
-        #file0.write(item_html0)
-
-    #for 每个元素 in tree_root
-    for item in org_items:
-        # 每个元素.click()
-        item.click()
-        # 采集党组织信息
-        downloading(file, wait, driver, path)
-        # 查看元素下面是否有//span[@class = "is-leaf fs-tree-node__expand-icon fs-icon-caret-right"]
-        ##在这里检查线程关闭信号
-
-        if stop_event.is_set():
-            break
-        item_html = item.get_attribute('outerHTML')
-        soup = BeautifulSoup(item_html, 'html.parser')
-        first_child = soup.find()
-        first_grandchild = first_child.find() if first_child else None
-        leaf = first_grandchild.find('span', class_= "is-leaf fs-tree-node__expand-icon fs-icon-caret-right")
-        #如果有：
-        if leaf:
-            #next
-            next
-        #如果没有：
-        else:
-            #断言元素下面有//span[@class = "fs-tree-node__expand-icon fs-icon-caret-right"]
-                #断言异常
-            #点击//span[@class = "fs-tree-node__expand-icon fs-icon-caret-right"]
-            while (1):
-                try:
-                    arrow_down = item.find_element(By.XPATH, "./div[@class='fs-tree-node__content']/span[@class='fs-tree-node__expand-icon fs-icon-caret-right']")
-                    break
-                except:
-                    time.sleep(0.5)
-            while(1):
-                try:
-                    arrow_down.click()
-                    break
-                except:
-                    time.sleep(0.5)
-                    arrow_down = item.find_element(By.XPATH, "./div[@class='fs-tree-node__content']/span[@class='fs-tree-node__expand-icon fs-icon-caret-right']")
-            #元素下面的//div[@role = "group"]结构体作为新的根节点结构体new_tree_root
-            while(1):
-                try:
-                    new_tree_root = item.find_element(By.XPATH, ".//div[@role = 'group']")
-                    break
-                except:
-                    time.sleep(0.5)
-            #递归recursion(new_tree_root)
-            recursion(new_tree_root, file, wait, driver, path)
+####    recursion(tree_root = tree_root, file = org_excel, wait = wait, driver = driver, path = org_excel_path)
+####
+####
+####
+####def recursion(tree_root, file, wait, driver, path):
+####    org_items = []
+####    org_items = tree_root.find_elements(By.XPATH, ".//div[@role = 'treeitem']")
+####    
+####    #item_html0 = org_items[0].get_attribute('outerHTML')
+####    #with open('item_html0.txt', 'w', encoding = 'utf-8') as file0:
+####        #file0.write(item_html0)
+####
+####    #for 每个元素 in tree_root
+####    for item in org_items:
+####        # 每个元素.click()
+####        item.click()
+####        # 采集党组织信息
+####        downloading(file, wait, driver, path)
+####        # 查看元素下面是否有//span[@class = "is-leaf fs-tree-node__expand-icon fs-icon-caret-right"]
+####        ##在这里检查线程关闭信号
+####
+####        if stop_event.is_set():
+####            break
+####        item_html = item.get_attribute('outerHTML')
+####        soup = BeautifulSoup(item_html, 'html.parser')
+####        first_child = soup.find()
+####        first_grandchild = first_child.find() if first_child else None
+####        leaf = first_grandchild.find('span', class_= "is-leaf fs-tree-node__expand-icon fs-icon-caret-right")
+####        #如果有：
+####        if leaf:
+####            #next
+####            next
+####        #如果没有：
+####        else:
+####            #断言元素下面有//span[@class = "fs-tree-node__expand-icon fs-icon-caret-right"]
+####                #断言异常
+####            #点击//span[@class = "fs-tree-node__expand-icon fs-icon-caret-right"]
+####            while (1):
+####                try:
+####                    arrow_down = item.find_element(By.XPATH, "./div[@class='fs-tree-node__content']/span[@class='fs-tree-node__expand-icon fs-icon-caret-right']")
+####                    break
+####                except:
+####                    time.sleep(0.5)
+####            while(1):
+####                try:
+####                    arrow_down.click()
+####                    break
+####                except:
+####                    time.sleep(0.5)
+####                    arrow_down = item.find_element(By.XPATH, "./div[@class='fs-tree-node__content']/span[@class='fs-tree-node__expand-icon fs-icon-caret-right']")
+####            #元素下面的//div[@role = "group"]结构体作为新的根节点结构体new_tree_root
+####            while(1):
+####                try:
+####                    new_tree_root = item.find_element(By.XPATH, ".//div[@role = 'group']")
+####                    break
+####                except:
+####                    time.sleep(0.5)
+####            #递归recursion(new_tree_root)
+####            recursion(new_tree_root, file, wait, driver, path)
 
 def downloading(file, wait, driver, path):
     global amount_that_complete
@@ -432,7 +432,7 @@ def downloading(file, wait, driver, path):
             company_info = wait.until(EC.element_to_be_clickable((By.XPATH, "//div[contains(text(), '党组织单位信息')]")))
 
     #单位名称（全称）#
-
+    time.sleep(2)
     file.active.cell(row=countx, column=19).value = wait.until(EC.presence_of_element_located((By.XPATH, "//label[contains(text(), '单位名称（全称）')]/following-sibling::div"))).text
     file.save(path)
     i_1 = 0
@@ -624,6 +624,7 @@ def downloading(file, wait, driver, path):
             councilcard = wait.until(EC.element_to_be_clickable((By.ID, "tab-class")))
             time.sleep(0.5)
     # 采集班子成员信息
+    time.sleep(2)
     table_council(name_temp, wait, driver)
     # 切换选项卡到惩戒信息
     while 1:
@@ -643,6 +644,7 @@ def downloading(file, wait, driver, path):
     table_reward_punish(name_temp, wait)
     
     print("填写第",count,"个党组织",name_temp,"信息成功") 
+    time.sleep(1.5)
     amount_that_complete = amount_that_complete + 1
 
 
