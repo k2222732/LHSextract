@@ -80,6 +80,17 @@ def wait_return_subelement_relative_v1(time_w, element,xpath):
             traceback.print_exc()
             time.sleep(time_w)
 
+#鲁棒返回对象（相对）
+def wait_return_subelement_relative_v2(time_w, element,xpath):
+    while(1):
+        try:
+            target_element = WebDriverWait(element,time_w).until(EC.element_to_be_clickable((By.XPATH, xpath)))
+            return target_element
+        except:
+            traceback.print_exc()
+            time.sleep(time_w)
+
+
 
 #鲁棒返回对象（绝对）
 def wait_return_subelement_absolute(wait, time_w, xpath):

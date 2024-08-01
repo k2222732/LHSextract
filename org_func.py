@@ -118,11 +118,12 @@ def rebuild(driver, wait, excel_file_path, org_excel):
     global amount_that_complete
     org_tree = TreeNode()
     synchronizing_org_v1(driver=driver, wait=wait, input_node=org_tree, xpath = "(//div[@class = 'fs-tree-node is-expanded is-current is-focusable']/div)[1]", xpath2 = "//div[@role = 'group' and @class = 'fs-tree-node__children']", xpath3 = ".//span[@class = 'fs-tree-node__expand-icon fs-icon-caret-right']", xpath4 = ".//div[@role = 'group']")
+    driver.refresh()
     org_totol_amount = org_tree.return_node_amount()
     amount_that_complete = init_complete_amount(excel_file_path)
 
-    for i in range(amount_that_complete, org_totol_amount):
-        current_node = org_tree.find_node_by_index(i)
+    for j in range(amount_that_complete, org_totol_amount):
+        current_node = org_tree.find_node_by_index(j)
         current_node_text = current_node.value
         path_to_node = current_node.path_to_root()
         path_to_node = path_to_node[0:]
@@ -137,10 +138,11 @@ def rebuild(driver, wait, excel_file_path, org_excel):
                 continue
             else:
                 arrow.click()
-        target = wait_return_subelement_relative(1, container, xpath=f".//span[contains(text(), '{current_node_text}')]/..")
+        target = wait_return_subelement_relative_v2(1, container, xpath=f".//span[contains(text(), '{current_node_text}')]/..")
         target.click()
-        time.sleep(2)
-        downloading(file = org_excel, wait = wait, driver = driver, path = excel_file_path)
+        time.sleep(1)
+        downloading(file = org_excel, wait = wait, driver = driver, path = excel_file_path, rebuild = True)
+        
 
 def new_excel(wait, driver):
     global org_directory
@@ -159,8 +161,8 @@ def new_excel(wait, driver):
         time.sleep(3)
         org_tree = TreeNode()
         synchronizing_org_v1(driver=driver, wait=wait, input_node=org_tree, xpath = "(//div[@class = 'fs-tree-node is-expanded is-current is-focusable']/div)[1]", xpath2 = "//div[@role = 'group' and @class = 'fs-tree-node__children']", xpath3 = ".//span[@class = 'fs-tree-node__expand-icon fs-icon-caret-right']", xpath4 = ".//div[@role = 'group']")
-        org_tree.dayin()
         #创建目录g:/project/LHSextract/database/database_org
+        driver.refresh()
         os.makedirs(org_directory, exist_ok=True)
         #设计党组织基本信息表头
         columns_base_info = ["序号","党组织全称", "组织树", "党组织简称", "党内统计用党组织简称", "成立日期", "党组织编码", "党组织联系人", "联系电话", "组织类别", 
@@ -229,10 +231,10 @@ def synchronizing(wait, org_excel, org_excel_path, driver, org_tree):
                 continue
             else:
                 arrow.click()
-        target = wait_return_subelement_relative(1, container, xpath=f".//span[contains(text(), '{current_node_text}')]/..")
+        target = wait_return_subelement_relative_v2(1, container, xpath=f".//span[contains(text(), '{current_node_text}')]/..")
         target.click()
-        time.sleep(2)
-        downloading(file = org_excel, wait = wait, driver = driver, path = org_excel_path)
+        downloading(file = org_excel, wait = wait, driver = driver, path = org_excel_path, rebuild=False)
+       
     
     
     #递归遍历树状列表完成每一个党组织的信息采集。
@@ -330,11 +332,15 @@ def synchronizing(wait, org_excel, org_excel_path, driver, org_tree):
 ####            #递归recursion(new_tree_root)
 ####            recursion(new_tree_root, file, wait, driver, path)
 
-def downloading(file, wait, driver, path):
+def downloading(file, wait, driver, path, rebuild):
     global amount_that_complete
-    count = amount_that_complete
-    count = count + 1
-    countx = count + 1
+    if rebuild == True:
+        count = amount_that_complete
+        countx = count + 1
+    else:
+        count = amount_that_complete
+        count = count + 1
+        countx = count + 1
     #填写序号#
     file.active.cell(row=countx, column=1).value = count
     file.save(path)
@@ -432,7 +438,7 @@ def downloading(file, wait, driver, path):
             company_info = wait.until(EC.element_to_be_clickable((By.XPATH, "//div[contains(text(), '党组织单位信息')]")))
 
     #单位名称（全称）#
-    time.sleep(2)
+    time.sleep(1)
     file.active.cell(row=countx, column=19).value = wait.until(EC.presence_of_element_located((By.XPATH, "//label[contains(text(), '单位名称（全称）')]/following-sibling::div"))).text
     file.save(path)
     i_1 = 0
@@ -624,7 +630,7 @@ def downloading(file, wait, driver, path):
             councilcard = wait.until(EC.element_to_be_clickable((By.ID, "tab-class")))
             time.sleep(0.5)
     # 采集班子成员信息
-    time.sleep(2)
+    time.sleep(1)
     table_council(name_temp, wait, driver)
     # 切换选项卡到惩戒信息
     while 1:
@@ -644,7 +650,7 @@ def downloading(file, wait, driver, path):
     table_reward_punish(name_temp, wait)
     
     print("填写第",count,"个党组织",name_temp,"信息成功") 
-    time.sleep(1.5)
+    time.sleep(1)
     amount_that_complete = amount_that_complete + 1
 
 
