@@ -125,7 +125,7 @@ def rebuild(driver, wait, excel_file_path, org_excel):
     amount_that_complete = init_complete_amount(excel_file_path)
 
     for j in range(amount_that_complete, org_totol_amount+1):
-        if amount_that_complete%10 == 0:
+        if amount_that_complete%20 == 0:
             driver.close()
             try:
                 for handle in driver.window_handles:
@@ -708,7 +708,8 @@ def table_council(org_name: str, wait, driver):
     #读取表格容器保存在变量container里
     while(1):
         try:
-            tbody = wait.until(EC.visibility_of_element_located((By.XPATH, "(//span[contains(text(), '班子信息集')]/../../../div[3]//tbody)[1]")))
+            tbody = wait_return_subelement_absolute(wait, 1, xpath="(//span[contains(text(), '班子信息集')]/../../../div[3]//tbody)[1]")
+            # tbody = wait.until(EC.visibility_of_element_located((By.XPATH, "(//span[contains(text(), '班子信息集')]/../../../div[3]//tbody)[1]")))
                                                                            #(//div[@class = 'fs-table__fixed-body-wrapper'])[3]//tbody
                                                                            #//div[@class = 'fs-table fs-table--fit fs-table--border fs-table--enable-row-transition fs-table--mini']/div[@class = 'fs-table__body-wrapper is-scrolling-none']//tbody
                                                                            #(//div[@class = 'fs-table__body-wrapper is-scrolling-left'])[5]//tbody

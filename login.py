@@ -49,7 +49,8 @@ def _main():
     chromedriver_path = config.get('Paths_driver', 'explore_driver_path', fallback='')
     account = config.get('Account', 'account', fallback='')
     password = config.get('Password', 'password', fallback='')
-
+    # options = webdriver.ChromeOptions()
+    # options.add_argument('--incognito')
     driver = driver_create(chrome_path, chromedriver_path)
     wait = WebDriverWait(driver, 10, 0.5)
     login(account, password, driver, url, wait)
@@ -59,6 +60,7 @@ def _main():
 
 def driver_create(chrome_path, chromedriver_path):
     chrome_options = Options()
+    #chrome_options.add_argument('--incognito')
     # 替换为你的 Chrome 浏览器的实际安装路径
     chrome_options.binary_location = chrome_path  
     # 创建 Service 对象并指定 ChromeDriver 的路径
