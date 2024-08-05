@@ -114,17 +114,21 @@ def switch_item_org(wait):
             org_info = wait.until(EC.element_to_be_clickable((By.XPATH, '(//*[contains(text(), "信息管理")]/..)[3]')))
 
 
-def rebuild(driver, wait, excel_file_path, org_excel):
+def rebuild(driver, wait, excel_file_path, org_excel, node_amount):
     global amount_that_complete
-    time.sleep(3)
-    #！！！！！@转移到初始化程序中
-    org_tree = TreeNode()
-    synchronizing_org_v1(driver=driver, wait=wait, input_node=org_tree, xpath = "(//div[@class = 'fs-tree-node is-expanded is-current is-focusable']/div)[1]", xpath2 = "//div[@role = 'group' and @class = 'fs-tree-node__children']", xpath3 = ".//span[@class = 'fs-tree-node__expand-icon fs-icon-caret-right']", xpath4 = ".//div[@role = 'group']")
     #！！！！！@
     driver.refresh()
     time.sleep(3)
-    org_totol_amount = org_tree.return_node_amount()
+    org_totol_amount = node_amount
     amount_that_complete = init_complete_amount(excel_file_path)
+    config = configparser.ConfigParser()
+    config.read('config.ini')
+    org_directory = config.get('Paths_org_info', 'org_info_path')
+    today_date = datetime.now().strftime("%Y-%m-%d")
+    excel_file_name = f"{today_date}党组织名单.xlsx"
+    excel_file_path_m = os.path.join(org_directory, excel_file_name)
+    workbook = openpyxl.load_workbook(excel_file_path_m)
+    sheet = workbook.active
 
     for j in range(amount_that_complete, org_totol_amount+1):
         if amount_that_complete%20 == 0:
@@ -140,12 +144,14 @@ def rebuild(driver, wait, excel_file_path, org_excel):
             switch_role(wait)
             switch_item_org(wait)
             time.sleep(3)
-        current_node = org_tree.find_node_by_index(j)
-        current_node_text = current_node.value
-        path_to_node = current_node.path_to_root()
-        path_to_node = path_to_node[0:]
+
+        string = sheet.cell(row = j, column = 3).value()
+        array = string.split('/')
+        #！！！！！@  从excel中读取
+        current_node_text = array[-1]    
         container = wait_return_subelement_absolute(wait, 1, xpath="//div[@class = 'tree_wrapper_div']")
-        for i, node_value in enumerate(path_to_node):
+        
+        for i, node_value in enumerate(array):
             complete_path = wait_return_subelement_relative(1, container, xpath=f".//span[contains(text(), '{node_value}')]/../../..")
             arrow = wait_return_subelement_relative(1, complete_path, xpath="./span")
             html = complete_path.get_attribute("outerHTML")
@@ -160,6 +166,38 @@ def rebuild(driver, wait, excel_file_path, org_excel):
         downloading(file = org_excel, wait = wait, driver = driver, path = excel_file_path, rebuild = True)
         
 
+def init(driver, wait, org_directory):
+    time.sleep(5)
+    org_tree = TreeNode()
+    synchronizing_org_v1(driver=driver, wait=wait, input_node=org_tree, xpath = "(//div[@class = 'fs-tree-node is-expanded is-current is-focusable']/div)[1]", xpath2 = "//div[@role = 'group' and @class = 'fs-tree-node__children']", xpath3 = ".//span[@class = 'fs-tree-node__expand-icon fs-icon-caret-right']", xpath4 = ".//div[@role = 'group']")
+    today_date = datetime.now().strftime("%Y-%m-%d")
+    excel_file_name = f"{today_date}党组织名单.xlsx"
+    excel_file_path = os.path.join(org_directory, excel_file_name)
+    if os.path.isfile(excel_file_path):
+        print("党组织名录已存在!")
+        return False
+    else:
+        os.makedirs(org_directory, exist_ok=True)
+        wb = openpyxl.Workbook()
+        ws = wb.active
+        ws.title = "sheet1"
+        node_amount = org_tree.return_node_amount()
+        for i in range(1, node_amount):
+            cur_node = org_tree.find_node_by_index(i)
+            value = cur_node.value
+            ws.cell(row = i, column = 1, value=i)
+            ws.cell(row = i, column = 2, value=value)
+            path_to_node = cur_node.path_to_root()
+            path_to_node = path_to_node[0:]
+            char = ''
+            for element in path_to_node:
+                char = char + '/' + element
+            ws.cell(row = i, column = 3, value=char)
+        wb.save(excel_file_path)
+        return node_amount
+
+
+
 def new_excel(wait, driver):
     global org_directory
     config = configparser.ConfigParser()
@@ -169,20 +207,16 @@ def new_excel(wait, driver):
     excel_file_name = f"{today_date}党组织信息库.xlsx"
     excel_file_path = os.path.join(org_directory, excel_file_name)
     #！！！！！初始化，将党组织信息录入到excel中
+    node_amount = init(driver, wait, org_directory)
+    if node_amount == False:
+        return
     if os.path.isfile(excel_file_path):
         time.sleep(3)
         org_excel = load_workbook(excel_file_path)
-        rebuild(driver, wait, excel_file_path, org_excel)
-
+        rebuild(driver, wait, excel_file_path, org_excel, node_amount)
     else:
-        time.sleep(3)
-        #！！！！！@转移到初始化程序中
-        org_tree = TreeNode()
-        synchronizing_org_v1(driver=driver, wait=wait, input_node=org_tree, xpath = "(//div[@class = 'fs-tree-node is-expanded is-current is-focusable']/div)[1]", xpath2 = "//div[@role = 'group' and @class = 'fs-tree-node__children']", xpath3 = ".//span[@class = 'fs-tree-node__expand-icon fs-icon-caret-right']", xpath4 = ".//div[@role = 'group']")
-        #！！！！！@
-        #创建目录g:/project/LHSextract/database/database_org
         driver.refresh()
-        time.sleep(3)
+    
         os.makedirs(org_directory, exist_ok=True)
         #设计党组织基本信息表头
         columns_base_info = ["序号","党组织全称", "组织树", "党组织简称", "党内统计用党组织简称", "成立日期", "党组织编码", "党组织联系人", "联系电话", "组织类别", 
@@ -190,7 +224,6 @@ def new_excel(wait, driver):
             "党组织曾用名", "单位名称（全称）", "UUID", "有无统一社会信用代码", "法人单位统一社会信用代码", "单位性质类别", 
             "法人单位标识", "建立党组情况", "法人单位建立党组织情况", "在岗职工人数", "企业控制（控股）情况", "企业规模", "单位所在目录", "单位隶属关系", "单位所在行政区划", "单位名称(全称)", "机构类型", "法人单位统一社会信用代码"
             , "新经济行业", "经济行业", "经济类型", "新经济类型", "成立日期", "注册地行政区划", "注册地址", "组织机构代码", "上级主管部门名称", "单位隶属关系"]
-
 
         wb = openpyxl.Workbook()
         ws = wb.active
@@ -203,40 +236,22 @@ def new_excel(wait, driver):
         #打印调试信息
         print(f"文件 '{excel_file_path}' 已成功创建。")
         #启动同步
-        synchronizing(wait, org_excel, excel_file_path, driver, org_tree, ws)
-  
+        synchronizing(wait, org_excel, excel_file_path, driver, ws, wb, node_amount)
 
 
-def access_info_page(wait, row):
-    xpath = f"(//table[@class='fs-table__body'])[3]/tbody/tr[{row}]/td[3]"
-    while 1:
-        try:
-            org = wait.until(EC.element_to_be_clickable((By.XPATH, xpath)))
-            break
-        except:
-            time.sleep(0.1)
-    while 1:
-        try:
-            org.click()
-            break
-        except:
-                while 1:
-                    try:
-                        org = wait.until(EC.element_to_be_clickable((By.XPATH, xpath)))
-                        break
-                    except:
-                        time.sleep(0.1)
-    print(f"进入党员个人页面成功") 
-
-
-
-
-
-
-def synchronizing(wait, org_excel, org_excel_path, driver, org_tree, ws):
-    org_totol_amount = org_tree.return_node_amount()
+def synchronizing(wait, org_excel, org_excel_path, driver, ws, wb, node_amount):
+    org_totol_amount = node_amount
+    config = configparser.ConfigParser()
+    config.read('config.ini')
+    org_directory = config.get('Paths_org_info', 'org_info_path')
+    today_date = datetime.now().strftime("%Y-%m-%d")
+    excel_file_name = f"{today_date}党组织名单.xlsx"
+    excel_file_path_m = os.path.join(org_directory, excel_file_name)
+    workbook = openpyxl.load_workbook(excel_file_path_m)
+    sheet = workbook.active
+    
     for i in range(1, org_totol_amount+1):
-        if amount_that_complete%10 == 0:
+        if amount_that_complete%20 == 0:
             driver.close()
             try:
                 for handle in driver.window_handles:
@@ -248,16 +263,14 @@ def synchronizing(wait, org_excel, org_excel_path, driver, org_tree, ws):
             access_org_database(driver, wait)
             switch_role(wait)
             switch_item_org(wait)
-            time.sleep(3)
         #！！！！！@
-        current_node = org_tree.find_node_by_index(i)
-        current_node_text = current_node.value
-        path_to_node = current_node.path_to_root()
-        path_to_node = path_to_node[0:]
-        #！！！！！@  从excel中读取
-        container = wait_return_subelement_absolute(wait, 1, xpath="//div[@class = 'tree_wrapper_div']")
         
-        for i, node_value in enumerate(path_to_node):
+        string = sheet.cell(row = i, column = 3).value()
+        array = string.split('/')
+        #！！！！！@  从excel中读取
+        current_node_text = array[-1]
+        container = wait_return_subelement_absolute(wait, 1, xpath="//div[@class = 'tree_wrapper_div']")
+        for i, node_value in enumerate(array):
             complete_path = wait_return_subelement_relative(1, container, xpath=f".//span[contains(text(), '{node_value}')]/../../..")
             arrow = wait_return_subelement_relative(1, complete_path, xpath="./span")
             html = complete_path.get_attribute("outerHTML")
@@ -269,7 +282,7 @@ def synchronizing(wait, org_excel, org_excel_path, driver, org_tree, ws):
                 arrow.click()         #！！！！！！！！！！！！！！！！！！！！！！！！！！！！
         target = wait_return_subelement_relative_v2(1, container, xpath=f".//span[contains(text(), '{current_node_text}')]/..")
         target.click()
-        downloading(file = org_excel, wait = wait, driver = driver, path = org_excel_path, rebuild=False, ws=ws)
+        downloading(file = org_excel, wait = wait, driver = driver, path = org_excel_path, rebuild=False, ws=ws, wb=wb, )
        
     
     
@@ -930,3 +943,25 @@ def element_exists(driver, by, value):
         return True
     except NoSuchElementException:
         return False
+    
+
+def access_info_page(wait, row):
+    xpath = f"(//table[@class='fs-table__body'])[3]/tbody/tr[{row}]/td[3]"
+    while 1:
+        try:
+            org = wait.until(EC.element_to_be_clickable((By.XPATH, xpath)))
+            break
+        except:
+            time.sleep(0.1)
+    while 1:
+        try:
+            org.click()
+            break
+        except:
+                while 1:
+                    try:
+                        org = wait.until(EC.element_to_be_clickable((By.XPATH, xpath)))
+                        break
+                    except:
+                        time.sleep(0.1)
+    print(f"进入党员个人页面成功") 
