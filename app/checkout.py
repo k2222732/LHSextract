@@ -139,8 +139,6 @@ def main(arg):
     ws['C1'] = "未上传主题党日的企业"
     excel_file_path = os.path.abspath(os.getcwd())+"\三会一课未上传\三会一课未上传名单.xlsx"
     wb.save(excel_file_path)
-
-
     #悬停
     input("")
     
