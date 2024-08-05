@@ -117,8 +117,10 @@ def switch_item_org(wait):
 def rebuild(driver, wait, excel_file_path, org_excel):
     global amount_that_complete
     time.sleep(3)
+    #！！！！！@转移到初始化程序中
     org_tree = TreeNode()
     synchronizing_org_v1(driver=driver, wait=wait, input_node=org_tree, xpath = "(//div[@class = 'fs-tree-node is-expanded is-current is-focusable']/div)[1]", xpath2 = "//div[@role = 'group' and @class = 'fs-tree-node__children']", xpath3 = ".//span[@class = 'fs-tree-node__expand-icon fs-icon-caret-right']", xpath4 = ".//div[@role = 'group']")
+    #！！！！！@
     driver.refresh()
     time.sleep(3)
     org_totol_amount = org_tree.return_node_amount()
@@ -166,6 +168,7 @@ def new_excel(wait, driver):
     today_date = datetime.now().strftime("%Y-%m-%d")
     excel_file_name = f"{today_date}党组织信息库.xlsx"
     excel_file_path = os.path.join(org_directory, excel_file_name)
+    #！！！！！初始化，将党组织信息录入到excel中
     if os.path.isfile(excel_file_path):
         time.sleep(3)
         org_excel = load_workbook(excel_file_path)
@@ -173,8 +176,10 @@ def new_excel(wait, driver):
 
     else:
         time.sleep(3)
+        #！！！！！@转移到初始化程序中
         org_tree = TreeNode()
         synchronizing_org_v1(driver=driver, wait=wait, input_node=org_tree, xpath = "(//div[@class = 'fs-tree-node is-expanded is-current is-focusable']/div)[1]", xpath2 = "//div[@role = 'group' and @class = 'fs-tree-node__children']", xpath3 = ".//span[@class = 'fs-tree-node__expand-icon fs-icon-caret-right']", xpath4 = ".//div[@role = 'group']")
+        #！！！！！@
         #创建目录g:/project/LHSextract/database/database_org
         driver.refresh()
         time.sleep(3)
@@ -244,11 +249,14 @@ def synchronizing(wait, org_excel, org_excel_path, driver, org_tree):
             switch_role(wait)
             switch_item_org(wait)
             time.sleep(3)
+        #！！！！！@
         current_node = org_tree.find_node_by_index(i)
         current_node_text = current_node.value
         path_to_node = current_node.path_to_root()
         path_to_node = path_to_node[0:]
+        #！！！！！@  从excel中读取
         container = wait_return_subelement_absolute(wait, 1, xpath="//div[@class = 'tree_wrapper_div']")
+        
         for i, node_value in enumerate(path_to_node):
             complete_path = wait_return_subelement_relative(1, container, xpath=f".//span[contains(text(), '{node_value}')]/../../..")
             arrow = wait_return_subelement_relative(1, complete_path, xpath="./span")
@@ -258,7 +266,7 @@ def synchronizing(wait, org_excel, org_excel_path, driver, org_tree):
             if span_element and 'expanded' in span_element.get('class'):
                 continue
             else:
-                arrow.click()
+                arrow.click()         #！！！！！！！！！！！！！！！！！！！！！！！！！！！！
         target = wait_return_subelement_relative_v2(1, container, xpath=f".//span[contains(text(), '{current_node_text}')]/..")
         target.click()
         downloading(file = org_excel, wait = wait, driver = driver, path = org_excel_path, rebuild=False)
