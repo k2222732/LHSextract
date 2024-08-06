@@ -21,7 +21,7 @@ from base.validate import *
 from middle.dev_middle import *
 stop_event = threading.Event()
 #dev_func.py进入个人页面的操作
-def enter_person_infopage(wait, driver0, row_number, member_excel, member_excel_path, page_number, control, temp_countx, xpath):
+def enter_person_infopage(wait, driver0, row_number, member_excel, member_excel_path, page_number, control, temp_countx, xpath, wb, ws):
     #//li[@class = 'el-select-dropdown__item selected hover']//span
     value = ""
     if control == 1:
@@ -37,7 +37,7 @@ def enter_person_infopage(wait, driver0, row_number, member_excel, member_excel_
     while 1:
         result =validate_list_content(wait, xpath, value=value)
         if result == True:
-            access_info_page(wait, row_number, file = member_excel, path = member_excel_path, temp_countx=temp_countx)
+            access_info_page(wait, row_number, file = member_excel, path = member_excel_path, temp_countx=temp_countx,wb=wb, ws=ws)
             try:
                 for handle in driver0.window_handles:
                     driver0.switch_to.window(handle)

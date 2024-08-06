@@ -117,7 +117,9 @@ def new_excel(wait):
     
     if os.path.isfile(excel_file_path):
         member_excel = load_workbook(excel_file_path)
-        rebuild(excel_file_path, wait, member_excel)
+        wb = openpyxl.load_workbook(excel_file_path)
+        ws = wb.active
+        rebuild(excel_file_path, wait, member_excel, wb, ws)
     else:
         os.makedirs(dev_directory, exist_ok=True)
         columns = ["序号", "姓名","性别","公民身份证号码","民族","出生日期","学历","申请入党日期","手机号码","背景信息","工作岗位",
@@ -139,12 +141,12 @@ def new_excel(wait):
         print(f"文件 '{excel_file_path}' 已成功创建。")
         switch_formal_mem(wait)
         mem_total_amount = get_total_amount(wait, xpath = "//span[@class = 'el-pagination__total']")
-        synchronizing(wait, member_excel, excel_file_path, control=1)
+        synchronizing(wait, member_excel, excel_file_path, control=1, wb=wb, ws=ws)
         if stop_event.is_set():
             return
         switch_informal_mem(wait)
         infomem_total_amount = get_total_amount(wait, xpath = "//span[@class = 'el-pagination__total']")
-        synchronizing(wait, member_excel, excel_file_path, control=2)
+        synchronizing(wait, member_excel, excel_file_path, control=2, wb=wb, ws=ws)
         if stop_event.is_set():
             return
         switch_devtarg(wait)
@@ -154,22 +156,22 @@ def new_excel(wait):
             pass
         else:
             devtar_total_amount = get_total_amount(wait, xpath = "//span[@class = 'el-pagination__total']")
-            synchronizing(wait, member_excel, excel_file_path, control=3)
+            synchronizing(wait, member_excel, excel_file_path, control=3, wb=wb, ws=ws)
         if stop_event.is_set():
             return
         switch_activist(wait)
         activist_total_amount = get_total_amount(wait, xpath = "//span[@class = 'el-pagination__total']")
-        synchronizing(wait, member_excel, excel_file_path, control=4)
+        synchronizing(wait, member_excel, excel_file_path, control=4, wb=wb, ws=ws)
         if stop_event.is_set():
             return
         switch_applicant(wait)
         applicant_total_amount = get_total_amount(wait, xpath = "//span[@class = 'el-pagination__total']")
-        synchronizing(wait, member_excel, excel_file_path, control=5)
+        synchronizing(wait, member_excel, excel_file_path, control=5, wb=wb, ws=ws)
         if stop_event.is_set():
             return
 
 
-def rebuild(excel_file_path, wait, member_excel):
+def rebuild(excel_file_path, wait, member_excel,wb,ws):
     global mem_total_amount
     global infomem_total_amount
     global devtar_total_amount
@@ -200,11 +202,11 @@ def rebuild(excel_file_path, wait, member_excel):
     a = init_complete_amount(excel_file_path)
     if a <= mem_total_amount:
         amount_mem_complete = a
-        synchronizing(wait, member_excel, excel_file_path, control = 1)
+        synchronizing(wait, member_excel, excel_file_path, control = 1,wb=wb,ws=ws)
         if stop_event.is_set():
             return
         switch_informal_mem(wait)
-        synchronizing(wait, member_excel, excel_file_path, control=2)
+        synchronizing(wait, member_excel, excel_file_path, control=2,wb=wb,ws=ws)
         if stop_event.is_set():
             return
         switch_devtarg(wait)
@@ -214,21 +216,21 @@ def rebuild(excel_file_path, wait, member_excel):
             pass
         else:
             devtar_total_amount = get_total_amount(wait, xpath = "//span[@class = 'el-pagination__total']")
-        synchronizing(wait, member_excel, excel_file_path, control=3)
+        synchronizing(wait, member_excel, excel_file_path, control=3,wb=wb,ws=ws)
         if stop_event.is_set():
             return
         switch_activist(wait)
-        synchronizing(wait, member_excel, excel_file_path, control=4)
+        synchronizing(wait, member_excel, excel_file_path, control=4,wb=wb,ws=ws)
         if stop_event.is_set():
             return
         switch_applicant(wait)
-        synchronizing(wait, member_excel, excel_file_path, control=5)
+        synchronizing(wait, member_excel, excel_file_path, control=5,wb=wb,ws=ws)
         if stop_event.is_set():
             return
     elif a>mem_total_amount and a <= mem_total_amount + infomem_total_amount:
         amount_mem_complete = mem_total_amount
         amount_infomem_complete = a - mem_total_amount
-        synchronizing(wait, member_excel, excel_file_path, control = 2)
+        synchronizing(wait, member_excel, excel_file_path, control = 2,wb=wb,ws=ws)
         if stop_event.is_set():
             return
         switch_devtarg(wait)
@@ -238,30 +240,30 @@ def rebuild(excel_file_path, wait, member_excel):
             pass
         else:
             devtar_total_amount = get_total_amount(wait, xpath = "//span[@class = 'el-pagination__total']")
-        synchronizing(wait, member_excel, excel_file_path, control=3)
+        synchronizing(wait, member_excel, excel_file_path, control=3,wb=wb,ws=ws)
         if stop_event.is_set():
             return
         switch_activist(wait)
-        synchronizing(wait, member_excel, excel_file_path, control=4)
+        synchronizing(wait, member_excel, excel_file_path, control=4,wb=wb,ws=ws)
         if stop_event.is_set():
             return
         switch_applicant(wait)
-        synchronizing(wait, member_excel, excel_file_path, control=5)
+        synchronizing(wait, member_excel, excel_file_path, control=5,wb=wb,ws=ws)
         if stop_event.is_set():
             return
     elif a>mem_total_amount + infomem_total_amount and a <= mem_total_amount + infomem_total_amount + devtar_total_amount:
         amount_mem_complete = mem_total_amount
         amount_infomem_complete = infomem_total_amount
         amount_devtar_complete = a - (mem_total_amount + infomem_total_amount)
-        synchronizing(wait, member_excel, excel_file_path, control = 3)
+        synchronizing(wait, member_excel, excel_file_path, control = 3,wb=wb,ws=ws)
         if stop_event.is_set():
             return
         switch_activist(wait)
-        synchronizing(wait, member_excel, excel_file_path, control=4)
+        synchronizing(wait, member_excel, excel_file_path, control=4,wb=wb,ws=ws)
         if stop_event.is_set():
             return
         switch_applicant(wait)
-        synchronizing(wait, member_excel, excel_file_path, control=5)
+        synchronizing(wait, member_excel, excel_file_path, control=5,wb=wb,ws=ws)
         if stop_event.is_set():
             return
     elif a>mem_total_amount + infomem_total_amount + devtar_total_amount and a <= mem_total_amount + infomem_total_amount + devtar_total_amount + activist_total_amount:
@@ -269,11 +271,11 @@ def rebuild(excel_file_path, wait, member_excel):
         amount_infomem_complete = infomem_total_amount
         amount_devtar_complete = devtar_total_amount
         amount_activist_complete = a - (mem_total_amount + infomem_total_amount + devtar_total_amount)
-        synchronizing(wait, member_excel, excel_file_path, control = 4)
+        synchronizing(wait, member_excel, excel_file_path, control = 4,wb=wb,ws=ws)
         if stop_event.is_set():
             return
         switch_applicant(wait)
-        synchronizing(wait, member_excel, excel_file_path, control=5)
+        synchronizing(wait, member_excel, excel_file_path, control=5,wb=wb,ws=ws)
         if stop_event.is_set():
             return
     elif a>mem_total_amount + infomem_total_amount + devtar_total_amount + activist_total_amount and a <= mem_total_amount + infomem_total_amount + devtar_total_amount + activist_total_amount + applicant_total_amount :
@@ -282,7 +284,7 @@ def rebuild(excel_file_path, wait, member_excel):
         amount_devtar_complete = devtar_total_amount
         amount_activist_complete = activist_total_amount
         amount_applicant_complete = a - (mem_total_amount + infomem_total_amount + devtar_total_amount + activist_total_amount)
-        synchronizing(wait, member_excel, excel_file_path, control = 5)
+        synchronizing(wait, member_excel, excel_file_path, control = 5,wb=wb,ws=ws)
         if stop_event.is_set():
             return
 
@@ -311,7 +313,9 @@ def count_non_empty_rows(excel_file_path, sheet_name=0):
     return non_empty_row_count
 
 
-def synchronizing(wait, member_excel, member_excel_path, control):
+
+
+def synchronizing(wait, member_excel, member_excel_path, control, wb, ws):
     global amount_mem_complete
     global amount_infomem_complete
     global amount_devtar_complete
@@ -326,15 +330,15 @@ def synchronizing(wait, member_excel, member_excel_path, control):
 
 
     if control == 1:
-        schedule(complete = amount_mem_complete, total = mem_total_amount, xpath = "//input[@type = 'number']", wait = wait, member_excel = member_excel, member_excel_path = member_excel_path, control = control)
+        schedule(complete = amount_mem_complete, total = mem_total_amount, xpath = "//input[@type = 'number']", wait = wait, member_excel = member_excel, member_excel_path = member_excel_path, control = control, wb=wb, ws=ws)
     elif control == 2:
-        schedule(complete = amount_infomem_complete, total = infomem_total_amount, xpath = "//input[@type = 'number']", wait = wait, member_excel = member_excel, member_excel_path = member_excel_path, control = control)
+        schedule(complete = amount_infomem_complete, total = infomem_total_amount, xpath = "//input[@type = 'number']", wait = wait, member_excel = member_excel, member_excel_path = member_excel_path, control = control, wb=wb, ws=ws)
     elif control == 3:
-        schedule(complete = amount_devtar_complete, total = devtar_total_amount, xpath = "//input[@type = 'number']", wait = wait, member_excel = member_excel, member_excel_path = member_excel_path, control = control)
+        schedule(complete = amount_devtar_complete, total = devtar_total_amount, xpath = "//input[@type = 'number']", wait = wait, member_excel = member_excel, member_excel_path = member_excel_path, control = control, wb=wb, ws=ws)
     elif control == 4:
-        schedule(complete = amount_activist_complete, total = activist_total_amount, xpath = "//input[@type = 'number']", wait = wait, member_excel = member_excel, member_excel_path = member_excel_path, control = control)
+        schedule(complete = amount_activist_complete, total = activist_total_amount, xpath = "//input[@type = 'number']", wait = wait, member_excel = member_excel, member_excel_path = member_excel_path, control = control, wb=wb, ws=ws)
     elif control == 5:
-        schedule(complete = amount_applicant_complete, total = applicant_total_amount, xpath = "//input[@type = 'number']", wait = wait, member_excel = member_excel, member_excel_path = member_excel_path, control = control)
+        schedule(complete = amount_applicant_complete, total = applicant_total_amount, xpath = "//input[@type = 'number']", wait = wait, member_excel = member_excel, member_excel_path = member_excel_path, control = control, wb=wb, ws=ws)
 
 
 def get_total_amount(wait, xpath):
@@ -365,7 +369,7 @@ def get_total_amount(wait, xpath):
 
 
 
-def schedule(complete, total, xpath, wait, member_excel, member_excel_path, control):
+def schedule(complete, total, xpath, wait, member_excel, member_excel_path, control, wb, ws):
     global driver0
     global amount_mem_complete
     global amount_infomem_complete
@@ -400,8 +404,8 @@ def schedule(complete, total, xpath, wait, member_excel, member_excel_path, cont
             time.sleep(1)
         else:
             pass
-        enter_person_infopage(wait, driver0, row_number, member_excel, member_excel_path, page_number, xpath="//li[@class = 'el-select-dropdown__item selected hover']//span", control = control, temp_countx = temp_countx)
-        downloading(file = member_excel, wait = wait, path = member_excel_path, control = control)
+        enter_person_infopage(wait, driver0, row_number, member_excel, member_excel_path, page_number, xpath="//li[@class = 'el-select-dropdown__item selected hover']//span", control = control, temp_countx = temp_countx, wb=wb, ws=ws)
+        downloading(file = member_excel, wait = wait, path = member_excel_path, control = control, wb=wb, ws=ws)
         driver0.close()
         try:
             for handle in driver0.window_handles:
@@ -436,7 +440,6 @@ def access_info_page(wait, rowx, file, path):
     #lishudangzuzhi = wait.until(EC.visibility_of_element_located((By.XPATH, f"//table[@class = 'el-table__body']/tbody/tr[{rowx}]/td[5]//a"))).text
     file.active.cell(row=temp_countx+2, column=28).value = lishudangzuzhi
     file.save(path)
-
     wait_click_xpath(wait, time_w = 0.5, xpath = f"//table[@class = 'el-table__body']/tbody/tr[{rowx}]/td[1]//a")
     
     
@@ -445,7 +448,7 @@ def access_info_page(wait, rowx, file, path):
 
 
 
-def downloading(file, wait, path, control):
+def downloading(file, wait, path, control, wb, ws):
     global driver0
     global amount_mem_complete
     global amount_infomem_complete
@@ -468,9 +471,9 @@ def downloading(file, wait, path, control):
         count = count + 1
         countx = count + 1
         temp_countx = count
-        name_temp = jibenxinxi_download(file, path, wait, countx, count)
-        jijifenzi_download(path, file, wait, countx, control)
-        yubeidangyuan(path, file, wait, countx, control)
+        name_temp = jibenxinxi_download(file, path, wait, countx, count, wb, ws)
+        jijifenzi_download(path, file, wait, countx, control, wb, ws)
+        yubeidangyuan(path, file, wait, countx, control, wb, ws)
         print("填写第",count,"个正式党员",name_temp,"信息成功") 
         amount_mem_complete = amount_mem_complete + 1
 
@@ -480,9 +483,9 @@ def downloading(file, wait, path, control):
         count = count + 1
         countx = count + 1
         temp_countx = count
-        name_temp = jibenxinxi_download(file, path, wait, countx, count)
-        jijifenzi_download(path, file, wait, countx, control)
-        yubeidangyuan(path, file, wait, countx, control)
+        name_temp = jibenxinxi_download(file, path, wait, countx, count, wb, ws)
+        jijifenzi_download(path, file, wait, countx, control, wb, ws)
+        yubeidangyuan(path, file, wait, countx, control, wb, ws)
         print("填写第",count,"个预备党员",name_temp,"信息成功") 
         amount_infomem_complete = amount_infomem_complete + 1
 
@@ -492,8 +495,8 @@ def downloading(file, wait, path, control):
         count = count + 1
         countx = count + 1
         temp_countx = count
-        name_temp = jibenxinxi_download(file, path, wait, countx, count)
-        jijifenzi_download(path, file, wait, countx, control)
+        name_temp = jibenxinxi_download(file, path, wait, countx, count, wb, ws)
+        jijifenzi_download(path, file, wait, countx, control, wb, ws)
         print("填写第",count,"个发展对象",name_temp,"信息成功") 
         amount_devtar_complete = amount_devtar_complete + 1
 
@@ -503,8 +506,8 @@ def downloading(file, wait, path, control):
         count = count + 1
         countx = count + 1
         temp_countx = count
-        name_temp = jibenxinxi_download(file, path, wait, countx, count)
-        jijifenzi_download(path, file, wait, countx, control)
+        name_temp = jibenxinxi_download(file, path, wait, countx, count, wb, ws)
+        jijifenzi_download(path, file, wait, countx, control, wb, ws)
         print("填写第",count,"个积极分子",name_temp,"信息成功") 
         amount_activist_complete = amount_activist_complete + 1
 
@@ -514,78 +517,80 @@ def downloading(file, wait, path, control):
         count = count + 1
         countx = count + 1
         temp_countx = count
-        name_temp = jibenxinxi_download(file, path, wait, countx, count)
+        name_temp = jibenxinxi_download(file, path, wait, countx, count, wb, ws)
         if "入党积极分子基本信息" in driver0.page_source:
-            jijifenzi_download(path, file, wait, countx, control)
+            jijifenzi_download(path, file, wait, countx, control, wb, ws)
             
             # 加入党组织日期
-            file.active.cell(row=countx, column=21).value = "-"
-            
+            ershiyi = "-"
+            ws.cell(row = countx, column = 21, value =ershiyi)
             # 转为正式党员日期
-            file.active.cell(row=countx, column=22).value = "-"
-               
+            ershier = "-"
+            ws.cell(row = countx, column = 22, value =ershier)
             # 人员类别
-            file.active.cell(row=countx, column=23).value = "-"
-                 
+            ershisan = "-"
+            ws.cell(row = countx, column = 23, value =ershisan)
             # 党籍状态
-            file.active.cell(row=countx, column=24).value = "-"
-                
+            ershisi = "-"
+            ws.cell(row = countx, column = 24, value =ershisi)
             # 入党类型
-            file.active.cell(row=countx, column=25).value = "-"
-           
+            ershiwu = "-"
+            ws.cell(row = countx, column = 25, value =ershiwu)
             # 所在党支部
-            file.active.cell(row=countx, column=26).value = "-"
-            file.save(path)
+            ershiliu = "-"
+            ws.cell(row = countx, column = 26, value =ershiliu)
+
             # 人员类型
-            file.active.cell(row=countx, column=27).value = "入党申请人"
-            file.save(path)
+            ershiqi = "入党申请人"
+            ws.cell(row = countx, column = 27, value =ershiqi)
+            wb.save(path)
             print("填写第",count,"个入党申请人",name_temp,"信息成功") 
             amount_applicant_complete = amount_applicant_complete + 1
         else:
             #籍贯
-            file.active.cell(row=countx, column=14).value = "-"
-            
+            shisi = "-"
+            ws.cell(row = countx, column = 14, value =shisi)
             #入团日期
-            file.active.cell(row=countx, column=15).value = "-"
-           
+            shiwu = "-"
+            ws.cell(row = countx, column = 15, value =shiwu)
             #参加工作日期
-            file.active.cell(row=countx, column=16).value = "-"
-            
+            shiliu = "-"
+            ws.cell(row = countx, column = 16, value =shiliu)
             #申请入党日期
-            file.active.cell(row=countx, column=17).value = wait.until(EC.presence_of_element_located((By.XPATH, "//tbody/tr[3]/td[2]"))).text
-           
+            shiqi = wait.until(EC.presence_of_element_located((By.XPATH, "//tbody/tr[3]/td[2]"))).text
+            ws.cell(row = countx, column = 17, value =shiqi)
             #确定入党积极分子日期
-            file.active.cell(row=countx, column=18).value = "-"
-            
+            shiba = "-"
+            ws.cell(row = countx, column = 18, value =shiba)
             #工作单位及职务
-            file.active.cell(row=countx, column=19).value = "-"
-           
+            shijiu = "-"
+            ws.cell(row = countx, column = 19, value =shijiu)
             #家庭住址
-            file.active.cell(row=countx, column=20).value = "-"
-          
+            ershi = "-"
+            ws.cell(row = countx, column = 20, value =ershi)
             # 加入党组织日期
-            file.active.cell(row=countx, column=21).value = "-"
-           
+            ershiyi = "-"
+            ws.cell(row = countx, column = 21, value =ershiyi)
             # 转为正式党员日期
-            file.active.cell(row=countx, column=22).value = "-"
-                  
+            ershier = "-"
+            ws.cell(row = countx, column = 22, value =ershier)
             # 人员类别
-            file.active.cell(row=countx, column=23).value = "-"
-                  
+            ershisan = "-"
+            ws.cell(row = countx, column = 23, value =ershisan)    
             # 党籍状态
-            file.active.cell(row=countx, column=24).value = "-"
-                  
+            ershisi = "-"
+            ws.cell(row = countx, column = 24, value =ershisi)
             # 入党类型
-            file.active.cell(row=countx, column=25).value = "-"
-            
+            ershiwu = "-"
+            ws.cell(row = countx, column = 25, value =ershiwu)
             # 所在党支部
-            file.active.cell(row=countx, column=26).value = "-"
-            file.save(path)
+            ershiliu = "-"
+            ws.cell(row = countx, column = 26, value =ershiliu)
             # 人员类型
-            file.active.cell(row=countx, column=27).value = "入党申请人"
-
+            ershiqi = "入党申请人"
+            ws.cell(row = countx, column = 27, value =ershiqi)
             print("填写第",count,"个入党申请人",name_temp,"信息成功") 
-            file.save(path)
+            wb.save(path)
             amount_applicant_complete = amount_applicant_complete + 1
 
 

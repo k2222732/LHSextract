@@ -179,7 +179,10 @@ def rebuild(driver, wait, excel_file_path, org_excel, ws, wb, excel_file_path_m)
         
 
 def init(driver, wait, org_directory):
-    time.sleep(5)
+    time.sleep(3)
+    scroll = wait_return_subelement_absolute(wait, 1, "//div[@class = 'tree_wrapper']")
+    driver.execute_script("arguments[0].scrollTop = arguments[0].scrollHeight", scroll)
+    time.sleep(2)
     org_tree = TreeNode()
     synchronizing_org_v1(driver=driver, wait=wait, input_node=org_tree, xpath = "(//div[@class = 'fs-tree-node is-expanded is-current is-focusable']/div)[1]", xpath2 = "//div[@role = 'group' and @class = 'fs-tree-node__children']", xpath3 = ".//span[@class = 'fs-tree-node__expand-icon fs-icon-caret-right']", xpath4 = ".//div[@role = 'group']")
     today_date = datetime.now().strftime("%Y-%m-%d")
@@ -700,6 +703,10 @@ def downloading(file, wait, driver, path, rebuild, ws, wb):
             time.sleep(0.5)
     # 采集班子成员信息
     table_council(name_temp, wait, driver)
+
+    right_arrow = wait_return_subelement_absolute(wait, 1, "//i[@class = 'fs-icon-arrow-right']")
+    right_arrow.click()
+
     # 切换选项卡到惩戒信息
     while 1:
         try:

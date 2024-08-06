@@ -22,11 +22,11 @@ stop_event = threading.Event()
 
 
 
-def access_info_page(wait, rowx, file, path, temp_countx):
+def access_info_page(wait, rowx, file, path, temp_countx, wb, ws):
     lishudangzuzhi = wait_return_subelement_absolute(wait, time_w = 0.5, xpath = f"//table[@class = 'el-table__body']/tbody/tr[{rowx}]/td[4]//a").text
     #lishudangzuzhi = wait.until(EC.visibility_of_element_located((By.XPATH, f"//table[@class = 'el-table__body']/tbody/tr[{rowx}]/td[5]//a"))).text
-    file.active.cell(row=temp_countx+2, column=28).value = lishudangzuzhi
-    file.save(path)
+    ws.cell(row=temp_countx+2, column=28, value = lishudangzuzhi)
+    wb.save(path)
 
     wait_click_xpath(wait, time_w = 0.5, xpath = f"//table[@class = 'el-table__body']/tbody/tr[{rowx}]/td[1]//a")
 
@@ -42,7 +42,7 @@ def switch_formal_mem(wait):
         except:
             wait_click_xpath(wait, time_w = 0.5, xpath = '(//input[@placeholder = "请选择"])[1]')
     wait_click_xpath(wait, time_w = 0.5, xpath = '//ul[@class = "el-scrollbar__view el-select-dropdown__list"]//li//span[contains(text(), "正式党员")]')
-    wait_click_xpath(wait, time_w = 0.5, xpath = '//span[contains(text(), "搜索")]')
+    wait_click_xpath(wait, time_w = 0.5, xpath = "//button[@class = 'el-button el-button--primary is-plain']//span[contains(text(), '查询')]")
     while 1:
         time.sleep(0.5)
         t = wait_return_subelement_absolute(wait, time_w=0.5, xpath='(//input[@placeholder = "请选择"])[1]')
@@ -60,7 +60,7 @@ def switch_formal_mem(wait):
                 except:
                     wait_click_xpath(wait, time_w = 0.5, xpath = '(//input[@placeholder = "请选择"])[1]')
             wait_click_xpath(wait, time_w = 0.5, xpath = '//ul[@class = "el-scrollbar__view el-select-dropdown__list"]//li//span[contains(text(), "正式党员")]')
-            wait_click_xpath(wait, time_w = 0.5, xpath = '//span[contains(text(), "搜索")]')
+            wait_click_xpath(wait, time_w = 0.5, xpath = "//button[@class = 'el-button el-button--primary is-plain']//span[contains(text(), '查询')]")
 
 
 def switch_informal_mem(wait):
@@ -74,7 +74,7 @@ def switch_informal_mem(wait):
         except:
             wait_click_xpath(wait, time_w = 0.5, xpath = '(//input[@placeholder = "请选择"])[1]')
     wait_click_xpath(wait, time_w = 0.5, xpath = '//ul[@class = "el-scrollbar__view el-select-dropdown__list"]//li//span[contains(text(), "预备党员")]')
-    wait_click_xpath(wait, time_w = 0.5, xpath = '//span[contains(text(), "搜索")]')
+    wait_click_xpath(wait, time_w = 0.5, xpath = "//button[@class = 'el-button el-button--primary is-plain']//span[contains(text(), '查询')]")
     while 1:
         time.sleep(0.5)
         t = wait_return_subelement_absolute(wait, time_w=0.5, xpath='(//input[@placeholder = "请选择"])[1]')
@@ -92,7 +92,7 @@ def switch_informal_mem(wait):
                 except:
                     wait_click_xpath(wait, time_w = 0.5, xpath = '(//input[@placeholder = "请选择"])[1]')
             wait_click_xpath(wait, time_w = 0.5, xpath = '//ul[@class = "el-scrollbar__view el-select-dropdown__list"]//li//span[contains(text(), "预备党员")]')
-            wait_click_xpath(wait, time_w = 0.5, xpath = '//span[contains(text(), "搜索")]')
+            wait_click_xpath(wait, time_w = 0.5, xpath = "//button[@class = 'el-button el-button--primary is-plain']//span[contains(text(), '查询')]")
 
 def switch_devtarg(wait):
     wait_click_xpath(wait, time_w = 0.5, xpath = '(//*[contains(text(), "人员信息")]/..)[1]')
@@ -105,7 +105,7 @@ def switch_devtarg(wait):
         except:
             wait_click_xpath(wait, time_w = 0.5, xpath = '(//input[@placeholder = "请选择"])[1]')
     wait_click_xpath(wait, time_w = 0.5, xpath = '//ul[@class = "el-scrollbar__view el-select-dropdown__list"]//li//span[contains(text(), "发展对象")]')
-    wait_click_xpath(wait, time_w = 0.5, xpath = '//span[contains(text(), "搜索")]')
+    wait_click_xpath(wait, time_w = 0.5, xpath = "//button[@class = 'el-button el-button--primary is-plain']//span[contains(text(), '查询')]")
     while 1:
         time.sleep(0.5)
         t = wait_return_subelement_absolute(wait, time_w=0.5, xpath='(//input[@placeholder = "请选择"])[1]')
@@ -123,7 +123,7 @@ def switch_devtarg(wait):
                 except:
                     wait_click_xpath(wait, time_w = 0.5, xpath = '(//input[@placeholder = "请选择"])[1]')
             wait_click_xpath(wait, time_w = 0.5, xpath = '//ul[@class = "el-scrollbar__view el-select-dropdown__list"]//li//span[contains(text(), "发展对象")]')
-            wait_click_xpath(wait, time_w = 0.5, xpath = '//span[contains(text(), "搜索")]')
+            wait_click_xpath(wait, time_w = 0.5, xpath = "//button[@class = 'el-button el-button--primary is-plain']//span[contains(text(), '查询')]")
 
 def switch_activist(wait):
     wait_click_xpath(wait, time_w = 0.5, xpath = '(//*[contains(text(), "人员信息")]/..)[1]')
@@ -136,7 +136,7 @@ def switch_activist(wait):
         except:
             wait_click_xpath(wait, time_w = 0.5, xpath = '(//input[@placeholder = "请选择"])[1]')
     wait_click_xpath(wait, time_w = 0.5, xpath = '//ul[@class = "el-scrollbar__view el-select-dropdown__list"]//li//span[contains(text(), "入党积极分子")]')
-    wait_click_xpath(wait, time_w = 0.5, xpath = '//span[contains(text(), "搜索")]')
+    wait_click_xpath(wait, time_w = 0.5, xpath = "//button[@class = 'el-button el-button--primary is-plain']//span[contains(text(), '查询')]")
     while 1:
         time.sleep(0.5)
         t = wait_return_subelement_absolute(wait, time_w=0.5, xpath='(//input[@placeholder = "请选择"])[1]')
@@ -154,7 +154,7 @@ def switch_activist(wait):
                 except:
                     wait_click_xpath(wait, time_w = 0.5, xpath = '(//input[@placeholder = "请选择"])[1]')
             wait_click_xpath(wait, time_w = 0.5, xpath = '//ul[@class = "el-scrollbar__view el-select-dropdown__list"]//li//span[contains(text(), "入党积极分子")]')
-            wait_click_xpath(wait, time_w = 0.5, xpath = '//span[contains(text(), "搜索")]')
+            wait_click_xpath(wait, time_w = 0.5, xpath = "//button[@class = 'el-button el-button--primary is-plain']//span[contains(text(), '查询')]")
 
 def switch_applicant(wait):
     wait_click_xpath(wait, time_w = 0.5, xpath = '(//*[contains(text(), "人员信息")]/..)[2]')
@@ -167,7 +167,7 @@ def switch_applicant(wait):
         except:
             wait_click_xpath(wait, time_w = 0.5, xpath = '(//input[@placeholder = "请选择"])[1]')
     wait_click_xpath(wait, time_w = 0.5, xpath = '//ul[@class = "el-scrollbar__view el-select-dropdown__list"]//li//span[contains(text(), "入党申请人")]')
-    wait_click_xpath(wait, time_w = 0.5, xpath = '//span[contains(text(), "搜索")]')
+    wait_click_xpath(wait, time_w = 0.5, xpath = "//button[@class = 'el-button el-button--primary is-plain']//span[contains(text(), '查询')]")
     while 1:
         time.sleep(0.5)
         t = wait_return_subelement_absolute(wait, time_w=0.5, xpath='(//input[@placeholder = "请选择"])[1]')
@@ -185,7 +185,7 @@ def switch_applicant(wait):
                 except:
                     wait_click_xpath(wait, time_w = 0.5, xpath = '(//input[@placeholder = "请选择"])[1]')
             wait_click_xpath(wait, time_w = 0.5, xpath = '//ul[@class = "el-scrollbar__view el-select-dropdown__list"]//li//span[contains(text(), "入党申请人")]')
-            wait_click_xpath(wait, time_w = 0.5, xpath = '//span[contains(text(), "搜索")]')
+            wait_click_xpath(wait, time_w = 0.5, xpath = "//button[@class = 'el-button el-button--primary is-plain']//span[contains(text(), '查询')]")
 
 
 def set_amount_perpage(wait):
