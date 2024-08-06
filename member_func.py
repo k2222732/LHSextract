@@ -72,7 +72,9 @@ def new_excel(wait, member_total_amount):
     excel_file_path = os.path.join(mem_directory, excel_file_name)
     if os.path.isfile(excel_file_path):
         member_excel = load_workbook(excel_file_path)
-        rebuild(excel_file_path, wait, member_total_amount, member_excel, excel_file_path)
+        wb = openpyxl.load_workbook(excel_file_path)
+        ws = wb.active
+        rebuild(excel_file_path, wait, member_total_amount, member_excel, excel_file_path, wb, ws)
     else:
         #在当前文件夹新建一个文件夹命名为"database"在里面新建一个文件夹名为"database_member"
         os.makedirs(mem_directory, exist_ok=True)
@@ -94,7 +96,7 @@ def new_excel(wait, member_total_amount):
 
         member_excel = load_workbook(excel_file_path)
         print(f"文件 '{excel_file_path}' 已成功创建。")
-        synchronizing(wait, member_total_amount, member_excel, excel_file_path)
+        synchronizing(wait, member_total_amount, member_excel, excel_file_path, wb, ws)
   
 
 def get_amountof_member(wait):
@@ -138,18 +140,15 @@ def access_info_page(wait, row):
     print(f"进入党员个人页面成功") 
 
 
-def rebuild(excel_file_path, wait, member_total_amount, member_excel, member_excel_path):
+def rebuild(excel_file_path, wait, member_total_amount, member_excel, member_excel_path, wb, ws):
     #先改变全局变量
-    init_complete_amount(excel_file_path)
-    synchronizing(wait, member_total_amount, member_excel, member_excel_path)
+    global amount_that_complete
+    amount_that_complete = init_complete_amount(excel_file_path)
+    synchronizing(wait, member_total_amount, member_excel, member_excel_path, wb, ws)
 
 
 
-
-
-
-
-def synchronizing(wait, member_total_amount, member_excel, member_excel_path):
+def synchronizing(wait, member_total_amount, member_excel, member_excel_path, wb, ws):
     global amount_that_complete
     while amount_that_complete < member_total_amount:
         page_number = int(amount_that_complete / 100 + 1)
@@ -163,7 +162,7 @@ def synchronizing(wait, member_total_amount, member_excel, member_excel_path):
         access_info_page(wait, row_number)
         while 1:
             try:
-                downloading(amount_that_complete, member_excel, wait, member_excel_path)
+                downloading(amount_that_complete, member_excel, wait, member_excel_path, wb, ws)
                 break
             except:
                 access_info_page(wait, row_number)
@@ -174,72 +173,86 @@ def synchronizing(wait, member_total_amount, member_excel, member_excel_path):
     
 
 
-def downloading(count, file, wait, path):
-    print("Current line number:", os.path.basename(__file__), inspect.currentframe().f_back.f_lineno)
+def downloading(count, file, wait, path, wb, ws):
     while 1:
             rylb = wait.until(EC.presence_of_element_located((By.XPATH, "(//div[@class = 'card-class']//div[@class = 'fs-tabs__content']//div[@class = 'row-val-shot'])[7]"))).text
             if rylb == '正式党员':
-                downloading_formal(count, file, wait, path)
+                downloading_formal(count, file, wait, path, wb, ws)
                 break
             elif rylb == '预备党员':
-                downloading_informal(count, file, wait, path)
+                downloading_informal(count, file, wait, path, wb, ws)
                 break
             else:
                 print('既不是正式党员也不是预备党员')
         
 
 
-def downloading_informal(count, file, wait, path):
+def downloading_informal(count, file, wait, path, wb, ws):
     count = count + 1
     countx = count + 1
     #填写序号
-    file.active.cell(row=countx, column=1).value = count
+    yi = count
+    ws.cell(row=countx, column = 1, value = yi)
     #file.save(path)
     #填写姓名
-    name_temp = wait.until(EC.presence_of_element_located((By.XPATH, "(//div[@class = 'card-class']//div[@class = 'fs-tabs__content']//div[@class = 'row-val-shot'])[1]"))).text
-    file.active.cell(row=countx, column=2).value = name_temp
+    er = wait.until(EC.presence_of_element_located((By.XPATH, "(//div[@class = 'card-class']//div[@class = 'fs-tabs__content']//div[@class = 'row-val-shot'])[1]"))).text
+    ws.cell(row=countx, column=2, value=er)
     #file.save(path)
     #性别
-    file.active.cell(row=countx, column=3).value = wait.until(EC.presence_of_element_located((By.XPATH, "(//div[@class = 'card-class']//div[@class = 'fs-tabs__content']//div[@class = 'row-val-shot'])[3]"))).text
+    san = wait.until(EC.presence_of_element_located((By.XPATH, "(//div[@class = 'card-class']//div[@class = 'fs-tabs__content']//div[@class = 'row-val-shot'])[3]"))).text
+    ws.cell(row=countx, column = 3, value = san)
     #file.save(path)
     #身份证
-    file.active.cell(row=countx, column=4).value = wait.until(EC.presence_of_element_located((By.XPATH, "(//div[@class = 'card-class']//div[@class = 'fs-tabs__content']//div[@class = 'row-val-shot'])[2]"))).text
+    si = wait.until(EC.presence_of_element_located((By.XPATH, "(//div[@class = 'card-class']//div[@class = 'fs-tabs__content']//div[@class = 'row-val-shot'])[2]"))).text
+    ws.cell(row=countx, column = 4, value = si)
     #file.save(path)
     #民族
-    file.active.cell(row=countx, column=5).value = wait.until(EC.presence_of_element_located((By.XPATH, "(//div[@class = 'card-class']//div[@class = 'fs-tabs__content']//div[@class = 'row-val-shot'])[4]"))).text
+    wu = wait.until(EC.presence_of_element_located((By.XPATH, "(//div[@class = 'card-class']//div[@class = 'fs-tabs__content']//div[@class = 'row-val-shot'])[4]"))).text
+    ws.cell(row=countx, column = 5, value = wu)
     #file.save(path)
     #出生日期
-    file.active.cell(row=countx, column=6).value = wait.until(EC.presence_of_element_located((By.XPATH, "(//div[@class = 'card-class']//div[@class = 'fs-tabs__content']//div[@class = 'row-val-shot'])[5]"))).text
+    liu = wait.until(EC.presence_of_element_located((By.XPATH, "(//div[@class = 'card-class']//div[@class = 'fs-tabs__content']//div[@class = 'row-val-shot'])[5]"))).text
+    ws.cell(row=countx, column = 6, value = liu)
     #file.save(path)
     #学历
-    file.active.cell(row=countx, column=7).value = wait.until(EC.presence_of_element_located((By.XPATH, "(//div[@class = 'card-class']//div[@class = 'fs-tabs__content']//div[@class = 'row-val-shot'])[6]"))).text
+    qi = wait.until(EC.presence_of_element_located((By.XPATH, "(//div[@class = 'card-class']//div[@class = 'fs-tabs__content']//div[@class = 'row-val-shot'])[6]"))).text
+    ws.cell(row=countx, column = 7, value = qi)
     #file.save(path)
     #人员类别
-    file.active.cell(row=countx, column=8).value = wait.until(EC.presence_of_element_located((By.XPATH, "(//div[@class = 'card-class']//div[@class = 'fs-tabs__content']//div[@class = 'row-val-shot'])[7]"))).text
+    ba = wait.until(EC.presence_of_element_located((By.XPATH, "(//div[@class = 'card-class']//div[@class = 'fs-tabs__content']//div[@class = 'row-val-shot'])[7]"))).text
+    ws.cell(row=countx, column = 8, value = ba)
     #file.save(path)
     #学位
-    file.active.cell(row=countx, column=9).value = wait.until(EC.presence_of_element_located((By.XPATH, "(//div[@class = 'card-class']//div[@class = 'fs-tabs__content']//div[@class = 'row-val-shot'])[8]"))).text
+    jiu = wait.until(EC.presence_of_element_located((By.XPATH, "(//div[@class = 'card-class']//div[@class = 'fs-tabs__content']//div[@class = 'row-val-shot'])[8]"))).text
+    ws.cell(row=countx, column = 9, value = jiu)
     #file.save(path)
     #所在党支部
-    file.active.cell(row=countx, column=10).value = wait.until(EC.presence_of_element_located((By.XPATH, "//div[@class = 'card-class']//div[@class = 'row-vals-shot']"))).text
+    shi = wait.until(EC.presence_of_element_located((By.XPATH, "//div[@class = 'card-class']//div[@class = 'row-vals-shot']"))).text
+    ws.cell(row=countx, column = 10, value = shi)
     #file.save(path)
     #手机号码
-    file.active.cell(row=countx, column=11).value = wait.until(EC.presence_of_element_located((By.XPATH, "(//div[@class = 'card-class']//div[@class = 'fs-tabs__content']//div[@class = 'row-val-shot'])[9]"))).text
+    shiyi = wait.until(EC.presence_of_element_located((By.XPATH, "(//div[@class = 'card-class']//div[@class = 'fs-tabs__content']//div[@class = 'row-val-shot'])[9]"))).text
+    ws.cell(row=countx, column = 11, value = shiyi)
     #file.save(path)
     #入党日期
-    file.active.cell(row=countx, column=12).value = wait.until(EC.presence_of_element_located((By.XPATH, "(//div[@class = 'card-class']//div[@class = 'fs-tabs__content']//div[@class = 'row-val-shot'])[10]"))).text
+    shier = wait.until(EC.presence_of_element_located((By.XPATH, "(//div[@class = 'card-class']//div[@class = 'fs-tabs__content']//div[@class = 'row-val-shot'])[10]"))).text
+    ws.cell(row=countx, column = 12, value = shier)
     #file.save(path)
     #转正日期
-    file.active.cell(row=countx, column=13).value = '-'
+    shisan = '-'
+    ws.cell(row=countx, column = 13, value = shisan)
     #file.save(path)
     #党龄
-    file.active.cell(row=countx, column=14).value = '-'
+    shisi = '-'
+    ws.cell(row=countx, column = 14, value = shisi)
     #file.save(path)
     #党龄矫正值
-    file.active.cell(row=countx, column=15).value = '-'
+    shiwu = '-'
+    ws.cell(row=countx, column = 15, value = shiwu)
     #file.save(path)
     #新社会阶层类型
-    file.active.cell(row=countx, column=16).value = wait.until(EC.presence_of_element_located((By.XPATH, "(//div[@class = 'card-class']//div[@class = 'fs-tabs__content']//div[@class = 'row-val-big'])[2]"))).text
+    shiliu = wait.until(EC.presence_of_element_located((By.XPATH, "(//div[@class = 'card-class']//div[@class = 'fs-tabs__content']//div[@class = 'row-val-big'])[2]"))).text
+    ws.cell(row=countx, column = 16, value = shiliu)
     #file.save(path)
     #工作岗位
     temp_job = wait.until(EC.presence_of_element_located((By.XPATH, "(//div[contains(text(), '工作岗位')])[1]/following-sibling::div[@class = 'row-val-shot']"))).text
@@ -248,99 +261,125 @@ def downloading_informal(count, file, wait, path):
             temp_job = wait.until(EC.presence_of_element_located((By.XPATH, "(//div[contains(text(), '工作岗位')])[1]/following-sibling::div[@class = 'row-val-shot']"))).text
         else:
             break
-    file.active.cell(row=countx, column=17).value = temp_job
+    shiqi = temp_job
+    ws.cell(row=countx, column = 17, value = shiqi)
     #file.save(path)
     #从事专业技术职务
-    file.active.cell(row=countx, column=18).value = wait.until(EC.presence_of_element_located((By.XPATH, "(//div[contains(text(), '从事专业技术职务')])[1]/following-sibling::div[@class = 'row-val-shot']"))).text
+    shiba = wait.until(EC.presence_of_element_located((By.XPATH, "(//div[contains(text(), '从事专业技术职务')])[1]/following-sibling::div[@class = 'row-val-shot']"))).text
+    ws.cell(row=countx, column = 18, value = shiba)
     #file.save(path)
     #是否农民工
-    file.active.cell(row=countx, column=19).value = wait.until(EC.presence_of_element_located((By.XPATH, "(//div[contains(text(), '是否农民工')])[1]/following-sibling::div[@class = 'row-val-shot']"))).text
+    shijiu = wait.until(EC.presence_of_element_located((By.XPATH, "(//div[contains(text(), '是否农民工')])[1]/following-sibling::div[@class = 'row-val-shot']"))).text
+    ws.cell(row=countx, column = 19, value = shijiu)
     #file.save(path)
     #现居住地
-    file.active.cell(row=countx, column=20).value = wait.until(EC.presence_of_element_located((By.XPATH, "((//div[contains(text(), '现居住地')])[1]/following-sibling::div)[1]"))).text
+    ershi = wait.until(EC.presence_of_element_located((By.XPATH, "((//div[contains(text(), '现居住地')])[1]/following-sibling::div)[1]"))).text
+    ws.cell(row=countx, column = 20, value = ershi)
     #file.save(path)
     #户籍所在地
-    file.active.cell(row=countx, column=21).value = wait.until(EC.presence_of_element_located((By.XPATH, "((//div[contains(text(), '户籍所在地')])[1]/following-sibling::div)[1]"))).text
+    ershiyi = wait.until(EC.presence_of_element_located((By.XPATH, "((//div[contains(text(), '户籍所在地')])[1]/following-sibling::div)[1]"))).text
+    ws.cell(row=countx, column = 21, value = ershiyi)
     #file.save(path)
     #是否失联党员
-    file.active.cell(row=countx, column=22).value = wait.until(EC.presence_of_element_located((By.XPATH, "((//div[contains(text(), '是否失联党员')])[1]/following-sibling::div)[1]"))).text
+    ershier = wait.until(EC.presence_of_element_located((By.XPATH, "((//div[contains(text(), '是否失联党员')])[1]/following-sibling::div)[1]"))).text
+    ws.cell(row=countx, column = 22, value = ershier)
     #file.save(path)
     #是否流动党员
-    file.active.cell(row=countx, column=23).value = wait.until(EC.presence_of_element_located((By.XPATH, "((//div[contains(text(), '是否流动党员')])[1]/following-sibling::div)[1]"))).text
-    file.save(path)
+    ershisan = wait.until(EC.presence_of_element_located((By.XPATH, "((//div[contains(text(), '是否流动党员')])[1]/following-sibling::div)[1]"))).text
+    ws.cell(row=countx, column = 4, value = ershisan)
+    wb.save(path)
     #切换选项卡
     switch_card_joininfo = wait.until(EC.element_to_be_clickable((By.ID, "tab-enterInfo")))
     switch_card_joininfo.click()
     #入党类型
     wait.until(EC.text_to_be_present_in_element((By.XPATH, "(//div[@class = 'table-row'])[1]/div[@class = 'row-key'][1]"), '入党类型'))
-    file.active.cell(row=countx, column=24).value = wait.until(EC.presence_of_element_located((By.XPATH, "(//div[contains(text(), '入党类型')]/following-sibling::div)[1]"))).text
+    ershisi = wait.until(EC.presence_of_element_located((By.XPATH, "(//div[contains(text(), '入党类型')]/following-sibling::div)[1]"))).text
+    ws.cell(row=countx, column = 24, value = ershisi)
     #file.save(path)
     #转正情况
-    file.active.cell(row=countx, column=25).value = wait.until(EC.presence_of_element_located((By.XPATH, "(//div[contains(text(), '转正情况')]/following-sibling::div)[1]"))).text
+    ershiwu = wait.until(EC.presence_of_element_located((By.XPATH, "(//div[contains(text(), '转正情况')]/following-sibling::div)[1]"))).text
+    ws.cell(row=countx, column = 25, value = ershiwu)
     #file.save(path)
     #入党时所在党支部
-    file.active.cell(row=countx, column=26).value = wait.until(EC.presence_of_element_located((By.XPATH, "(//div[contains(text(), '入党时所在支部')]/following-sibling::div)[1]"))).text
+    ershiliu = wait.until(EC.presence_of_element_located((By.XPATH, "(//div[contains(text(), '入党时所在支部')]/following-sibling::div)[1]"))).text
+    ws.cell(row=countx, column = 26, value = ershiliu)
     #file.save(path)
     #延长预备期时间
-    file.active.cell(row=countx, column=27).value = wait.until(EC.presence_of_element_located((By.XPATH, "(//div[contains(text(), '延长预备期时间')]/following-sibling::div)[1]"))).text
-    file.save(path)
+    ershiqi = wait.until(EC.presence_of_element_located((By.XPATH, "(//div[contains(text(), '延长预备期时间')]/following-sibling::div)[1]"))).text
+    ws.cell(row=countx, column = 27, value = ershiqi)
+    wb.save(path)
     #debugging()
-    print("填写第",count,"名预备党员",name_temp,"信息成功") 
+    print("填写第",count,"名预备党员",er,"信息成功") 
     exit_member_card = wait.until(EC.element_to_be_clickable((By.XPATH, "(//button[@class = 'fs-button fs-button--default fs-button--small'])[2]")))
     exit_member_card.click()
 
 
-def downloading_formal(count, file, wait, path):
+def downloading_formal(count, file, wait, path, wb, ws):
     count = count + 1
     countx = count + 1
     #填写序号
-    file.active.cell(row=countx, column=1).value = count
+    yi = count
+    ws.cell(row=countx, column = 1, value = yi)
     #file.save(path)
     #填写姓名
-    name_temp = wait.until(EC.presence_of_element_located((By.XPATH, "(//div[@class = 'card-class']//div[@class = 'fs-tabs__content']//div[@class = 'row-val-shot'])[1]"))).text
-    file.active.cell(row=countx, column=2).value = name_temp
+    er = wait.until(EC.presence_of_element_located((By.XPATH, "(//div[@class = 'card-class']//div[@class = 'fs-tabs__content']//div[@class = 'row-val-shot'])[1]"))).text
+    ws.cell(row=countx, column = 2, value = er)
     #file.save(path)
     #性别
-    file.active.cell(row=countx, column=3).value = wait.until(EC.presence_of_element_located((By.XPATH, "(//div[@class = 'card-class']//div[@class = 'fs-tabs__content']//div[@class = 'row-val-shot'])[3]"))).text
+    san = wait.until(EC.presence_of_element_located((By.XPATH, "(//div[@class = 'card-class']//div[@class = 'fs-tabs__content']//div[@class = 'row-val-shot'])[3]"))).text
+    ws.cell(row=countx, column = 3, value = san)
     #file.save(path)
     #身份证
-    file.active.cell(row=countx, column=4).value = wait.until(EC.presence_of_element_located((By.XPATH, "(//div[@class = 'card-class']//div[@class = 'fs-tabs__content']//div[@class = 'row-val-shot'])[2]"))).text
+    si = wait.until(EC.presence_of_element_located((By.XPATH, "(//div[@class = 'card-class']//div[@class = 'fs-tabs__content']//div[@class = 'row-val-shot'])[2]"))).text
+    ws.cell(row=countx, column = 4, value = si)
     #file.save(path)
     #民族
-    file.active.cell(row=countx, column=5).value = wait.until(EC.presence_of_element_located((By.XPATH, "(//div[@class = 'card-class']//div[@class = 'fs-tabs__content']//div[@class = 'row-val-shot'])[4]"))).text
+    wu = wait.until(EC.presence_of_element_located((By.XPATH, "(//div[@class = 'card-class']//div[@class = 'fs-tabs__content']//div[@class = 'row-val-shot'])[4]"))).text
+    ws.cell(row=countx, column = 5, value = wu)
     #file.save(path)
     #出生日期
-    file.active.cell(row=countx, column=6).value = wait.until(EC.presence_of_element_located((By.XPATH, "(//div[@class = 'card-class']//div[@class = 'fs-tabs__content']//div[@class = 'row-val-shot'])[5]"))).text
+    liu = wait.until(EC.presence_of_element_located((By.XPATH, "(//div[@class = 'card-class']//div[@class = 'fs-tabs__content']//div[@class = 'row-val-shot'])[5]"))).text
+    ws.cell(row=countx, column = 6, value = liu)
     #file.save(path)
     #学历
-    file.active.cell(row=countx, column=7).value = wait.until(EC.presence_of_element_located((By.XPATH, "(//div[@class = 'card-class']//div[@class = 'fs-tabs__content']//div[@class = 'row-val-shot'])[6]"))).text
+    qi = wait.until(EC.presence_of_element_located((By.XPATH, "(//div[@class = 'card-class']//div[@class = 'fs-tabs__content']//div[@class = 'row-val-shot'])[6]"))).text
+    ws.cell(row=countx, column = 7, value = qi)
     #file.save(path)
     #人员类别
-    file.active.cell(row=countx, column=8).value = wait.until(EC.presence_of_element_located((By.XPATH, "(//div[@class = 'card-class']//div[@class = 'fs-tabs__content']//div[@class = 'row-val-shot'])[7]"))).text
+    ba = wait.until(EC.presence_of_element_located((By.XPATH, "(//div[@class = 'card-class']//div[@class = 'fs-tabs__content']//div[@class = 'row-val-shot'])[7]"))).text
+    ws.cell(row=countx, column = 8, value = ba)
     #file.save(path)
     #学位
-    file.active.cell(row=countx, column=9).value = wait.until(EC.presence_of_element_located((By.XPATH, "(//div[@class = 'card-class']//div[@class = 'fs-tabs__content']//div[@class = 'row-val-shot'])[8]"))).text
+    jiu = wait.until(EC.presence_of_element_located((By.XPATH, "(//div[@class = 'card-class']//div[@class = 'fs-tabs__content']//div[@class = 'row-val-shot'])[8]"))).text
+    ws.cell(row=countx, column = 9, value = jiu)
     #file.save(path)
     #所在党支部
-    file.active.cell(row=countx, column=10).value = wait.until(EC.presence_of_element_located((By.XPATH, "//div[@class = 'card-class']//div[@class = 'row-vals-shot']"))).text
+    shi = wait.until(EC.presence_of_element_located((By.XPATH, "//div[@class = 'card-class']//div[@class = 'row-vals-shot']"))).text
+    ws.cell(row=countx, column = 10, value = shi)
     #file.save(path)
     #手机号码
-    file.active.cell(row=countx, column=11).value = wait.until(EC.presence_of_element_located((By.XPATH, "(//div[@class = 'card-class']//div[@class = 'fs-tabs__content']//div[@class = 'row-val-shot'])[9]"))).text
+    shiyi = wait.until(EC.presence_of_element_located((By.XPATH, "(//div[@class = 'card-class']//div[@class = 'fs-tabs__content']//div[@class = 'row-val-shot'])[9]"))).text
+    ws.cell(row=countx, column = 11, value = shiyi)
     #file.save(path)
     #入党日期
-    file.active.cell(row=countx, column=12).value = wait.until(EC.presence_of_element_located((By.XPATH, "(//div[@class = 'card-class']//div[@class = 'fs-tabs__content']//div[@class = 'row-val-shot'])[10]"))).text
+    shier = wait.until(EC.presence_of_element_located((By.XPATH, "(//div[@class = 'card-class']//div[@class = 'fs-tabs__content']//div[@class = 'row-val-shot'])[10]"))).text
+    ws.cell(row=countx, column = 12, value = shier)
     #file.save(path)
     #转正日期
-    file.active.cell(row=countx, column=13).value = wait.until(EC.presence_of_element_located((By.XPATH, "(//div[@class = 'card-class']//div[@class = 'fs-tabs__content']//div[@class = 'row-val-big'])[1]"))).text
+    shisan = wait.until(EC.presence_of_element_located((By.XPATH, "(//div[@class = 'card-class']//div[@class = 'fs-tabs__content']//div[@class = 'row-val-big'])[1]"))).text
+    ws.cell(row=countx, column = 13, value = shisan)
     #file.save(path)
     #党龄
-    file.active.cell(row=countx, column=14).value = wait.until(EC.presence_of_element_located((By.XPATH, "(//div[@class = 'card-class']//div[@class = 'table-row'])[7]//div[2]"))).text
+    shisi = wait.until(EC.presence_of_element_located((By.XPATH, "(//div[@class = 'card-class']//div[@class = 'table-row'])[7]//div[2]"))).text
+    ws.cell(row=countx, column = 14, value = shisi)
     #file.save(path)
     #党龄矫正值
-    file.active.cell(row=countx, column=15).value = wait.until(EC.presence_of_element_located((By.XPATH, "(//div[@class = 'card-class']//div[@class = 'fs-tabs__content']//div[@class = 'row-val-big'])[2]"))).text
+    shiwu = wait.until(EC.presence_of_element_located((By.XPATH, "(//div[@class = 'card-class']//div[@class = 'fs-tabs__content']//div[@class = 'row-val-big'])[2]"))).text
+    ws.cell(row=countx, column = 15, value = shiwu)
     #file.save(path)
     #新社会阶层类型
-    file.active.cell(row=countx, column=16).value = wait.until(EC.presence_of_element_located((By.XPATH, "(//div[@class = 'card-class']//div[@class = 'fs-tabs__content']//div[@class = 'row-val-big'])[4]"))).text
+    shiliu = wait.until(EC.presence_of_element_located((By.XPATH, "(//div[@class = 'card-class']//div[@class = 'fs-tabs__content']//div[@class = 'row-val-big'])[4]"))).text
+    ws.cell(row=countx, column = 16, value = shiliu)
     #file.save(path)
     #工作岗位
     temp_job = wait.until(EC.presence_of_element_located((By.XPATH, "(//div[contains(text(), '工作岗位')])[1]/following-sibling::div[@class = 'row-val-shot']"))).text
@@ -349,44 +388,55 @@ def downloading_formal(count, file, wait, path):
             temp_job = wait.until(EC.presence_of_element_located((By.XPATH, "(//div[contains(text(), '工作岗位')])[1]/following-sibling::div[@class = 'row-val-shot']"))).text
         else:
             break
-    file.active.cell(row=countx, column=17).value = temp_job
+    shiqi = temp_job
+    ws.cell(row=countx, column = 27, value = shiqi)
     #file.save(path)
     #从事专业技术职务
-    file.active.cell(row=countx, column=18).value = wait.until(EC.presence_of_element_located((By.XPATH, "(//div[contains(text(), '从事专业技术职务')])[1]/following-sibling::div[@class = 'row-val-shot']"))).text
+    shiba = wait.until(EC.presence_of_element_located((By.XPATH, "(//div[contains(text(), '从事专业技术职务')])[1]/following-sibling::div[@class = 'row-val-shot']"))).text
+    ws.cell(row=countx, column = 18, value = shiba)
     #file.save(path)
     #是否农民工
-    file.active.cell(row=countx, column=19).value = wait.until(EC.presence_of_element_located((By.XPATH, "(//div[contains(text(), '是否农民工')])[1]/following-sibling::div[@class = 'row-val-shot']"))).text
+    shijiu = wait.until(EC.presence_of_element_located((By.XPATH, "(//div[contains(text(), '是否农民工')])[1]/following-sibling::div[@class = 'row-val-shot']"))).text
+    ws.cell(row=countx, column = 19, value = shijiu)
     #file.save(path)
     #现居住地
-    file.active.cell(row=countx, column=20).value = wait.until(EC.presence_of_element_located((By.XPATH, "((//div[contains(text(), '现居住地')])[1]/following-sibling::div)[1]"))).text
+    ershi = wait.until(EC.presence_of_element_located((By.XPATH, "((//div[contains(text(), '现居住地')])[1]/following-sibling::div)[1]"))).text
+    ws.cell(row=countx, column = 20, value = ershi)
     #file.save(path)
     #户籍所在地
-    file.active.cell(row=countx, column=21).value = wait.until(EC.presence_of_element_located((By.XPATH, "((//div[contains(text(), '户籍所在地')])[1]/following-sibling::div)[1]"))).text
+    ershiyi = wait.until(EC.presence_of_element_located((By.XPATH, "((//div[contains(text(), '户籍所在地')])[1]/following-sibling::div)[1]"))).text
+    ws.cell(row=countx, column = 21, value = ershiyi)
     #file.save(path)
     #是否失联党员
-    file.active.cell(row=countx, column=22).value = wait.until(EC.presence_of_element_located((By.XPATH, "((//div[contains(text(), '是否失联党员')])[1]/following-sibling::div)[1]"))).text
+    ershier = wait.until(EC.presence_of_element_located((By.XPATH, "((//div[contains(text(), '是否失联党员')])[1]/following-sibling::div)[1]"))).text
+    ws.cell(row=countx, column = 22, value = ershier)
     #file.save(path)
     #是否流动党员
-    file.active.cell(row=countx, column=23).value = wait.until(EC.presence_of_element_located((By.XPATH, "((//div[contains(text(), '是否流动党员')])[1]/following-sibling::div)[1]"))).text
-    file.save(path)
+    ershisan = wait.until(EC.presence_of_element_located((By.XPATH, "((//div[contains(text(), '是否流动党员')])[1]/following-sibling::div)[1]"))).text
+    ws.cell(row=countx, column = 23, value = ershisan)
+    wb.save(path)
     #切换选项卡
     switch_card_joininfo = wait.until(EC.element_to_be_clickable((By.ID, "tab-enterInfo")))
     switch_card_joininfo.click()
     #入党类型
     wait.until(EC.text_to_be_present_in_element((By.XPATH, "(//div[@class = 'table-row'])[1]/div[@class = 'row-key'][1]"), '入党类型'))
-    file.active.cell(row=countx, column=24).value = wait.until(EC.presence_of_element_located((By.XPATH, "(//div[contains(text(), '入党类型')]/following-sibling::div)[1]"))).text
+    ershisi = wait.until(EC.presence_of_element_located((By.XPATH, "(//div[contains(text(), '入党类型')]/following-sibling::div)[1]"))).text
+    ws.cell(row=countx, column = 24, value = ershisi)
     #file.save(path)
     #转正情况
-    file.active.cell(row=countx, column=25).value = wait.until(EC.presence_of_element_located((By.XPATH, "(//div[contains(text(), '转正情况')]/following-sibling::div)[1]"))).text
+    ershiwu = wait.until(EC.presence_of_element_located((By.XPATH, "(//div[contains(text(), '转正情况')]/following-sibling::div)[1]"))).text
+    ws.cell(row=countx, column = 25, value = ershiwu)
     #file.save(path)
     #入党时所在党支部
-    file.active.cell(row=countx, column=26).value = wait.until(EC.presence_of_element_located((By.XPATH, "(//div[contains(text(), '入党时所在支部')]/following-sibling::div)[1]"))).text
+    ershiliu = wait.until(EC.presence_of_element_located((By.XPATH, "(//div[contains(text(), '入党时所在支部')]/following-sibling::div)[1]"))).text
+    ws.cell(row=countx, column = 26, value = ershiliu)
     #file.save(path)
     #延长预备期时间
-    file.active.cell(row=countx, column=27).value = wait.until(EC.presence_of_element_located((By.XPATH, "(//div[contains(text(), '延长预备期时间')]/following-sibling::div)[1]"))).text
-    file.save(path)
+    ershiqi = wait.until(EC.presence_of_element_located((By.XPATH, "(//div[contains(text(), '延长预备期时间')]/following-sibling::div)[1]"))).text
+    ws.cell(row=countx, column = 27, value = ershiqi)
+    wb.save(path)
     #debugging()
-    print("填写第",count,"名党员",name_temp,"信息成功") 
+    print("填写第",count,"名党员",er,"信息成功") 
     exit_member_card = wait.until(EC.element_to_be_clickable((By.XPATH, "(//button[@class = 'fs-button fs-button--default fs-button--small'])[2]")))
     exit_member_card.click()
 
