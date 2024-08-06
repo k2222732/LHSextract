@@ -306,6 +306,8 @@ def synchronizing(wait, org_excel, org_excel_path, driver, ws, wb, node_amount):
             if span_element and 'expanded' in span_element.get('class'):
                 continue
             else:
+                scroll = wait_return_subelement_absolute(wait, 1, "//div[@class = 'tree_wrapper']")
+                driver.execute_script("arguments[0].scrollTop = arguments[0].scrollHeight", scroll)
                 arrow.click()         #！！！！！！！！！！！！！！！！！！！！！！！！！！！！
         target = wait_return_subelement_relative_v2(1, container, xpath=f".//span[contains(text(), '{current_node_text}')]/..")
         target.click()
@@ -704,8 +706,10 @@ def downloading(file, wait, driver, path, rebuild, ws, wb):
     # 采集班子成员信息
     table_council(name_temp, wait, driver)
 
-    right_arrow = wait_return_subelement_absolute(wait, 1, "//i[@class = 'fs-icon-arrow-right']")
-    right_arrow.click()
+    # right_arrow = wait_return_subelement_absolute_notmust(wait, 1, "//i[@class = 'fs-icon-arrow-right']", 3)
+    
+    # if right_arrow is not None:
+    #     right_arrow.click()
 
     # 切换选项卡到惩戒信息
     while 1:

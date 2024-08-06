@@ -102,6 +102,16 @@ def wait_return_subelement_absolute(wait, time_w, xpath):
             traceback.print_exc()
             time.sleep(time_w)
 
+def wait_return_subelement_absolute_v1(wait, time_w, xpath):
+    while(1):
+        try:
+            target_element = wait.until(EC.element_to_be_clickable((By.XPATH, xpath)))
+            return target_element
+        except:
+            traceback.print_exc()
+            time.sleep(time_w)
+
+
 
 #返回对象文本（绝对）
 def wait_return_element_text(wait, time_w, xpath):
