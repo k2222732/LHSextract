@@ -70,9 +70,20 @@ def switch_role(wait, driver):
             config = configparser.ConfigParser()
             config.read(config_file)
             role_name_dev = config.get('role_dev_name', 'name_role_dev', fallback='')
-            wait_click_xpath_action(driver, wait, time_w = 0.5, xpath = f'//li[contains(text(), "{role_name_dev}")]')
-            print(f"切换角色成功")
-            break
+            element = wait_return_subelement_absolute(wait, time_w = 0.5, xpath = f'//li[contains(text(), "{role_name_dev}")]')
+            html = element.get_attribute('outerHTML')
+            soup = BeautifulSoup(html, 'html.parser')
+            li = soup.find('li')
+            li_class = li.get('class')
+            sum = ''.join(li_class)
+
+            if 'el-dropdown-menu__item is-disabled red' in sum:
+                break
+            else:
+                element.click()
+                time.sleep(2)
+                print(f"切换角色成功")
+                break
         except:
             time.sleep(2)
 

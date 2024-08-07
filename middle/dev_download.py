@@ -15,11 +15,9 @@ from base.waitclick import *
 from base.write_entry import *
 
 def jibenxinxi_download(file, path, wait, countx, count, wb, ws):
-    
     #填写序号
     yi = count
     ws.cell(row = countx, column = 1, value =yi)
-    
     #姓名
     name_temp = wait.until(EC.visibility_of_element_located((By.XPATH, "(//tbody)[1]/tr[1]/td[2]/span"))).text
     er = name_temp
