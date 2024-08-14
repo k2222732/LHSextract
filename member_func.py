@@ -269,7 +269,7 @@ def downloading_informal(count, file, wait, path, wb, ws):
     ws.cell(row=countx, column = 18, value = shiba)
     #file.save(path)
     #是否农民工
-    shijiu = wait.until(EC.presence_of_element_located((By.XPATH, "(//div[contains(text(), '是否农民工')])[1]/following-sibling::div[@class = 'row-val-shot']"))).text
+    shijiu = wait.until(EC.presence_of_element_located((By.XPATH, "(//div[contains(text(), '是否农民工')])[1]/following-sibling::div[@class = 'row-val-big']"))).text
     ws.cell(row=countx, column = 19, value = shijiu)
     #file.save(path)
     #现居住地
@@ -286,8 +286,8 @@ def downloading_informal(count, file, wait, path, wb, ws):
     #file.save(path)
     #是否流动党员
     ershisan = wait.until(EC.presence_of_element_located((By.XPATH, "((//div[contains(text(), '是否流动党员')])[1]/following-sibling::div)[1]"))).text
-    ws.cell(row=countx, column = 4, value = ershisan)
-    wb.save(path)
+    ws.cell(row=countx, column = 23, value = ershisan)
+    
     #切换选项卡
     switch_card_joininfo = wait.until(EC.element_to_be_clickable((By.ID, "tab-enterInfo")))
     switch_card_joininfo.click()
@@ -307,7 +307,8 @@ def downloading_informal(count, file, wait, path, wb, ws):
     #延长预备期时间
     ershiqi = wait.until(EC.presence_of_element_located((By.XPATH, "(//div[contains(text(), '延长预备期时间')]/following-sibling::div)[1]"))).text
     ws.cell(row=countx, column = 27, value = ershiqi)
-    wb.save(path)
+    if count%100 == 0:
+        wb.save(path)
     #debugging()
     print("填写第",count,"名预备党员",er,"信息成功") 
     exit_member_card = wait.until(EC.element_to_be_clickable((By.XPATH, "(//button[@class = 'fs-button fs-button--default fs-button--small'])[2]")))
@@ -396,7 +397,7 @@ def downloading_formal(count, file, wait, path, wb, ws):
     ws.cell(row=countx, column = 18, value = shiba)
     #file.save(path)
     #是否农民工
-    shijiu = wait.until(EC.presence_of_element_located((By.XPATH, "(//div[contains(text(), '是否农民工')])[1]/following-sibling::div[@class = 'row-val-shot']"))).text
+    shijiu = wait.until(EC.presence_of_element_located((By.XPATH, "(//div[contains(text(), '是否农民工')])[1]/following-sibling::div"))).text
     ws.cell(row=countx, column = 19, value = shijiu)
     #file.save(path)
     #现居住地
@@ -414,7 +415,7 @@ def downloading_formal(count, file, wait, path, wb, ws):
     #是否流动党员
     ershisan = wait.until(EC.presence_of_element_located((By.XPATH, "((//div[contains(text(), '是否流动党员')])[1]/following-sibling::div)[1]"))).text
     ws.cell(row=countx, column = 23, value = ershisan)
-    wb.save(path)
+    
     #切换选项卡
     switch_card_joininfo = wait.until(EC.element_to_be_clickable((By.ID, "tab-enterInfo")))
     switch_card_joininfo.click()
@@ -434,7 +435,8 @@ def downloading_formal(count, file, wait, path, wb, ws):
     #延长预备期时间
     ershiqi = wait.until(EC.presence_of_element_located((By.XPATH, "(//div[contains(text(), '延长预备期时间')]/following-sibling::div)[1]"))).text
     ws.cell(row=countx, column = 27, value = ershiqi)
-    wb.save(path)
+    if count%100 == 0:
+        wb.save(path)
     #debugging()
     print("填写第",count,"名党员",er,"信息成功") 
     exit_member_card = wait.until(EC.element_to_be_clickable((By.XPATH, "(//button[@class = 'fs-button fs-button--default fs-button--small'])[2]")))
