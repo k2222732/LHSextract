@@ -145,7 +145,7 @@ def rebuild(excel_file_path, wait, member_total_amount, member_excel, member_exc
     global amount_that_complete
     amount_that_complete = init_complete_amount(excel_file_path)
     synchronizing(wait, member_total_amount, member_excel, member_excel_path, wb, ws)
-
+    
 
 
 def synchronizing(wait, member_total_amount, member_excel, member_excel_path, wb, ws):
@@ -170,7 +170,7 @@ def synchronizing(wait, member_total_amount, member_excel, member_excel_path, wb
         ##在这里检查线程关闭信号
         if stop_event.is_set():
             break
-    
+    wb.save(member_excel_path)
 
 
 def downloading(count, file, wait, path, wb, ws):

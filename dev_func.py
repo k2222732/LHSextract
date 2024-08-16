@@ -75,7 +75,11 @@ def switch_role(wait, driver):
             soup = BeautifulSoup(html, 'html.parser')
             li = soup.find('li')
             li_class = li.get('class')
-            sum = ''.join(li_class)
+            sum = ''
+            for ele in li_class:
+                sum = sum + ele + ' '
+                
+            sum = sum[:-1]
 
             if 'el-dropdown-menu__item is-disabled red' in sum:
                 break
@@ -87,8 +91,35 @@ def switch_role(wait, driver):
         except:
             time.sleep(2)
 
+def switch_role_e(wait, driver):
+    while 1:
+        try:
+            wait_click_xpath(wait, time_w = 0.5, xpath = "//i[@class = 'el-icon-caret-bottom']")
+            print(f"进入角色下拉列表成功")
+            config_file = 'config.ini'
+            config = configparser.ConfigParser()
+            config.read(config_file)
+            role_name_dev = config.get('role_e_name', 'name_role_e', fallback='')
+            element = wait_return_subelement_absolute(wait, time_w = 0.5, xpath = f'//li[contains(text(), "{role_name_dev}")]')
+            html = element.get_attribute('outerHTML')
+            soup = BeautifulSoup(html, 'html.parser')
+            li = soup.find('li')
+            li_class = li.get('class')
+            sum = ''
+            for ele in li_class:
+                sum = sum + ele + ' '
+                
+            sum = sum[:-1]
 
-#切换到正式党员信息页面
+            if 'el-dropdown-menu__item is-disabled red' in sum:
+                break
+            else:
+                element.click()
+                time.sleep(2)
+                print(f"切换角色成功")
+                break
+        except:
+            time.sleep(2)
 
     
 
@@ -193,6 +224,7 @@ def rebuild(excel_file_path, wait, member_excel,wb,ws):
     global amount_activist_complete
     global amount_devtar_complete
     global amount_applicant_complete
+    global temp_countx
 
     switch_formal_mem(wait)
     mem_total_amount = get_total_amount(wait, xpath = "//span[@class = 'el-pagination__total']")  
@@ -211,6 +243,7 @@ def rebuild(excel_file_path, wait, member_excel,wb,ws):
     applicant_total_amount = get_total_amount(wait, xpath = "//span[@class = 'el-pagination__total']")
     #先改变全局变量
     a = init_complete_amount(excel_file_path)
+    temp_countx = a
     if a <= mem_total_amount:
         amount_mem_complete = a
         synchronizing(wait, member_excel, excel_file_path, control = 1,wb=wb,ws=ws)
@@ -302,7 +335,7 @@ def rebuild(excel_file_path, wait, member_excel,wb,ws):
 def init_complete_amount(excel_file_path):
     df = pd.read_excel(excel_file_path, sheet_name=0)
     row_count = count_non_empty_rows(excel_file_path, sheet_name=0)
-    amount_that_complete = row_count - 1
+    amount_that_complete = row_count - 3
     return amount_that_complete
 
 def count_non_empty_rows(excel_file_path, sheet_name=0):
@@ -350,7 +383,8 @@ def synchronizing(wait, member_excel, member_excel_path, control, wb, ws):
         schedule(complete = amount_activist_complete, total = activist_total_amount, xpath = "//input[@type = 'number']", wait = wait, member_excel = member_excel, member_excel_path = member_excel_path, control = control, wb=wb, ws=ws)
     elif control == 5:
         schedule(complete = amount_applicant_complete, total = applicant_total_amount, xpath = "//input[@type = 'number']", wait = wait, member_excel = member_excel, member_excel_path = member_excel_path, control = control, wb=wb, ws=ws)
-
+    
+    wb.save(member_excel_path)
 
 def get_total_amount(wait, xpath):
     time.sleep(1)
@@ -402,9 +436,14 @@ def schedule(complete, total, xpath, wait, member_excel, member_excel_path, cont
 
     set_amount_perpage(wait)
     page_number_old = 1
-    while complete < total:
-        page_number = int(complete / 100 + 1)
-        row_number = int(complete % 100 + 1)
+    while complete+1 <= total:
+        row_number = int((complete+1) % 100)
+        if row_number == 0:
+            page_number = int((complete + 1 )/ 100)
+            row_number = 100
+        else:
+            page_number = int((complete + 1)/ 100) + 1
+            row_number = int((complete + 1) % 100)
         #time.sleep(0.1)
         if page_number != page_number_old:
             input_page = wait.until(EC.visibility_of_element_located((By.XPATH, xpath)))
@@ -554,7 +593,6 @@ def downloading(file, wait, path, control, wb, ws):
             # 人员类型
             ershiqi = "入党申请人"
             ws.cell(row = countx, column = 27, value =ershiqi)
-            wb.save(path)
             print("填写第",count,"个入党申请人",name_temp,"信息成功") 
             amount_applicant_complete = amount_applicant_complete + 1
         else:
@@ -601,7 +639,6 @@ def downloading(file, wait, path, control, wb, ws):
             ershiqi = "入党申请人"
             ws.cell(row = countx, column = 27, value =ershiqi)
             print("填写第",count,"个入党申请人",name_temp,"信息成功") 
-            wb.save(path)
             amount_applicant_complete = amount_applicant_complete + 1
 
 

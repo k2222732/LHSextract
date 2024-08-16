@@ -26,8 +26,8 @@ def access_info_page(wait, rowx, file, path, temp_countx, wb, ws):
     lishudangzuzhi = wait_return_subelement_absolute(wait, time_w = 0.5, xpath = f"//table[@class = 'el-table__body']/tbody/tr[{rowx}]/td[4]//a").text
     #lishudangzuzhi = wait.until(EC.visibility_of_element_located((By.XPATH, f"//table[@class = 'el-table__body']/tbody/tr[{rowx}]/td[5]//a"))).text
     ws.cell(row=temp_countx+2, column=28, value = lishudangzuzhi)
-    wb.save(path)
-
+    if (temp_countx)%100 == 0:
+        wb.save(path)
     wait_click_xpath(wait, time_w = 0.5, xpath = f"//table[@class = 'el-table__body']/tbody/tr[{rowx}]/td[1]//a")
 
 

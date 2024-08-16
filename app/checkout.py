@@ -52,7 +52,7 @@ def main(arg):
     wait = WebDriverWait(driver, 2, 0.5)
     #获取全体支部名单
     dev_func.access_dev_database(driver, wait)
-    dev_func.switch_role(wait, driver)
+    dev_func.switch_role_e(wait, driver)
     commen_button(wait, driver, xpath="(//span[contains(text(), '人员信息')])[1]")
     #(//span[contains(text(), '人员信息')])[1]
     org_tree = TreeNode()
