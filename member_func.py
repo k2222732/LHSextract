@@ -142,6 +142,7 @@ def access_info_page(wait, row):
 
 def rebuild(excel_file_path, wait, member_total_amount, member_excel, member_excel_path, wb, ws):
     #先改变全局变量
+    #相比dev_func的rebuild，mem_func的rebuild不需要重写，也不用预先写
     global amount_that_complete
     amount_that_complete = init_complete_amount(excel_file_path)
     synchronizing(wait, member_total_amount, member_excel, member_excel_path, wb, ws)
