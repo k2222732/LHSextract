@@ -20,7 +20,7 @@ def jibenxinxi_download(file, path, wait, countx, count, wb, ws):
     
     ws.cell(row = countx, column = 1, value =yi)
     #姓名
-    name_temp = wait.until(EC.visibility_of_element_located((By.XPATH, "(//tbody)[1]/tr[1]/td[2]/span"))).text
+    name_temp = wait.until(EC.visibility_of_element_located((By.XPATH, "(//td[contains(text(), '姓名')]//following-sibling::td)[1]"))).text
     er = name_temp
     ws.cell(row = countx, column = 2, value =er)
     #循环断言
