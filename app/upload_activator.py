@@ -10,7 +10,7 @@ import base.write_entry as cursor
 from base.boot import synchronizing_org, synchronizing_job, synchronizing_xueli, synchronizing_jg
 from base.mystruct import TreeNode
 import time
-from base.solv_date import calculate_date_add
+from base.solv_date import *
 from selenium.webdriver.common.by import By
 from selenium.webdriver.common.action_chains import ActionChains
 import dev_func
@@ -66,10 +66,14 @@ def main():
         card7 =None
         wait_click_xpath(wait, time_w = 0.5, xpath = '(//*[contains(text(), "人员信息")]/..)')
         cursor.input_text(wait, driver, xpath="//input[@placeholder = '请输入姓名']", text=applicant_info[person]['姓名'])
-        cursor.input_text(wait, driver, xpath="//input[@placeholder = '请输入身份证号']", text=applicant_info[person]['公民身份证号码'])
+        time.sleep(2)
+        cursor.input_text(wait, driver, xpath="//input[@placeholder = '请输入姓名']", text=applicant_info[person]['姓名'])
+        cursor.input_text(wait, driver, xpath="//input[@placeholder = '请输入全量公民身份号码']", text=applicant_info[person]['公民身份证号码'])
+        time.sleep(2)
+        cursor.input_text(wait, driver, xpath="//input[@placeholder = '请输入全量公民身份号码']", text=applicant_info[person]['公民身份证号码'])
         wait_click_xpath(wait, time_w = 0.5, xpath = '(//input[@placeholder = "请选择"])[1]')
         wait_click_xpath(wait, time_w = 0.5, xpath = '//ul[@class = "el-scrollbar__view el-select-dropdown__list"]//li//span[contains(text(), "全部")]')
-        wait_click_xpath(wait, time_w = 0.5, xpath = '//span[contains(text(), "搜索")]')
+        wait_click_xpath(wait, time_w = 0.5, xpath = '(//span[contains(text(), "查询")])[3]')
         #number = dev_func.get_total_amount(wait, "//span[@class = 'el-pagination__total']")
         t = wait_return_subelement_absolute_notmust(wait, time_w= 0.5, xpath="//span[contains(text(), '暂无数据')]", times=3)
         if t == None:
@@ -93,7 +97,7 @@ def main():
             result_report.append(f"积极分子{applicant_info[person]['姓名']} {applicant_info[person]['公民身份证号码']}")
         else:
             #看这个人是如当申请人还是积极分子  //table[@class = 'el-table__body']//tr//td[8]
-            rylx = wait_return_subelement_absolute(wait, time_w=0.5, xpath="//table[@class = 'el-table__body']//tr//td[9]")
+            rylx = wait_return_subelement_absolute(wait, time_w=0.5, xpath="//table[@class = 'el-table__body']//tr//td[9]") #2024/8/21/11/07改
             rylx = rylx.get_attribute('textContent')
 
             #切换到发展流程
@@ -103,13 +107,21 @@ def main():
             if rylx == "入党申请人 ":
                 wait_click_xpath(wait, time_w=0.5, xpath="(//div[contains(text(), '申请入党')])[1]")
                 cursor.input_text(wait, driver, xpath="//input[@placeholder = '请输入姓名']", text=applicant_info[person]['姓名'])
+                time.sleep(2)
+                cursor.input_text(wait, driver, xpath="//input[@placeholder = '请输入姓名']", text=applicant_info[person]['姓名'])
+                cursor.input_text(wait, driver, xpath="//input[@placeholder = '请输入公民身份号码']", text=applicant_info[person]['公民身份证号码'])
+                time.sleep(2)
                 cursor.input_text(wait, driver, xpath="//input[@placeholder = '请输入公民身份号码']", text=applicant_info[person]['公民身份证号码'])
                 wait_click_xpath(wait, time_w = 0.5, xpath = '(//span[contains(text(), "查询")])[3]')
                 try:
-                    click_button_until_specifyxpath_appear_except(wait, driver, specifyxpath = "//span[contains(text(), '模板下载')]", buttonxpath = "//tbody[1]/tr[1]/td[2]//span", time_w=5, times=2)
+                    click_button_until_specifyxpath_appear_except(wait, driver, specifyxpath = "//span[contains(text(), '模板下载')]", buttonxpath = "//tbody[1]/tr[1]/td[2]//span", time_w=5, times=3)
                 except TimeoutException:
                     wait_click_xpath(wait, time_w=0.5, xpath="(//div[contains(text(), '入党积极分子')])[1]")
                     cursor.input_text(wait, driver, xpath="//input[@placeholder = '请输入姓名']", text=applicant_info[person]['姓名'])
+                    time.sleep(2)
+                    cursor.input_text(wait, driver, xpath="//input[@placeholder = '请输入姓名']", text=applicant_info[person]['姓名'])
+                    cursor.input_text(wait, driver, xpath="//input[@placeholder = '请输入公民身份号码']", text=applicant_info[person]['公民身份证号码'])
+                    time.sleep(2)
                     cursor.input_text(wait, driver, xpath="//input[@placeholder = '请输入公民身份号码']", text=applicant_info[person]['公民身份证号码'])
                     wait_click_xpath(wait, time_w = 0.5, xpath = '(//span[contains(text(), "查询")])[3]')
                     wait_click_xpath(wait, time_w=0.5, xpath="//tbody[1]/tr[1]/td[2]//span")
@@ -241,9 +253,16 @@ def main():
             elif rylx == "入党积极分子 ":
                 wait_click_xpath(wait, time_w=0.5, xpath="(//div[contains(text(), '入党积极分子')])[1]")
                 cursor.input_text(wait, driver, xpath="//input[@placeholder = '请输入姓名']", text=applicant_info[person]['姓名'])
+                time.sleep(2)
+                cursor.input_text(wait, driver, xpath="//input[@placeholder = '请输入姓名']", text=applicant_info[person]['姓名'])
+                
+                cursor.input_text(wait, driver, xpath="//input[@placeholder = '请输入公民身份号码']", text=applicant_info[person]['公民身份证号码'])
+                time.sleep(2)
                 cursor.input_text(wait, driver, xpath="//input[@placeholder = '请输入公民身份号码']", text=applicant_info[person]['公民身份证号码'])
                 wait_click_xpath(wait, time_w = 0.5, xpath = '(//span[contains(text(), "查询")])[3]')
-                click_button_until_specifyxpath_appear_except(wait, driver, specifyxpath = "//span[contains(text(), '模板下载')]", buttonxpath = "//tbody[1]/tr[1]/td[2]//span", time_w=5, times=2)
+                
+                
+                click_button_until_specifyxpath_appear_except(wait, driver, specifyxpath = "//span[contains(text(), '模板下载')]", buttonxpath = "//tbody[1]/tr[1]/td[2]//span", time_w=5, times=5)
                 #click_button_until_specifyxpath_appear(wait, driver, "//span[contains(text(), '模板下载')]", "//tbody[1]/tr[1]/td[2]//span")
             #输入身份证号查询
             #点击此人进入发展流程
@@ -464,6 +483,7 @@ def load_to_cache(mfilepath):
             rtrq = row['入团日期']
             cjgzrq = row['参加工作日期']
             sqrdrq = row['申请入党日期']
+            jjfzhyrq = row['积极分子会议日期']
             qdrdjjfzrq = row['确定入党积极分子日期']
             gzdwjzw = row['工作单位及职务']
             jtzz = row['家庭住址']
@@ -477,7 +497,7 @@ def load_to_cache(mfilepath):
             nested_dict = {'序号': xh, '姓名': xm, '性别':xb, '公民身份证号码':gmsfzhm,'民族':mz,
                                   '出生日期':csny, '学历':xl, '申请入党日期':sqrdrq, '手机号码':sjhm, 
                                   '工作岗位':gzgw, '政治面貌':zzmm, '接受申请党组织':jssqdzz, '籍贯':jg ,
-                                  '入团日期':rtrq, '参加工作日期':cjgzrq, '申请入党日期':sqrdrq, '确定入党积极分子日期':qdrdjjfzrq,
+                                  '入团日期':rtrq, '参加工作日期':cjgzrq,'积极分子会议日期':jjfzhyrq, '申请入党日期':sqrdrq, '确定入党积极分子日期':qdrdjjfzrq,
                                   '工作单位及职务':gzdwjzw, '家庭住址':jtzz, '培养联系人':pylxr, '确定积极分子的会议主持人':qdjjfzdhyzcr,'党支部书记':dzbsj,
                                   '积极分子会议的列席组织员':jjfzhydzzy, '一线情况': yxqk, '积极分子确定会议实到人数':jjfzqdhysdrs, '积极分子确定会议应到人数':jjfzqdhyydrs}
             data_dict[gmsfzhm]=nested_dict
@@ -665,7 +685,7 @@ def step_3(driver, wait, data_dict, gmsfzhm, jg):
     #1编辑#(//span[contains(text(), '编辑')])[1]
     cursor.commen_button(wait, driver, xpath="(//span[contains(text(), '编辑')])[1]")
     #党员推荐会议时间#(//input[@placeholder = '请选择日期'])[1]
-    cursor.input_text(wait, driver, xpath="(//input[@placeholder = '请选择日期'])[1]", text=calculate_date_add(data_dict[gmsfzhm]['申请入党日期'],190))
+    cursor.input_text(wait, driver, xpath="(//input[@placeholder = '请选择日期'])[1]", text=data_dict[gmsfzhm]['积极分子会议日期'])
     #上传双推会议纪录#(//input[@type="file"])[1]
     current_working_dir = os.getcwd()
     absolute_path = current_working_dir + f"\\材料图片保存处\\{data_dict[gmsfzhm]['姓名']}+{gmsfzhm}\\党员推荐会议记录"
@@ -676,7 +696,7 @@ def step_3(driver, wait, data_dict, gmsfzhm, jg):
     #2编辑#(//span[contains(text(), '编辑')])[3]
     cursor.commen_button(wait, driver, xpath="(//span[contains(text(), '编辑')])[3]")
     #时间#(//input[@placeholder = '请选择日期'])[1]
-    cursor.input_text(wait, driver, xpath="(//input[@placeholder = '请选择日期'])[1]", text=calculate_date_add(data_dict[gmsfzhm]['申请入党日期'],190))
+    cursor.input_text(wait, driver, xpath="(//input[@placeholder = '请选择日期'])[1]",  text=data_dict[gmsfzhm]['积极分子会议日期'])
     t = wait_return_subelement_absolute(wait, time_w = 0.5, xpath = "(//input[@placeholder = '请选择日期'])[1]")
     t.send_keys(Keys.RETURN)
     #地点#(//input[@placeholder = '请输入内容'])[1]
@@ -742,7 +762,7 @@ def step_3_rebuild(driver, wait, data_dict, gmsfzhm, jg):
     #编辑#(//span[contains(text(), '编辑')])[1]
     cursor.commen_button(wait, driver, xpath="(//span[contains(text(), '编辑')])[1]")
     #党员推荐会议时间#(//input[@placeholder = '请选择日期'])[1]
-    cursor.input_text(wait, driver, xpath="(//input[@placeholder = '请选择日期'])[1]", text=calculate_date_add(data_dict[gmsfzhm]['申请入党日期'],190))
+    cursor.input_text(wait, driver, xpath="(//input[@placeholder = '请选择日期'])[1]",  text=data_dict[gmsfzhm]['积极分子会议日期'])
     #上传双推会议纪录#(//input[@type="file"])[1]
     current_working_dir = os.getcwd()
     absolute_path = current_working_dir + f"\\材料图片保存处\\{data_dict[gmsfzhm]['姓名']}+{gmsfzhm}\\党员推荐会议记录"
@@ -753,7 +773,7 @@ def step_3_rebuild(driver, wait, data_dict, gmsfzhm, jg):
     #编辑#(//span[contains(text(), '编辑')])[3]
     cursor.commen_button(wait, driver, xpath="(//span[contains(text(), '编辑')])[3]")
     #时间#(//input[@placeholder = '请选择日期'])[1]
-    cursor.input_text(wait, driver, xpath="(//input[@placeholder = '请选择日期'])[1]", text=calculate_date_add(data_dict[gmsfzhm]['申请入党日期'],190))
+    cursor.input_text(wait, driver, xpath="(//input[@placeholder = '请选择日期'])[1]",  text=data_dict[gmsfzhm]['积极分子会议日期'])
     t = wait_return_subelement_absolute(wait, time_w = 0.5, xpath = "(//input[@placeholder = '请选择日期'])[1]")
     t.send_keys(Keys.RETURN)
     #地点#(//input[@placeholder = '请输入内容'])[1]

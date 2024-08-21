@@ -12,3 +12,12 @@ def calculate_date_add(date_in:str, days:int):
     return date_out
 
 
+def calculate_date_sub(date_in:str, days:int):
+
+    date_object = datetime.strptime(date_in._date_repr, "%Y-%m-%d")
+    
+    new_date_object = date_object - timedelta(days=days)
+    
+    date_out = new_date_object.strftime("%Y-%m-%d")
+    
+    return date_out
