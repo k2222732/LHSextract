@@ -99,7 +99,6 @@ def main():
             #看这个人是如当申请人还是积极分子  //table[@class = 'el-table__body']//tr//td[8]
             rylx = wait_return_subelement_absolute(wait, time_w=0.5, xpath="//table[@class = 'el-table__body']//tr//td[9]") #2024/8/21/11/07改
             rylx = rylx.get_attribute('textContent')
-
             #切换到发展流程
             ryxx = wait_return_subelement_absolute(wait, time_w=0.5, xpath="//span[contains(text(), '发展流程')]")
             ryxx.click()

@@ -30,9 +30,11 @@ from datetime import datetime
 from openpyxl import load_workbook
 import openpyxl
 import app.do_upload_dkt
-
+#保存上传了主题党日支部的列表
 ztdr = []
+#保存上传了大课堂支部的列表
 dkt = []
+#保存了全体支部的列表
 quanti = []
 kssj = '2024-04'#开始时间
 jssj = '2024-04'#结束时间
@@ -52,7 +54,7 @@ def main(arg):
     wait = WebDriverWait(driver, 2, 0.5)
     #获取全体支部名单
     dev_func.access_dev_database(driver, wait)
-    dev_func.switch_role_e(wait, driver)
+    dev_func.switch_role(wait, driver)
     commen_button(wait, driver, xpath="(//span[contains(text(), '人员信息')])[1]")
     #(//span[contains(text(), '人员信息')])[1]
     org_tree = TreeNode()
