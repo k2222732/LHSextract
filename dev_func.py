@@ -61,7 +61,7 @@ def access_dev_database(driver, wait):
         time.sleep(1)
 
 
-def switch_role(wait, driver):
+def switch_role_dev(wait, driver):
     while 1:
         try:
             wait_click_xpath(wait, time_w = 0.5, xpath = "//i[@class = 'el-icon-caret-bottom']")
