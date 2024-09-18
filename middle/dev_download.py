@@ -43,7 +43,7 @@ def jibenxinxi_download(file, path, wait, countx, count, wb, ws):
     wu = wait.until(EC.presence_of_element_located((By.XPATH, "(//td[contains(text(), '民族')]//following-sibling::td)[1]"))).text
     ws.cell(row = countx, column = 5, value =wu)
     #出生日期
-    liu = wait.until(EC.presence_of_element_located((By.XPATH, "(//td[contains(text(), '学历')]//following-sibling::td)[1]"))).text
+    liu = wait.until(EC.presence_of_element_located((By.XPATH, "(//td[contains(text(), '出生日期')]//following-sibling::td)[1]"))).text
     ws.cell(row = countx, column = 6, value =liu)
     #学历
     bitian_located(file, path, countx, column=7, wait = wait, str = "(//td[contains(text(), '学历')]//following-sibling::td)[1]", wb=wb, ws=ws)

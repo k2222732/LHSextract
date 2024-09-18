@@ -30,9 +30,11 @@ from datetime import datetime
 from openpyxl import load_workbook
 import openpyxl
 import app.do_upload_dkt
-
+#保存上传了主题党日支部的列表
 ztdr = []
+#保存上传了大课堂支部的列表
 dkt = []
+#保存了全体支部的列表
 quanti = []
 kssj = '2024-04'#开始时间
 jssj = '2024-04'#结束时间
