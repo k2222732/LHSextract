@@ -444,16 +444,16 @@ def downloading(file, wait, driver, path, rebuild, ws, wb):
     si = wait.until(EC.presence_of_element_located((By.XPATH, "//span[contains(text(), '党组织简称')]/../following-sibling::*/div[1]"))).text
     ws.cell(row=countx, column = 4, value=si) 
     #党内统计用党组织简称#
-    wu = wait.until(EC.presence_of_element_located((By.XPATH, "//label[contains(text(),  '党内统计用党组织简称')]/following-sibling::*/div[1]"))).text
+    wu = wait.until(EC.presence_of_element_located((By.XPATH, "(//span[contains(text(),  '党内统计用党组织简称')]/../following-sibling::div/div)[1]"))).text
     ws.cell(row=countx, column = 5, value=wu)
     #成立日期#
     liu = wait.until(EC.presence_of_element_located((By.XPATH, "//span[contains(text(),  '成立日期')]/../following-sibling::div/div[1]"))).text
     ws.cell(row=countx, column = 6, value=liu)
     #党组织编码#
-    qi = wait.until(EC.presence_of_element_located((By.XPATH, "//label[contains(text(),  '党组织编码')]/following-sibling::*/span"))).text
+    qi = wait.until(EC.presence_of_element_located((By.XPATH, "//span[contains(text(),  '党组织编码')]/../following-sibling::*/span"))).text
     ws.cell(row=countx, column = 7, value=qi)
     #党组织联系人#
-    ba = wait.until(EC.presence_of_element_located((By.XPATH, "//label[contains(text(),  '党组织联系人')]/following-sibling::*/div[1]"))).text
+    ba = wait.until(EC.presence_of_element_located((By.XPATH, "//span[contains(text(),  '党组织联系人')]/../following-sibling::*/div[1]"))).text
     ws.cell(row=countx, column = 8, value=ba)
     #联系电话#
     jiu = wait.until(EC.presence_of_element_located((By.XPATH, "//span[contains(text(), '联系电话')]/../following-sibling::*/div[1]"))).text
@@ -463,14 +463,14 @@ def downloading(file, wait, driver, path, rebuild, ws, wb):
     ws.cell(row=countx, column = 10, value=shi)
     #是否具有"审批预备党员权限"#
     if "委员会" in shi:
-        shiyi = wait.until(EC.presence_of_element_located((By.XPATH, "//label[contains(text(),  '审批预备党员权限')]/following-sibling::div/span"))).text
+        shiyi = wait.until(EC.presence_of_element_located((By.XPATH, "//span[contains(text(),  '审批预备党员权限')]/../following-sibling::div/span"))).text
         ws.cell(row=countx, column = 11, value=shiyi)
     elif "总支" in shi:
         ws.cell(row=countx, column = 11, value="-")
     else:
         ws.cell(row=countx, column = 11, value="-")
     #功能型党组织#
-    shier= wait.until(EC.presence_of_element_located((By.XPATH, "//label[contains(text(),  '功能型党组织')]/following-sibling::*/span"))).text
+    shier= wait.until(EC.presence_of_element_located((By.XPATH, "//span[contains(text(),  '功能型党组织')]/../following-sibling::*/span"))).text
     ws.cell(row=countx, column = 12, value=shier)
     #党组织所在单位情况#
     shisan = wait.until(EC.presence_of_element_located((By.XPATH, "//span[contains(text(), '党组织所在单位情况')]/../following-sibling::*/div[1]"))).text
@@ -482,10 +482,10 @@ def downloading(file, wait, driver, path, rebuild, ws, wb):
     shiwu = wait.until(EC.presence_of_element_located((By.XPATH, "//span[contains(text(),  '批准成立的上级党组织')]/../following-sibling::*/div[1]"))).text
     ws.cell(row=countx, column = 15, value=shiwu)
     #是否为新业态#
-    shiliu = wait.until(EC.presence_of_element_located((By.XPATH, "//label[contains(text(),  '是否为新业态')]/following-sibling::*/div[1]"))).text
+    shiliu = wait.until(EC.presence_of_element_located((By.XPATH, "//span[contains(text(),  '是否为新业态')]/../following-sibling::*/div[1]"))).text
     ws.cell(row=countx, column = 16, value=shiliu)
     #驻外情况#
-    shiqi = wait.until(EC.presence_of_element_located((By.XPATH, "//label[contains(text(),  '驻外情况')]/following-sibling::*/div[1]"))).text
+    shiqi = wait.until(EC.presence_of_element_located((By.XPATH, "//span[contains(text(),  '驻外情况')]/../following-sibling::*/div[1]"))).text
     ws.cell(row=countx, column = 17, value=shiqi)
     #党组织曾用名，这里需要用soup判断是否有这一条
     html0 = driver.find_element(By.XPATH, '//div[contains(text(), "党组织曾用名")]/../..')
