@@ -21,8 +21,9 @@ from base.validate import *
 from middle.dev_middle import *
 stop_event = threading.Event()
 #dev_func.py进入个人页面的操作
+
 def enter_person_infopage(wait, driver0, row_number, member_excel, member_excel_path, page_number, control, temp_countx, xpath, wb, ws):
-    #//li[@class = 'el-select-dropdown__item selected hover']//span
+    #首先要确保选人页面的人的人员类型全都是正确的
     value = ""
     if control == 1:
         value = "正式党员"
@@ -35,9 +36,12 @@ def enter_person_infopage(wait, driver0, row_number, member_excel, member_excel_
     elif control == 5:
         value = "入党申请人"
     while 1:
+        #判断当前页面的人员类型是否与给定的人员类型一致
         result =validate_list_content(wait, xpath, value=value)
+        #如果一致则直接进入个人信息页
         if result == True:
-            access_info_page(wait, row_number, file = member_excel, path = member_excel_path, temp_countx=temp_countx,wb=wb, ws=ws)
+            #这一步正式进入个人基本页面，并且所属党组织在这一步录入
+            yixianrudang = access_info_page(wait, row_number, file = member_excel, path = member_excel_path, temp_countx=temp_countx,wb=wb, ws=ws)
             try:
                 for handle in driver0.window_handles:
                     driver0.switch_to.window(handle)
@@ -47,6 +51,7 @@ def enter_person_infopage(wait, driver0, row_number, member_excel, member_excel_
                 time.sleep(0.3)
             print(f"进入入党申请人基本信息页面成功")
             break
+        #如果不一致则重选人员类型然后设置每页显示数和当前页面
         elif result == False:
             if value == "正式党员":
                 switch_formal_mem(wait)
@@ -65,5 +70,6 @@ def enter_person_infopage(wait, driver0, row_number, member_excel, member_excel_
             input_page.send_keys(page_number)
             input_page.send_keys(Keys.RETURN)
             time.sleep(0.5)
+    return yixianrudang
             
 

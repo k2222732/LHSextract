@@ -192,7 +192,7 @@ def new_excel(wait):
         if stop_event.is_set():
             return
         switch_devtarg(wait)
-        temp = wait.until(EC.presence_of_element_located((By.ID, "tabls")))
+        temp = wait.until(EC.presence_of_element_located((By.XPATH, "//div[@class = 'el-table person-table el-table--fit el-table--border el-table--enable-row-hover el-table--enable-row-transition']")))
         temp_html = temp.get_attribute("outerHTML")
         if "暂无数据" in temp_html:
             pass
@@ -231,7 +231,7 @@ def rebuild(excel_file_path, wait, member_excel,wb,ws):
     switch_informal_mem(wait)
     infomem_total_amount = get_total_amount(wait, xpath = "//span[@class = 'el-pagination__total']")
     switch_devtarg(wait)
-    temp = wait.until(EC.presence_of_element_located((By.ID, "tabls")))
+    temp = wait.until(EC.presence_of_element_located((By.XPATH, "//div[@class = 'el-table person-table el-table--fit el-table--border el-table--enable-row-hover el-table--enable-row-transition']")))
     temp_html = temp.get_attribute("outerHTML")
     if "暂无数据" in temp_html:
         devtar_total_amount = 0
@@ -244,6 +244,9 @@ def rebuild(excel_file_path, wait, member_excel,wb,ws):
     #先改变全局变量
     a = init_complete_amount(excel_file_path)
     temp_countx = a
+    if temp_countx <0:
+        print("请删除损坏的excel然后重新运行程序")
+        return
     if a <= mem_total_amount:
         amount_mem_complete = a
         synchronizing(wait, member_excel, excel_file_path, control = 1,wb=wb,ws=ws)
@@ -254,7 +257,7 @@ def rebuild(excel_file_path, wait, member_excel,wb,ws):
         if stop_event.is_set():
             return
         switch_devtarg(wait)
-        temp = wait.until(EC.presence_of_element_located((By.ID, "tabls")))
+        temp = wait.until(EC.presence_of_element_located((By.XPATH, "//div[@class = 'el-table person-table el-table--fit el-table--border el-table--enable-row-hover el-table--enable-row-transition']")))
         temp_html = temp.get_attribute("outerHTML")
         if "暂无数据" in temp_html:
             pass
@@ -278,7 +281,7 @@ def rebuild(excel_file_path, wait, member_excel,wb,ws):
         if stop_event.is_set():
             return
         switch_devtarg(wait)
-        temp = wait.until(EC.presence_of_element_located((By.ID, "tabls")))
+        temp = wait.until(EC.presence_of_element_located((By.XPATH, "//div[@class = 'el-table person-table el-table--fit el-table--border el-table--enable-row-hover el-table--enable-row-transition']")))
         temp_html = temp.get_attribute("outerHTML")
         if "暂无数据" in temp_html:
             pass
@@ -422,7 +425,7 @@ def schedule(complete, total, xpath, wait, member_excel, member_excel_path, cont
     global amount_devtar_complete
     global amount_applicant_complete
     global temp_countx
-
+    #根据控制信息切换人员类型
     if control == 1:
         switch_formal_mem(wait)
     elif control == 2:
@@ -433,18 +436,23 @@ def schedule(complete, total, xpath, wait, member_excel, member_excel_path, cont
         switch_activist(wait)
     elif control == 5:
         switch_applicant(wait)
-
+    #设置每一张页面显示个人信息的条数
     set_amount_perpage(wait)
+    #初始化初始页面为1
     page_number_old = 1
+    #检测总完成条目是否小于total
     while complete+1 <= total:
+        #检查即将录取的条目是否是100的整数
         row_number = int((complete+1) % 100)
+        #计算得到页码和行码
         if row_number == 0:
             page_number = int((complete + 1 )/ 100)
             row_number = 100
         else:
             page_number = int((complete + 1)/ 100) + 1
             row_number = int((complete + 1) % 100)
-        #time.sleep(0.1)
+        #time.sleep(0.1) 
+        #判断是否需要改变页码
         if page_number != page_number_old:
             input_page = wait.until(EC.visibility_of_element_located((By.XPATH, xpath)))
             input_page.send_keys(Keys.CONTROL + "a")
@@ -454,8 +462,11 @@ def schedule(complete, total, xpath, wait, member_excel, member_excel_path, cont
             time.sleep(1)
         else:
             pass
-        enter_person_infopage(wait, driver0, row_number, member_excel, member_excel_path, page_number, xpath="//li[@class = 'el-select-dropdown__item selected hover']//span", control = control, temp_countx = temp_countx, wb=wb, ws=ws)
-        downloading(file = member_excel, wait = wait, path = member_excel_path, control = control, wb=wb, ws=ws)
+        #进入个人页面函数
+        yixianrudang = enter_person_infopage(wait, driver0, row_number, member_excel, member_excel_path, page_number, xpath="//li[@class = 'el-select-dropdown__item selected hover']//span", control = control, temp_countx = temp_countx, wb=wb, ws=ws)
+        #逐条录入个人信息项到excel
+        downloading(file = member_excel, wait = wait, path = member_excel_path, control = control, wb=wb, ws=ws, yixianrudang = yixianrudang)
+        #录入完毕，重新回到选人页面
         driver0.close()
         try:
             for handle in driver0.window_handles:
@@ -464,11 +475,10 @@ def schedule(complete, total, xpath, wait, member_excel, member_excel_path, cont
                     break
         except:
             time.sleep(0.3)
-
-        ##在这里检查线程关闭信号
+        #在这里检查线程关闭信号
         if stop_event.is_set():
             break
-
+        #更新完成总数
         if control == 1:
             complete = amount_mem_complete
         elif control == 2:
@@ -479,7 +489,7 @@ def schedule(complete, total, xpath, wait, member_excel, member_excel_path, cont
             complete = amount_activist_complete
         elif control == 5:
             complete = amount_applicant_complete
-
+        #更新选人页面老页码
         page_number_old = page_number
 
 
@@ -498,7 +508,7 @@ def access_info_page(wait, rowx, file, path):
 
 
 
-def downloading(file, wait, path, control, wb, ws):
+def downloading(file, wait, path, control, wb, ws, yixianrudang = False):
     global driver0
     global amount_mem_complete
     global amount_infomem_complete
@@ -516,16 +526,25 @@ def downloading(file, wait, path, control, wb, ws):
         count = amount_devtar_complete + amount_activist_complete + amount_infomem_complete + amount_mem_complete
     elif control == 5:
         count = amount_applicant_complete + amount_devtar_complete + amount_activist_complete + amount_infomem_complete + amount_mem_complete
+        
 
     if control == 1:
-        count = count + 1
-        countx = count + 1
-        temp_countx = count
-        name_temp = jibenxinxi_download(file, path, wait, countx, count, wb, ws)
-        jijifenzi_download(path, file, wait, countx, control, wb, ws)
-        yubeidangyuan(path, file, wait, countx, control, wb, ws)
-        print("填写第",count,"个正式党员",name_temp,"信息成功") 
-        amount_mem_complete = amount_mem_complete + 1
+        if yixianrudang == False:
+            count = count + 1
+            countx = count + 1
+            temp_countx = count
+            name_temp = jibenxinxi_download(file, path, wait, countx, count, wb, ws)
+            jijifenzi_download(path, file, wait, countx, control, wb, ws)
+            yubeidangyuan(path, file, wait, countx, control, wb, ws)
+            print("填写第",count,"个正式党员",name_temp,"信息成功") 
+            amount_mem_complete = amount_mem_complete + 1
+        elif yixianrudang== True:
+            count = count + 1
+            countx = count + 1
+            temp_countx = count
+            name_temp = formal_yixian_download(file, path, wait, countx, count, wb, ws)
+            print("填写第",count,"个正式党员",name_temp,"信息成功") 
+            amount_mem_complete = amount_mem_complete + 1
 
 
 

@@ -56,13 +56,12 @@ def jibenxinxi_download(file, path, wait, countx, count, wb, ws):
     #背景信息
     bitian_located(file, path, countx, column=10, wait = wait, str = "(//td[contains(text(), '背景信息')]//following-sibling::td)[1]", wb=wb, ws=ws)
     #工作岗位
-    bitian_located(file, path, countx, column=11, wait = wait, str = "(//tbody)[1]/tr[4]/td[2]//span[1]", wb=wb, ws=ws)
+    bitian_located(file, path, countx, column=11, wait = wait, str = "(//td[contains(text(), '工作岗位')]//following-sibling::td)[1]", wb=wb, ws=ws)
     #政治面貌
-    bitian_located(file, path, countx, column=12, wait = wait, str = "(//tbody)[1]/tr[4]/td[4]//span[1]", wb=wb, ws=ws)
+    bitian_located(file, path, countx, column=12, wait = wait, str = "(//td[contains(text(), '政治面貌')]//following-sibling::td)[1]", wb=wb, ws=ws)
     #接受申请党组织
     shisan = wait_return_subelement_absolute(wait, time_w = 0.5, xpath="(//td[contains(text(), '接收入党申请的党组织')])[1]//following-sibling::td").get_attribute("textContent")
     ws.cell(row = countx, column = 13, value =shisan)
-   
     return name_temp
 
 
@@ -90,22 +89,23 @@ def jijifenzi_download(path, file, wait, countx, control, wb, ws):
         #         break
         #入团日期
         
-        shiwu = wait.until(EC.presence_of_element_located((By.XPATH, "((//tbody)[2]/tr[4]/td[4]//span)[1]"))).text
+        shiwu = wait.until(EC.presence_of_element_located((By.XPATH, "(//td[contains(text(), '入团日期')])[2]/following-sibling::td[1]"))).text
         ws.cell(row = countx, column = 15, value =shiwu)
         #参加工作日期
-        shiliu = wait.until(EC.presence_of_element_located((By.XPATH, "((//tbody)[2]/tr[4]/td[6]//span)[1]"))).text
+        shiliu = wait.until(EC.presence_of_element_located((By.XPATH, "(//td[contains(text(), '参加工作日期')])[2]/following-sibling::td[1]"))).text
         ws.cell(row = countx, column = 16, value =shiliu)
         #申请入党日期
-        shiqi = wait.until(EC.presence_of_element_located((By.XPATH, "((//tbody)[2]/tr[5]/td[2]//span)[1]"))).text
+        shiqi = wait.until(EC.presence_of_element_located((By.XPATH, "(//td[contains(text(), '递交入党申请书日期')])[2]/following-sibling::td[1]"))).text
         ws.cell(row = countx, column = 17, value =shiqi)
         #确定入党积极分子日期
-        shiba = wait.until(EC.presence_of_element_located((By.XPATH, "((//tbody)[2]/tr[5]/td[4]//span)[1]"))).text
+        shiba = wait.until(EC.presence_of_element_located((By.XPATH, "(//td[contains(text(), '确定入党积极分子日期')])[1]/following-sibling::td[1]"))).text
         ws.cell(row = countx, column = 18, value =shiba)
         #工作单位及职务
-        shijiu = wait.until(EC.presence_of_element_located((By.XPATH, "((//tbody)[2]/tr[6]/td[4]//span)[1]"))).text
+        shijiu = wait.until(EC.presence_of_element_located((By.XPATH, "(//td[contains(text(), '工作单位及职务')])[2]/following-sibling::td[1]//span"))).text
+        
         ws.cell(row = countx, column = 19, value =shijiu)
         #家庭住址
-        ershi = wait.until(EC.presence_of_element_located((By.XPATH, "((//tbody)[2]/tr[7]/td[2]//span)[1]"))).text
+        ershi = wait.until(EC.presence_of_element_located((By.XPATH, "(//td[contains(text(), '现居住地')])[2]/following-sibling::td[1]"))).text
         ws.cell(row = countx, column = 20, value =ershi)
         
         if control == 3 or 4:
@@ -159,7 +159,7 @@ def yubeidangyuan(path, file, wait, countx, control, wb, ws):
         ershiyi = wait_return_subelement_absolute(wait, time_w = 0.5, xpath="(//td[contains(text(), '加入党组织日期')])[1]//following-sibling::td[1]").get_attribute("textContent")
         ws.cell(row = countx, column = 21, value =ershiyi)
         # 转为正式党员日期
-        ershier = wait_return_subelement_absolute(wait, time_w = 0.5, xpath="(//td[contains(text(), '转为正式党员日期')])[1]//following-sibling::td[1]").get_attribute("textContent")
+        ershier = '-'#wait_return_subelement_absolute(wait, time_w = 0.5, xpath="(//td[contains(text(), '转为正式党员日期')])[1]//following-sibling::td[1]").get_attribute("textContent")
         ws.cell(row = countx, column = 22, value =ershier)
         # 人员类别
         ershisan = wait_return_subelement_absolute(wait, time_w = 0.5, xpath="(//td[contains(text(), '人员类别')])[1]//following-sibling::td[1]").get_attribute("textContent")
@@ -171,7 +171,7 @@ def yubeidangyuan(path, file, wait, countx, control, wb, ws):
         ershiwu = wait_return_subelement_absolute(wait, time_w = 0.5, xpath="(//td[contains(text(), '入党类型')])[1]//following-sibling::td[1]").get_attribute("textContent")
         ws.cell(row = countx, column = 25, value =ershiwu)
         # 所在党支部
-        ershiliu = wait_return_subelement_absolute(wait, time_w = 0.5, xpath="(//td[contains(text(), '所在党支部')])[1]//following-sibling::td[1]").get_attribute("textContent")
+        ershiliu = wait_return_subelement_absolute(wait, time_w = 0.5, xpath="(//td[contains(text(), '所属党组织')])[2]//following-sibling::td[1]").get_attribute("textContent")
         ws.cell(row = countx, column = 26, value =ershiliu)
         # 人员类型
         if control == 1:
@@ -181,7 +181,97 @@ def yubeidangyuan(path, file, wait, countx, control, wb, ws):
             ershiqi = "预备党员"
             ws.cell(row = countx, column = 27, value =ershiqi)
         
-        
+
+def formal_yixian_download(file, path, wait, countx, count, wb, ws):
+    #填写序号
+    yi = count
+    
+    ws.cell(row = countx, column = 1, value =yi)
+    #姓名
+    name_temp = wait.until(EC.visibility_of_element_located((By.XPATH, "(//td[contains(text(), '姓名')]//following-sibling::td)[1]"))).text
+    er = name_temp
+    ws.cell(row = countx, column = 2, value =er)
+    #循环断言
+    while(1):
+        try:
+            df = ws.cell(row=countx, column=2).value
+            assert df != ""
+            break
+        except AssertionError:
+            time.sleep(0.5)
+            er = wait.until(EC.presence_of_element_located((By.XPATH, "(//td[contains(text(), '姓名')]//following-sibling::td)[1]"))).text
+            ws.cell(row = countx, column = 2, value =er)
+    #性别
+    san = wait.until(EC.presence_of_element_located((By.XPATH, "(//td[contains(text(), '性别')]//following-sibling::td)[1]"))).text
+    ws.cell(row = countx, column = 3, value =san)
+    #公民身份证号码
+    si = wait.until(EC.presence_of_element_located((By.XPATH, "(//td[contains(text(), '公民身份')]//following-sibling::td)[1]"))).text
+    ws.cell(row = countx, column = 4, value =si)
+    #民族
+    wu = wait.until(EC.presence_of_element_located((By.XPATH, "(//td[contains(text(), '民族')]//following-sibling::td)[1]"))).text
+    ws.cell(row = countx, column = 5, value =wu)
+    #出生日期
+    liu = wait.until(EC.presence_of_element_located((By.XPATH, "(//td[contains(text(), '出生日期')]//following-sibling::td)[1]"))).text
+    ws.cell(row = countx, column = 6, value =liu)
+    #学历
+    bitian_located(file, path, countx, column=7, wait = wait, str = "(//td[contains(text(), '学历')]//following-sibling::td)[1]", wb=wb, ws=ws)
+    #申请入党日期
+    ba = wait.until(EC.presence_of_element_located((By.XPATH, "(//td[contains(text(), '入党申请书')]//following-sibling::td)[1]"))).text
+    ws.cell(row = countx, column = 8, value =ba)
+    #手机号码
+    jiu = wait.until(EC.presence_of_element_located((By.XPATH, "(//td[contains(text(), '联系')]//following-sibling::td)[1]"))).text
+    ws.cell(row = countx, column = 9, value =jiu)
+    #背景信息
+    bitian_located(file, path, countx, column=10, wait = wait, str = "(//td[contains(text(), '背景信息')]//following-sibling::td)[1]", wb=wb, ws=ws)
+    #工作岗位
+    bitian_located(file, path, countx, column=11, wait = wait, str = "(//td[contains(text(), '工作岗位')]//following-sibling::td)[1]", wb=wb, ws=ws)
+    #政治面貌
+    shier = '-'
+    ws.cell(row = countx, column = 12, value =shier)
+    #bitian_located(file, path, countx, column=12, wait = wait, str = "(//td[contains(text(), '政治面貌')]//following-sibling::td)[1]", wb=wb, ws=ws)
+    #接受申请党组织
+    shisan = '-'
+    ws.cell(row = countx, column = 13, value =shisan)
+    #入团日期
+    shiwu = wait.until(EC.presence_of_element_located((By.XPATH, "(//td[contains(text(), '入团日期')])/following-sibling::td[1]"))).text
+    ws.cell(row = countx, column = 15, value =shiwu)
+    #参加工作日期
+    shiliu = wait.until(EC.presence_of_element_located((By.XPATH, "(//td[contains(text(), '参加工作日期')])/following-sibling::td[1]"))).text
+    ws.cell(row = countx, column = 16, value =shiliu)
+    #申请入党日期
+    shiqi = wait.until(EC.presence_of_element_located((By.XPATH, "(//td[contains(text(), '递交入党申请书日期')])/following-sibling::td[1]"))).text
+    ws.cell(row = countx, column = 17, value =shiqi)
+    #确定入党积极分子日期
+    shiba = wait.until(EC.presence_of_element_located((By.XPATH, "(//td[contains(text(), '确定为入党积极分子日期')])[1]/following-sibling::td[1]"))).text
+    ws.cell(row = countx, column = 18, value =shiba)
+    #工作单位及职务
+    shijiu = wait.until(EC.presence_of_element_located((By.XPATH, "(//td[contains(text(), '工作单位及职务')])[1]/following-sibling::td[1]"))).text
+    ws.cell(row = countx, column = 19, value =shijiu)
+    #家庭住址
+    ershi = wait.until(EC.presence_of_element_located((By.XPATH, "(//td[contains(text(), '现居住地')])[1]/following-sibling::td[1]"))).text
+    ws.cell(row = countx, column = 20, value =ershi)
+    #加入党组织日期
+    ershiyi = wait.until(EC.presence_of_element_located((By.XPATH, "(//td[contains(text(), '加入党组织日期')])[1]/following-sibling::td[1]"))).text
+    ws.cell(row = countx, column = 21, value =ershiyi)
+    #转为正式党员日期
+    ershier = '-'
+    ws.cell(row = countx, column = 22, value =ershier)
+    #人员类别
+    ershisan = wait.until(EC.presence_of_element_located((By.XPATH, "(//td[contains(text(), '人员类别')])[1]/following-sibling::td[1]"))).text
+    ws.cell(row = countx, column = 23, value =ershisan)
+    #党籍状态
+    ershisi = wait.until(EC.presence_of_element_located((By.XPATH, "(//td[contains(text(), '党籍状态')])[1]/following-sibling::td[1]"))).text
+    ws.cell(row = countx, column = 24, value =ershisi)
+    #入党类型
+    ershiwu = wait.until(EC.presence_of_element_located((By.XPATH, "(//td[contains(text(), '入党类型')])[1]/following-sibling::td[1]"))).text
+    ws.cell(row = countx, column = 25, value =ershiwu)
+    #所在党支部
+    ershiliu = wait.until(EC.presence_of_element_located((By.XPATH, "(//td[contains(text(), '所属党组织')])[1]/following-sibling::td[1]"))).text
+    ws.cell(row=countx, column=26, value = ershiliu)
+    ershiqi = "正式党员"
+    ws.cell(row = countx, column = 27, value =ershiqi)
+    return name_temp
+
 
 def bitian_located(file, path, row, column, wait, str, wb, ws):
     z = wait_return_subelement_absolute(wait, time_w=0.5, xpath=str).text
