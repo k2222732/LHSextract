@@ -111,6 +111,15 @@ def wait_return_subelement_absolute_v1(wait, time_w, xpath):
             traceback.print_exc()
             time.sleep(time_w)
 
+#鲁棒返回对象（绝对）
+def wait_return_subelement_absolute_v2(wait, time_w, xpath):
+    while(1):
+        try:
+            target_element = wait.until(EC.visibility_of_element_located((By.XPATH, xpath)))
+            return target_element
+        except:
+            traceback.print_exc()
+            time.sleep(time_w)
 
 
 #返回对象文本（绝对）

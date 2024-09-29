@@ -17,7 +17,7 @@ def main():
     #设置一次性爬取的条目数
     member_func.set_amount_perpage(wait)
     #指定位置创建excel工作簿
-    member_func.new_excel(wait, member_total_amount)
+    member_func.new_excel(driver, wait, member_total_amount)
     member_func.stop_event.clear()
 
 if __name__ == "__main__":

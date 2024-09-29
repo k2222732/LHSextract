@@ -15,14 +15,12 @@ account = ""
 password = ""
 
 
-
 def main():
     global chrome_path
     global chromedriver_path
     global account
     global password
     global url
-
     config_file = 'config.ini'
     config = configparser.ConfigParser()
     config.read(config_file)
@@ -30,11 +28,11 @@ def main():
     chromedriver_path = config.get('Paths_driver', 'explore_driver_path', fallback='')
     account = config.get('Account', 'account', fallback='')
     password = config.get('Password', 'password', fallback='')
-
     driver = driver_create(chrome_path, chromedriver_path)
     wait = WebDriverWait(driver, 10, 0.5)
     login(account, password, driver, url, wait)
     input("按任意键退出")
+
 
 def _main():
     global chrome_path
@@ -112,26 +110,21 @@ def get_captcha():
     window = tk.Tk()
     window.title("请输入验证码")
     window.geometry("300x100")
-
     # 创建标签
     label = tk.Label(window, text="请输入验证码(不区分大小写):")
     label.pack()
-
     # 创建输入框
     entry = tk.Entry(window)
     entry.pack()
-
     # 定义获取输入值的函数
     def submit(event = None):
         global captcha
         captcha = entry.get()
         window.destroy()
- 
     entry.bind("<Return>", submit)
     # 创建按钮
     button = tk.Button(window, text="确定", command=submit)
     button.pack()
-
     # 运行窗口
     window.mainloop()
 

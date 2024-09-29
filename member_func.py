@@ -13,6 +13,7 @@ import threading
 from openpyxl import load_workbook
 import openpyxl
 from base.membase import *
+from base.waitclick import *
 stop_event = threading.Event()
 captcha = ""
 amount_that_complete = 0
@@ -62,7 +63,7 @@ def switch_role(wait):
             time.sleep(2)
 
 
-def new_excel(wait, member_total_amount):
+def new_excel(driver, wait, member_total_amount):
     global mem_directory
     config = configparser.ConfigParser()
     config.read('config.ini')
@@ -74,7 +75,7 @@ def new_excel(wait, member_total_amount):
         member_excel = load_workbook(excel_file_path)
         wb = openpyxl.load_workbook(excel_file_path)
         ws = wb.active
-        rebuild(excel_file_path, wait, member_total_amount, member_excel, excel_file_path, wb, ws)
+        rebuild(driver, excel_file_path, wait, member_total_amount, member_excel, excel_file_path, wb, ws)
     else:
         #在当前文件夹新建一个文件夹命名为"database"在里面新建一个文件夹名为"database_member"
         os.makedirs(mem_directory, exist_ok=True)
@@ -96,7 +97,7 @@ def new_excel(wait, member_total_amount):
 
         member_excel = load_workbook(excel_file_path)
         print(f"文件 '{excel_file_path}' 已成功创建。")
-        synchronizing(wait, member_total_amount, member_excel, excel_file_path, wb, ws)
+        synchronizing(driver, wait, member_total_amount, member_excel, excel_file_path, wb, ws)
   
 
 def get_amountof_member(wait):
@@ -119,10 +120,10 @@ def set_amount_perpage(wait):
 
 
 def access_info_page(wait, row):
-    xpath = f"(//table[@class='fs-table__body'])[3]/tbody/tr[{row}]/td[3]"
+    xpath = f"(//table[@class='fs-table__body'])[3]/tbody/tr[{row}]/td[3]//div[@role = 'button']"
     while 1:
         try:
-            member = wait.until(EC.element_to_be_clickable((By.XPATH, xpath)))
+            member = wait.until(EC.presence_of_element_located((By.XPATH, xpath)))
             break
         except:
             time.sleep(0.1)
@@ -133,23 +134,23 @@ def access_info_page(wait, row):
         except:
                 while 1:
                     try:
-                        member = wait.until(EC.element_to_be_clickable((By.XPATH, xpath)))
+                        member = wait.until(EC.presence_of_element_located((By.XPATH, xpath)))
                         break
                     except:
                         time.sleep(0.1)
     print(f"进入党员个人页面成功") 
 
 
-def rebuild(excel_file_path, wait, member_total_amount, member_excel, member_excel_path, wb, ws):
+def rebuild(driver, excel_file_path, wait, member_total_amount, member_excel, member_excel_path, wb, ws):
     #先改变全局变量
     #相比dev_func的rebuild，mem_func的rebuild不需要重写，也不用预先写
     global amount_that_complete
     amount_that_complete = init_complete_amount(excel_file_path)
-    synchronizing(wait, member_total_amount, member_excel, member_excel_path, wb, ws)
+    synchronizing(driver, wait, member_total_amount, member_excel, member_excel_path, wb, ws)
     
 
 
-def synchronizing(wait, member_total_amount, member_excel, member_excel_path, wb, ws):
+def synchronizing(driver, wait, member_total_amount, member_excel, member_excel_path, wb, ws):
     global amount_that_complete
     while amount_that_complete < member_total_amount:
         page_number = int(amount_that_complete / 100 + 1)
@@ -160,10 +161,14 @@ def synchronizing(wait, member_total_amount, member_excel, member_excel_path, wb
         input_page.send_keys(Keys.BACKSPACE)
         input_page.send_keys(page_number)
         input_page.send_keys(Keys.RETURN)
+        scroll = wait_return_subelement_absolute(wait, 1, "//div[@class = 'fs-table__body-wrapper is-scrolling-left']")
+        scroll_height = scroll.get_attribute('scrollHeight')
+        current_scroll = ((row_number%100)/100)*int(scroll_height)
         access_info_page(wait, row_number)
         while 1:
             try:
                 downloading(amount_that_complete, member_excel, wait, member_excel_path, wb, ws)
+                driver.execute_script("arguments[0].scrollTop = arguments[1]", scroll, current_scroll)
                 break
             except:
                 access_info_page(wait, row_number)
@@ -314,6 +319,7 @@ def downloading_informal(count, file, wait, path, wb, ws):
     print("填写第",count,"名预备党员",er,"信息成功") 
     exit_member_card = wait.until(EC.element_to_be_clickable((By.XPATH, "(//button[@class = 'fs-button fs-button--default fs-button--small'])[2]")))
     exit_member_card.click()
+    
 
 
 def downloading_formal(count, file, wait, path, wb, ws):
@@ -442,6 +448,5 @@ def downloading_formal(count, file, wait, path, wb, ws):
     print("填写第",count,"名党员",er,"信息成功") 
     exit_member_card = wait.until(EC.element_to_be_clickable((By.XPATH, "(//button[@class = 'fs-button fs-button--default fs-button--small'])[2]")))
     exit_member_card.click()
-
 
 

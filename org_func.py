@@ -177,7 +177,7 @@ def rebuild(driver, wait, excel_file_path, org_excel, ws, wb, excel_file_path_m)
         target.click()
         downloading(file = org_excel, wait = wait, driver = driver, path = excel_file_path, rebuild = True, ws=sheet0, wb=workbook)
         
-
+#在newexcel函数中执行init（）
 def init(driver, wait, org_directory):
     time.sleep(3)
     scroll = wait_return_subelement_absolute(wait, 1, "//div[@class = 'tree_wrapper']")
@@ -236,6 +236,7 @@ def new_excel(wait, driver):
         sheet = workbook.active
         rebuild(driver, wait, excel_file_path, org_excel,ws = sheet,wb=workbook, excel_file_path_m=excel_file_path_m)
     else:
+        
         node_amount = init(driver, wait, org_directory)
         if node_amount == False:
             return
@@ -248,7 +249,6 @@ def new_excel(wait, driver):
             "党组织曾用名", "单位名称（全称）", "UUID", "有无统一社会信用代码", "法人单位统一社会信用代码", "单位性质类别", 
             "法人单位标识", "建立党组情况", "法人单位建立党组织情况", "在岗职工人数", "企业控制（控股）情况", "企业规模", "单位所在目录", "单位隶属关系", "单位所在行政区划", "单位名称(全称)", "机构类型", "法人单位统一社会信用代码"
             , "新经济行业", "经济行业", "经济类型", "新经济类型", "成立日期", "注册地行政区划", "注册地址", "组织机构代码", "上级主管部门名称", "单位隶属关系"]
-
 
         wb = openpyxl.Workbook()
         ws = wb.active
@@ -752,13 +752,14 @@ def table_council(org_name: str, wait, driver):
     #将党组织的全称存放在单元格A1
     sheet['A1'] = org_name
     #设计党组织委员会信息表头
-    table_head = ["所属党支部", "党内职务", "姓名", "公民身份证号码", "性别", "出生日期", "学历", "领导职务", "任职日期", "离职日期", "排序", "公司职务"]
+    table_head = ["所属党支部", "党内职务", "姓名", "公民身份证号码", "性别", "出生日期", "学历", "领导职务", "任职日期", "离职日期", "排序", "单位职务"]
     for i, value in enumerate(table_head, start = 1):
         sheet.cell(row = 1, column = i, value = value)
     #读取表格容器保存在变量container里
+    book.save(excel_file_path)
     while(1):
         try:
-            tbody = wait_return_subelement_absolute(wait, 1, xpath="(//span[contains(text(), '班子信息集')]/../../../div[3]//tbody)[1]")
+            tbody = wait_return_subelement_absolute_v2(wait, 1, xpath="(//span[contains(text(), '班子信息集')]/../../../div[3]//tbody)[1]")
             # tbody = wait.until(EC.visibility_of_element_located((By.XPATH, "(//span[contains(text(), '班子信息集')]/../../../div[3]//tbody)[1]")))
                                                                            #(//div[@class = 'fs-table__fixed-body-wrapper'])[3]//tbody
                                                                            #//div[@class = 'fs-table fs-table--fit fs-table--border fs-table--enable-row-transition fs-table--mini']/div[@class = 'fs-table__body-wrapper is-scrolling-none']//tbody
@@ -795,7 +796,7 @@ def table_council(org_name: str, wait, driver):
     tr = soup.find_all('tr')
 
 
-    #从tr里提取数据保存在自单元格A3始向右的区域内
+    #从tr里提取数据保存在自单元格A2始向右的区域内
     for j, every_row in enumerate(tr, start = 1):
         # 从elm_tr里解析出td, 保存在td数组里
         col = every_row.find_all('td')     
@@ -842,23 +843,10 @@ def table_council(org_name: str, wait, driver):
         appointmentdate_content = appointmentdate.get_text(strip = True)
         sheet.cell(row = j+1, column = 9, value = appointmentdate_content)
 
-        #将离职日期填入第j+1行，第10列span
-        resignationdate = col[9].find_all('span')[-1]
-        resignationdate_content = resignationdate.get_text(strip = True)
-        sheet.cell(row = j+1, column = 10, value = resignationdate_content)
-
-        #将排序填入第j+1行，第11列div
-        sort = col[10].find_all('div')[-1]
-        sort_content = sort.get_text(strip = True)
-        sheet.cell(row = j+1, column = 11, value = sort_content)
-
-        #将公司职务填入第j+1行，第12列div
-        companyposition = col[11].find_all('div')[-1]
-        companyposition_content = companyposition.get_text(strip = True)
-        sheet.cell(row = j+1, column = 12, value = companyposition_content)
-        book.save(excel_file_path)
+        
 
     #释放资源
+    book.save(excel_file_path)
     book.close()
     
 
