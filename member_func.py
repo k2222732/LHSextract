@@ -123,7 +123,7 @@ def access_info_page(wait, row):
     xpath = f"(//table[@class='fs-table__body'])[3]/tbody/tr[{row}]/td[3]//div[@role = 'button']"
     while 1:
         try:
-            member = wait.until(EC.presence_of_element_located((By.XPATH, xpath)))
+            member = wait.until(EC.element_to_be_clickable((By.XPATH, xpath)))
             break
         except:
             time.sleep(0.1)
@@ -134,7 +134,7 @@ def access_info_page(wait, row):
         except:
                 while 1:
                     try:
-                        member = wait.until(EC.presence_of_element_located((By.XPATH, xpath)))
+                        member = wait.until(EC.element_to_be_clickable((By.XPATH, xpath)))
                         break
                     except:
                         time.sleep(0.1)
@@ -161,9 +161,14 @@ def synchronizing(driver, wait, member_total_amount, member_excel, member_excel_
         input_page.send_keys(Keys.BACKSPACE)
         input_page.send_keys(page_number)
         input_page.send_keys(Keys.RETURN)
-        scroll = wait_return_subelement_absolute(wait, 1, "//div[@class = 'fs-table__body-wrapper is-scrolling-left']")
+
+        scroll = wait_return_subelement_absolute_v2(wait, 1, "//div[@class = 'fs-table__body-wrapper is-scrolling-left' or @class = 'fs-table__body-wrapper is-scrolling-right']")
         scroll_height = scroll.get_attribute('scrollHeight')
-        current_scroll = ((row_number%100)/100)*int(scroll_height)
+        if member_total_amount - amount_that_complete < 100:
+            strip_num = member_total_amount % 100
+        else:
+            strip_num = 100
+        current_scroll = ((row_number%100)/strip_num)*int(scroll_height)
         access_info_page(wait, row_number)
         while 1:
             try:
@@ -263,7 +268,7 @@ def downloading_informal(count, file, wait, path, wb, ws):
     #工作岗位
     temp_job = wait.until(EC.presence_of_element_located((By.XPATH, "(//div[contains(text(), '工作岗位')])[1]/following-sibling::div[@class = 'row-val-shot']"))).text
     while 1:
-        if temp_job == None:
+        if temp_job == None or '':
             temp_job = wait.until(EC.presence_of_element_located((By.XPATH, "(//div[contains(text(), '工作岗位')])[1]/following-sibling::div[@class = 'row-val-shot']"))).text
         else:
             break
@@ -392,12 +397,12 @@ def downloading_formal(count, file, wait, path, wb, ws):
     #工作岗位
     temp_job = wait.until(EC.presence_of_element_located((By.XPATH, "(//div[contains(text(), '工作岗位')])[1]/following-sibling::div[@class = 'row-val-shot']"))).text
     while 1:
-        if temp_job == None:
+        if temp_job == None or '':
             temp_job = wait.until(EC.presence_of_element_located((By.XPATH, "(//div[contains(text(), '工作岗位')])[1]/following-sibling::div[@class = 'row-val-shot']"))).text
         else:
             break
     shiqi = temp_job
-    ws.cell(row=countx, column = 27, value = shiqi)
+    ws.cell(row=countx, column = 17, value = shiqi)
     #file.save(path)
     #从事专业技术职务
     shiba = wait.until(EC.presence_of_element_located((By.XPATH, "(//div[contains(text(), '从事专业技术职务')])[1]/following-sibling::div[@class = 'row-val-shot']"))).text
