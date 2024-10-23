@@ -164,7 +164,7 @@ def synchronizing(driver, wait, member_total_amount, member_excel, member_excel_
 
         scroll = wait_return_subelement_absolute_v2(wait, 1, "//div[@class = 'fs-table__body-wrapper is-scrolling-left' or @class = 'fs-table__body-wrapper is-scrolling-right']")
         scroll_height = scroll.get_attribute('scrollHeight')
-        if member_total_amount - amount_that_complete < 100:
+        if (member_total_amount - amount_that_complete < 100) and (amount_that_complete > member_total_amount - member_total_amount%100):
             strip_num = member_total_amount % 100
         else:
             strip_num = 100

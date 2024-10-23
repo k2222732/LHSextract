@@ -65,7 +65,7 @@ def main(args:list[str]):
     driver = login._main()
     wait = WebDriverWait(driver, 2, 0.5)
     dev_func.access_dev_database(driver, wait)
-    dev_func.switch_role(wait, driver)
+    dev_func.switch_role_dev(wait, driver)
     commen_button(wait, driver, xpath="(//span[contains(text(), '人员信息')])[1]")
     #(//span[contains(text(), '人员信息')])[1]
     org_tree = TreeNode()
@@ -97,8 +97,8 @@ def main(args:list[str]):
         commen_button(wait, driver, xpath="(//span[contains(text(), '记入电子日志')])[1]")
         #wait_click_xpath(wait, driver, xpath="(//input[@placeholder = '请选择字段项'])[8]")
         #//input[@placeholder = '请输入活动主题'] <--- hdzt 
+        time.sleep(3)
         input_text(wait, driver, xpath="//input[@placeholder = '请输入活动主题']", text=hdzt)
-        time.sleep(1)
         input_text(wait, driver, xpath="//input[@placeholder = '请输入活动主题']", text=hdzt)
         #//input[@class = 'vue-treeselect__input']    出现
         commen_button(wait, driver, xpath="//input[@class = 'vue-treeselect__input']")
@@ -131,7 +131,8 @@ def main(args:list[str]):
 
 
         #//input[@placeholder = '请输入主持人']  <--  (//div[@aria-label = 'checkbox-group'])[2]/label[1]
-        element_zcr = wait.until(EC.presence_of_element_located((By.XPATH, "(//div[@aria-label = 'checkbox-group'])[2]/label[1]")))
+        #element_zcr = wait.until(EC.presence_of_element_located((By.XPATH, "(//div[@aria-label = 'checkbox-group'])[2]/label[1]")))
+        element_zcr = wait_return_subelement_absolute(wait, time_w=0.5, xpath="(//div[@aria-label = 'checkbox-group'])[2]/label[1]")
         zcr = element_zcr.get_attribute('textContent')
         input_text(wait, driver, xpath="//input[@placeholder = '请输入主持人']", text=zcr)
         #//input[@placeholder = '请输入记录人']  <--  (//div[@aria-label = 'checkbox-group'])[2]/label[2]

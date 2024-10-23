@@ -79,15 +79,18 @@ def jijifenzi_download(path, file, wait, countx, control, wb, ws):
                 break
             except:
                 company_info = wait.until(EC.element_to_be_clickable((By.XPATH, "//div[contains(text(), '入党积极分子基本信息')]")))
-        # #籍贯
-        # while 1:
-        #     jiguan = wait.until(EC.presence_of_element_located((By.XPATH, "(//tbody)[2]/tr[3]/td[4]//span[1]"))).text
-        #     if jiguan == "":
-        #         pass
-        #     else:
-        #         file.active.cell(row=countx, column=14).value = jiguan
-        #         break
-        #入团日期
+        #籍贯
+        jiguan_try = 1
+        while 1:
+            
+            shisi = wait.until(EC.presence_of_element_located((By.XPATH, "((//table[@class = 'y_table w_td']//td[contains(text(),'籍贯')])[2]//following-sibling::td//span)[1]"))).text
+            if shisi == "" and jiguan_try < 5:
+                jiguan_try += 1
+                pass
+            else:
+                ws.cell(row = countx, column = 14, value =shisi)
+                break
+  
         
         shiwu = wait.until(EC.presence_of_element_located((By.XPATH, "(//td[contains(text(), '入团日期')])[2]/following-sibling::td[1]"))).text
         ws.cell(row = countx, column = 15, value =shiwu)
@@ -155,14 +158,22 @@ def yubeidangyuan(path, file, wait, countx, control, wb, ws):
             except:
                 company_info = wait.until(EC.element_to_be_clickable((By.XPATH, "//div[contains(text(), '预备党员')]")))
         # 加入党组织日期
-        
+        time.sleep(2)
         ershiyi = wait_return_subelement_absolute(wait, time_w = 0.5, xpath="(//td[contains(text(), '加入党组织日期')])[1]//following-sibling::td[1]").get_attribute("textContent")
         ws.cell(row = countx, column = 21, value =ershiyi)
         # 转为正式党员日期
         ershier = '-'#wait_return_subelement_absolute(wait, time_w = 0.5, xpath="(//td[contains(text(), '转为正式党员日期')])[1]//following-sibling::td[1]").get_attribute("textContent")
         ws.cell(row = countx, column = 22, value =ershier)
         # 人员类别
+
         ershisan = wait_return_subelement_absolute(wait, time_w = 0.5, xpath="(//td[contains(text(), '人员类别')])[1]//following-sibling::td[1]").get_attribute("textContent")
+        try_num = 1
+        while 1:
+            if ershisan != '' or try_num > 5:
+                ershisan = wait_return_subelement_absolute(wait, time_w = 0.5, xpath="(//td[contains(text(), '人员类别')])[1]//following-sibling::td[1]").get_attribute("textContent")
+                break
+            else:
+                try_num += 1
         ws.cell(row = countx, column = 23, value =ershisan)
         # 党籍状态
         ershisi = wait_return_subelement_absolute(wait, time_w = 0.5, xpath="(//td[contains(text(), '党籍状态')])[1]//following-sibling::td[1]").get_attribute("textContent")

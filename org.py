@@ -1,6 +1,7 @@
 import org_func
 from selenium.webdriver.support.ui import WebDriverWait
 import login
+from app.merge_xls import *
 
 
 def main():
@@ -13,6 +14,8 @@ def main():
     #指定位置创建excel工作簿
     org_func.new_excel(wait, driver)
     org_func.stop_event.clear()
+    merge()
+
 
 if __name__ == "__main__":
     main()

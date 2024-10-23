@@ -245,10 +245,10 @@ def new_excel(wait, driver):
         os.makedirs(org_directory, exist_ok=True)
         #设计党组织基本信息表头
         columns_base_info = ["序号","党组织全称", "组织树", "党组织简称", "党内统计用党组织简称", "成立日期", "党组织编码", "党组织联系人", "联系电话", "组织类别", 
-            '是否具有"审批预备党员权限"', "功能型党组织", "党组织所在单位情况", "党组织所在行政区划", "批准成立的上级党组织", "是否为新业态", "驻外情况", 
+            '是否具有"审批预备党员权限"', "功能型党组织", "党组织所在单位情况", "党组织关联单位属性", "批准成立的上级党组织", "是否为新业态", "驻外情况", 
             "党组织曾用名", "单位名称（全称）", "UUID", "有无统一社会信用代码", "法人单位统一社会信用代码", "单位性质类别", 
-            "法人单位标识", "建立党组情况", "法人单位建立党组织情况", "在岗职工人数", "企业控制（控股）情况", "企业规模", "单位所在目录", "单位隶属关系", "单位所在行政区划", "单位名称(全称)", "机构类型", "法人单位统一社会信用代码"
-            , "新经济行业", "经济行业", "经济类型", "新经济类型", "成立日期", "注册地行政区划", "注册地址", "组织机构代码", "上级主管部门名称", "单位隶属关系"]
+            "法人单位标识", "建立党组情况", "法人单位建立党组织情况", "在岗职工人数", "企业控制（控股）情况", "企业规模", "单位所在目录", "民营科技企业标识", "单位所在行政区划", "单位名称(全称)", "机构类型", "法人单位统一社会信用代码"
+            , "新经济行业", "经济行业", "经济类型", "新经济类型", "成立日期", "注册地行政区划", "注册地址", "组织机构代码", "上级主管部门名称", "党组织所属行业"]
 
         wb = openpyxl.Workbook()
         ws = wb.active
@@ -466,9 +466,9 @@ def downloading(file, wait, driver, path, rebuild, ws, wb):
         shiyi = wait.until(EC.presence_of_element_located((By.XPATH, "//span[contains(text(),  '审批预备党员权限')]/../following-sibling::div/span"))).text
         ws.cell(row=countx, column = 11, value=shiyi)
     elif "总支" in shi:
-        ws.cell(row=countx, column = 11, value="-")
+        ws.cell(row=countx, column = 11, value="否")
     else:
-        ws.cell(row=countx, column = 11, value="-")
+        ws.cell(row=countx, column = 11, value="否")
     #功能型党组织#
     shier= wait.until(EC.presence_of_element_located((By.XPATH, "//span[contains(text(),  '功能型党组织')]/../following-sibling::*/span"))).text
     ws.cell(row=countx, column = 12, value=shier)
@@ -476,7 +476,7 @@ def downloading(file, wait, driver, path, rebuild, ws, wb):
     shisan = wait.until(EC.presence_of_element_located((By.XPATH, "//span[contains(text(), '党组织所在单位情况')]/../following-sibling::*/div[1]"))).text
     ws.cell(row=countx, column = 13, value=shisan)
     #党组织所在行政区划#
-    shisi = wait.until(EC.presence_of_element_located((By.XPATH, "//span[contains(text(), '党组织所在行政区划')]/../following-sibling::*/div[1]"))).text
+    shisi = wait.until(EC.presence_of_element_located((By.XPATH, "//span[contains(text(), '党组织关联单位属性')]/../following-sibling::*/div[1]"))).text
     ws.cell(row=countx, column = 14, value=shisi)
     #批准成立的上级党组织#
     shiwu = wait.until(EC.presence_of_element_located((By.XPATH, "//span[contains(text(),  '批准成立的上级党组织')]/../following-sibling::*/div[1]"))).text
@@ -497,6 +497,12 @@ def downloading(file, wait, driver, path, rebuild, ws, wb):
         shiba = wait.until(EC.presence_of_element_located((By.XPATH, "//div[contains(text(),  '党组织曾用名')]/following-sibling::*//tbody/tr/td[2]/div/div"))).text
         ws.cell(row=countx, column = 18, value=shiba)
 
+
+    #党组织所属行业
+    sishiwu = wait.until(EC.presence_of_element_located((By.XPATH, "//span[contains(text(), '党组织所属行业')]/../following-sibling::div/div"))).text
+    ws.cell(row=countx, column = 45, value=sishiwu)
+
+
     #切换选项卡
     while(1):
         try:
@@ -515,7 +521,7 @@ def downloading(file, wait, driver, path, rebuild, ws, wb):
     shijiu = wait.until(EC.presence_of_element_located((By.XPATH, "//label[contains(text(), '单位名称（全称）')]/following-sibling::div"))).text
     ws.cell(row=countx, column = 19, value=shijiu)
     i_1 = 0
-    while(i_1 < 15):
+    while(i_1 < 5):
         try:
             df =  ws.cell(row=countx, column=19).value
             #print("df:",df)
@@ -526,6 +532,10 @@ def downloading(file, wait, driver, path, rebuild, ws, wb):
             shijiu = wait.until(EC.presence_of_element_located((By.XPATH, "//label[contains(text(), '单位名称（全称）')]/following-sibling::div"))).text
             ws.cell(row=countx, column = 19, value=shijiu)
             i_1 = i_1 + 1
+            if i_1 == 5:
+                shijiu = '缺项'
+                ws.cell(row=countx, column = 19, value=shijiu)
+                break
 
     #UUID#
     ershi = wait.until(EC.presence_of_element_located((By.XPATH, "//label[contains(text(), 'UUID')]/following-sibling::div"))).text
@@ -549,7 +559,7 @@ def downloading(file, wait, driver, path, rebuild, ws, wb):
         ershiwu = wait.until(EC.presence_of_element_located((By.XPATH, "//label[contains(text(), '建立党组情况')]/following-sibling::div"))).text
         ws.cell(row=countx, column = 25, value=ershiwu)
     else:
-        ershiwu = "-"
+        ershiwu = "缺项"
         ws.cell(row=countx, column = 25, value=ershiwu)
     #法人单位建立党组织情况!
     if '法人单位建立党组织情况' in temp_1_html:
@@ -560,44 +570,38 @@ def downloading(file, wait, driver, path, rebuild, ws, wb):
         ws.cell(row=countx, column = 26, value=ershiliu)
     #在岗职工数#
     #如果字符串org_type里面包含字眼"公司"则执行下面两行代码
-    if "公司" in org_type:
+    #if "公司" in org_type:
+    if "公司" in org_type or "企业" in org_type:
         ershiqi = wait.until(EC.presence_of_element_located((By.XPATH, "//label[contains(text(), '在岗职工数')]/following-sibling::div"))).text
         ws.cell(row=countx, column = 27, value=ershiqi)
-    #否则执行
+    
     else:
-        ershiqi = "-"
+        ershiqi = "缺项"
         ws.cell(row=countx, column = 27, value=ershiqi)
     #在企业控制（控股）情况
-    if "公司" in org_type:
+    if "公司" in org_type or "企业" in org_type:
         ershiba = wait.until(EC.presence_of_element_located((By.XPATH, "//label[contains(text(), '企业控制（控股）情况')]/following-sibling::div"))).text
         ws.cell(row=countx, column = 28, value=ershiba)
     else:
-        ershiba = "-"
+        ershiba = "缺项"
         ws.cell(row=countx, column = 28, value=ershiba)
     #企业规模
-    if "公司" in org_type:
+    if "公司" in org_type or "企业" in org_type:
         ershijiu = wait.until(EC.presence_of_element_located((By.XPATH, "//label[contains(text(), '企业规模')]/following-sibling::div"))).text
         ws.cell(row=countx, column = 29, value=ershijiu)
     else:
-        ershijiu = "-"
+        ershijiu = "缺项"
         ws.cell(row=countx, column = 29, value=ershijiu)
     #单位所在目录
     sanshi = wait.until(EC.presence_of_element_located((By.XPATH, "//label[contains(text(), '单位所在目录')]/following-sibling::div"))).text
     ws.cell(row=countx, column = 30, value=sanshi)
-    #如果单位性质类别位行政机关，则补充单位隶属关系
-    if "机关" in org_type:
-        sishiwu = wait.until(EC.presence_of_element_located((By.XPATH, "//label[contains(text(), '隶属关系')]/following-sibling::div/div/span"))).text
-        ws.cell(row=countx, column = 45, value=sishiwu)
-    else:
-        sishiwu = "-"
-        ws.cell(row=countx, column = 45, value=sishiwu)
 
     #民营科技企业标识
-    if "公司" in org_type:
+    if "公司" in org_type or "企业" in org_type:
         sanshiyi = wait.until(EC.presence_of_element_located((By.XPATH, "//label[contains(text(), '民营科技企业标识')]/following-sibling::div"))).text
         ws.cell(row=countx, column = 31, value=sanshiyi)
     else:
-        sanshiyi = "-"
+        sanshiyi = "缺项"
         ws.cell(row=countx, column = 31, value=sanshiyi)
     # 单位所在行政区划
     sanshier = wait.until(EC.presence_of_element_located((By.XPATH, "//label[contains(text(), '单位所在行政区划')]/following-sibling::div//input"))).text
@@ -653,40 +657,40 @@ def downloading(file, wait, driver, path, rebuild, ws, wb):
         wb.save(path)
 
     else:
-        sanshisan = "-"
+        sanshisan = "缺项"
         ws.cell(row=countx, column = 33, value=sanshisan)
         # 机构类型
-        sanshisi = "-"
+        sanshisi = "缺项"
         ws.cell(row=countx, column = 34, value=sanshisi)
         # 法人单位统一社会信用代码
-        sanshiwu = "-"
+        sanshiwu = "缺项"
         ws.cell(row=countx, column = 35, value=sanshiwu)
         # 新经济行业
-        sanshiliu = "-"
+        sanshiliu = "缺项"
         ws.cell(row=countx, column = 36, value=sanshiliu)
         # 经济行业
-        sanshiqi = "-"
+        sanshiqi = "缺项"
         ws.cell(row=countx, column = 37, value=sanshiqi)
         # 经济类型
-        sanshiba = "-"
+        sanshiba = "缺项"
         ws.cell(row=countx, column = 38, value=sanshiba)
         # 新经济类型
-        sanshijiu = "-"
+        sanshijiu = "缺项"
         ws.cell(row=countx, column = 39, value=sanshijiu)
         # 成立日期
-        sishi = "-"
+        sishi = "缺项"
         ws.cell(row=countx, column = 40, value=sishi)
         # 注册地行政区划
-        sishiyi = "-"
+        sishiyi = "缺项"
         ws.cell(row=countx, column = 41, value=sishiyi)
         # 注册地址
-        sishier = "-"
+        sishier = "缺项"
         ws.cell(row=countx, column = 42, value=sishier)
         # 组织机构代码
-        sishisan = "-"
+        sishisan = "缺项"
         ws.cell(row=countx, column = 43, value=sishisan)
         # 上级主管部门名称
-        sishisi = "-"
+        sishisi = "缺项"
         ws.cell(row=countx, column = 44, value=sishisi)
         wb.save(path)
     # 切换选项卡到班子成员
