@@ -81,9 +81,8 @@ def jijifenzi_download(path, file, wait, countx, control, wb, ws):
                 company_info = wait.until(EC.element_to_be_clickable((By.XPATH, "//div[contains(text(), '入党积极分子基本信息')]")))
         #籍贯
         jiguan_try = 1
-        while 1:
-            
-            shisi = wait.until(EC.presence_of_element_located((By.XPATH, "((//table[@class = 'y_table w_td']//td[contains(text(),'籍贯')])[2]//following-sibling::td//span)[1]"))).text
+        while 1:      
+            shisi = wait.until(EC.presence_of_element_located((By.XPATH, "(//table[@class = 'y_table form-table']//span[contains(text(),'籍贯')])[2]/../following-sibling::td"))).text
             if shisi == "" and jiguan_try < 5:
                 jiguan_try += 1
                 pass
@@ -92,19 +91,19 @@ def jijifenzi_download(path, file, wait, countx, control, wb, ws):
                 break
   
         
-        shiwu = wait.until(EC.presence_of_element_located((By.XPATH, "(//td[contains(text(), '入团日期')])[2]/following-sibling::td[1]"))).text
+        shiwu = wait.until(EC.presence_of_element_located((By.XPATH, "(//span[contains(text(), '入团日期')])[2]/../following-sibling::td"))).text
         ws.cell(row = countx, column = 15, value =shiwu)
         #参加工作日期
-        shiliu = wait.until(EC.presence_of_element_located((By.XPATH, "(//td[contains(text(), '参加工作日期')])[2]/following-sibling::td[1]"))).text
+        shiliu = wait.until(EC.presence_of_element_located((By.XPATH, "((//span[contains(text(), '参加工作日期')])[2]/../following-sibling::td)[1]"))).text
         ws.cell(row = countx, column = 16, value =shiliu)
         #申请入党日期
-        shiqi = wait.until(EC.presence_of_element_located((By.XPATH, "(//td[contains(text(), '递交入党申请书日期')])[2]/following-sibling::td[1]"))).text
+        shiqi = wait.until(EC.presence_of_element_located((By.XPATH, "(//td[contains(text(), '递交入党申请书日期')])[2]/following-sibling::td"))).text
         ws.cell(row = countx, column = 17, value =shiqi)
         #确定入党积极分子日期
-        shiba = wait.until(EC.presence_of_element_located((By.XPATH, "(//td[contains(text(), '确定入党积极分子日期')])[1]/following-sibling::td[1]"))).text
+        shiba = wait.until(EC.presence_of_element_located((By.XPATH, "(//span[contains(text(), '确定入党积极分子日期')])[1]/../following-sibling::td"))).text
         ws.cell(row = countx, column = 18, value =shiba)
         #工作单位及职务
-        shijiu = wait.until(EC.presence_of_element_located((By.XPATH, "(//td[contains(text(), '工作单位及职务')])[2]/following-sibling::td[1]//span"))).text
+        shijiu = wait.until(EC.presence_of_element_located((By.XPATH, "((//td[contains(text(), '工作单位及职务')])[2]//following-sibling::td)[1]"))).text
         
         ws.cell(row = countx, column = 19, value =shijiu)
         #家庭住址
@@ -182,7 +181,7 @@ def yubeidangyuan(path, file, wait, countx, control, wb, ws):
         ershiwu = wait_return_subelement_absolute(wait, time_w = 0.5, xpath="(//td[contains(text(), '入党类型')])[1]//following-sibling::td[1]").get_attribute("textContent")
         ws.cell(row = countx, column = 25, value =ershiwu)
         # 所在党支部
-        ershiliu = wait_return_subelement_absolute(wait, time_w = 0.5, xpath="(//td[contains(text(), '所属党组织')])[2]//following-sibling::td[1]").get_attribute("textContent")
+        ershiliu = '缺项'#wait_return_subelement_absolute(wait, time_w = 0.5, xpath="(//td[contains(text(), '所属党组织')])[2]//following-sibling::td[1]").get_attribute("textContent")
         ws.cell(row = countx, column = 26, value =ershiliu)
         # 人员类型
         if control == 1:

@@ -36,8 +36,8 @@ ztdr = []
 dkt = []
 #保存了全体支部的列表
 quanti = []
-kssj = '2024-04'#开始时间
-jssj = '2024-04'#结束时间
+kssj = '2024-10'#开始时间
+jssj = '2024-10'#结束时间
 
 def init(arg):
     global kssj
