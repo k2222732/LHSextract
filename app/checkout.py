@@ -99,24 +99,18 @@ def main(arg):
     # #同步主题党日支部
     commen_button(wait, driver, xpath="(//tbody[1]/tr[1]/td[2]//span)[1]")
     totalnum_ztdr = get_amountof_member(wait)
-    synchronizing_ztdr(wait, totalnum_ztdr)
+
+    synchronizing(access_info_page_ztdr, wait, totalnum_ztdr)
+
+    #synchronizing_ztdr(wait, totalnum_ztdr)
     commen_button(wait, driver, xpath="(//I[@class = 'fs-dialog__close fs-icon fs-icon-close'])[1]")
     #同步灯塔大课堂支部
     commen_button(wait, driver, xpath="(//tbody[1]/tr[1]/td[4]//span)[1]")
     totalnum_dkt = get_amountof_member(wait)
-    synchronizing_dkt(wait, totalnum_dkt)
+    #synchronizing_dkt(wait, totalnum_dkt)
+    synchronizing(access_info_page_dkt, wait, totalnum_dkt)
     commen_button(wait, driver, xpath="(//I[@class = 'fs-dialog__close fs-icon fs-icon-close'])[1]")
     
-
-    # mfilepath  = os.path.abspath(os.getcwd())+"\三会一课未上传"
-    # today_date = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
-    # excel_file_name = f"{today_date}三会一课未上传.xlsx"
-    # excel_file_path = os.path.join(mfilepath, excel_file_name)
-    # 通过链接得到绝对路径
-    # columns = ["未上传大课堂的企业","未上传主题党日的企业"]
-    # df = pd.DataFrame(columns=columns)
-    # df.to_excel(excel_file_path, index=False)
-    # member_excel = load_workbook(excel_file_path)
 
 
     difference_dkt = [item for item in quanti if item not in dkt]
@@ -155,7 +149,7 @@ def get_amountof_member(wait):
     return int(int_amountof_member)
 
 
-def synchronizing_ztdr(wait, member_total_amount):
+def synchronizing(func, wait, member_total_amount):
     amount_that_complete = 0
     page_number_used = 1
     while amount_that_complete < member_total_amount:
@@ -168,11 +162,15 @@ def synchronizing_ztdr(wait, member_total_amount):
         input_page.send_keys(page_number)
         input_page.send_keys(Keys.RETURN)
         if page_number - page_number_used != 0:
-            time.sleep(1)
-        access_info_page_ztdr(wait, row_number)
+            time.sleep(2)
+
+        func(wait, row_number)
+
         amount_that_complete = amount_that_complete + 1
         page_number_used = page_number
         ##在这里检查线程关闭信号
+
+
 
 def access_info_page_ztdr(wait, row_number):
     #f"(//table[@class = 'fs-table__body'])[2]//tbody/tr[{row_number}]/td[2]"
@@ -181,20 +179,7 @@ def access_info_page_ztdr(wait, row_number):
     element_name = element.get_attribute("textContent")
     ztdr.append(element_name)
     
-def synchronizing_dkt(wait, member_total_amount):
-    amount_that_complete = 0
-    while amount_that_complete < member_total_amount:
-        page_number = int(amount_that_complete / 30 + 1)
-        row_number = int(amount_that_complete % 30 + 1)
-        #time.sleep(0.1)
-        input_page = wait.until(EC.visibility_of_element_located((By.XPATH, "//div[@class = 'fs-input fs-input--small fs-pagination__editor is-in-pagination']/input")))
-        input_page.send_keys(Keys.CONTROL + "a")
-        input_page.send_keys(Keys.BACKSPACE)
-        input_page.send_keys(page_number)
-        input_page.send_keys(Keys.RETURN)
-        access_info_page_dkt(wait, row_number)
-        amount_that_complete = amount_that_complete + 1
-        ##在这里检查线程关闭信号
+
 
 def access_info_page_dkt(wait, row_number):
     #f"(//table[@class = 'fs-table__body'])[2]//tbody/tr[{row_number}]/td[2]"

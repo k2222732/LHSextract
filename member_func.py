@@ -14,6 +14,7 @@ from openpyxl import load_workbook
 import openpyxl
 from base.membase import *
 from base.waitclick import *
+from base.write_entry import *
 stop_event = threading.Event()
 captcha = ""
 amount_that_complete = 0
@@ -86,7 +87,7 @@ def new_excel(driver, wait, member_total_amount):
         columns = ["序号","姓名", "性别", "公民身份号码", "民族", "出生日期", "学历", "人员类别", "学位", 
             "所在党支部", "手机号码", "入党日期", "转正日期", "党龄", "党龄校正值", "新社会阶层类型", 
             "工作岗位", "从事专业技术职务", "是否农民工", "现居住地", "户籍所在地", "是否失联党员", 
-            "是否流动党员", "入党类型", "转正情况", "入党时所在支部", "延长预备期时间"]
+            "是否流动党员", "入党类型", "转正情况", "入党时所在支部", "延长预备期时间","党员所属行业"]
         
         wb = openpyxl.Workbook()
         ws = wb.active
@@ -130,6 +131,7 @@ def access_info_page(wait, row):
     while 1:
         try:
             member.click()
+            
             break
         except:
                 while 1:
@@ -169,14 +171,16 @@ def synchronizing(driver, wait, member_total_amount, member_excel, member_excel_
         else:
             strip_num = 100
         current_scroll = ((row_number%100)/strip_num)*int(scroll_height)
-        access_info_page(wait, row_number)
+        #access_info_page(wait, row_number)
+        click_button_until_specifyxpath_appear(wait, driver, specifyxpath = "//span[contains(text(), '党员详情')]", buttonxpath = f"(//table[@class='fs-table__body'])[3]/tbody/tr[{row_number}]/td[3]//div[@role = 'button']")
         while 1:
             try:
-                downloading(amount_that_complete, member_excel, wait, member_excel_path, wb, ws)
+                downloading(amount_that_complete, member_excel, wait, member_excel_path, wb, ws, driver)
                 driver.execute_script("arguments[0].scrollTop = arguments[1]", scroll, current_scroll)
                 break
             except:
-                access_info_page(wait, row_number)
+                #access_info_page(wait, row_number)
+                click_button_until_specifyxpath_appear(wait, driver, specifyxpath = "//span[contains(text(), '党员详情')]", buttonxpath = f"(//table[@class='fs-table__body'])[3]/tbody/tr[{row_number}]/td[3]//div[@role = 'button']")
         amount_that_complete = amount_that_complete + 1
         ##在这里检查线程关闭信号
         if stop_event.is_set():
@@ -184,21 +188,21 @@ def synchronizing(driver, wait, member_total_amount, member_excel, member_excel_
     wb.save(member_excel_path)
 
 
-def downloading(count, file, wait, path, wb, ws):
+def downloading(count, file, wait, path, wb, ws, driver):
     while 1:
             rylb = wait.until(EC.presence_of_element_located((By.XPATH, "(//div[@class = 'card-class']//div[@class = 'fs-tabs__content']//div[@class = 'row-val-shot'])[7]"))).text
             if rylb == '正式党员':
-                downloading_formal(count, file, wait, path, wb, ws)
+                downloading_formal(count, file, wait, path, wb, ws, driver)
                 break
             elif rylb == '预备党员':
-                downloading_informal(count, file, wait, path, wb, ws)
+                downloading_informal(count, file, wait, path, wb, ws, driver)
                 break
             else:
                 print('既不是正式党员也不是预备党员')
         
 
 
-def downloading_informal(count, file, wait, path, wb, ws):
+def downloading_informal(count, file, wait, path, wb, ws, driver):
     count = count + 1
     countx = count + 1
     #填写序号
@@ -298,6 +302,9 @@ def downloading_informal(count, file, wait, path, wb, ws):
     #是否流动党员
     ershisan = wait.until(EC.presence_of_element_located((By.XPATH, "((//div[contains(text(), '是否流动党员')])[1]/following-sibling::div)[1]"))).text
     ws.cell(row=countx, column = 23, value = ershisan)
+    #党员所属行业
+    ershiba = wait.until(EC.presence_of_element_located((By.XPATH, "((//div[contains(text(), '党员所属行业')])[1]/following-sibling::div)[1]"))).text
+    ws.cell(row=countx, column = 28, value = ershiba)
     
     #切换选项卡
     switch_card_joininfo = wait.until(EC.element_to_be_clickable((By.ID, "tab-enterInfo")))
@@ -318,16 +325,19 @@ def downloading_informal(count, file, wait, path, wb, ws):
     #延长预备期时间
     ershiqi = wait.until(EC.presence_of_element_located((By.XPATH, "(//div[contains(text(), '延长预备期时间')]/following-sibling::div)[1]"))).text
     ws.cell(row=countx, column = 27, value = ershiqi)
+    
+
     if count%100 == 0:
         wb.save(path)
     #debugging()
     print("填写第",count,"名预备党员",er,"信息成功") 
-    exit_member_card = wait.until(EC.element_to_be_clickable((By.XPATH, "(//button[@class = 'fs-button fs-button--default fs-button--small'])[2]")))
-    exit_member_card.click()
+    #exit_member_card = wait.until(EC.element_to_be_clickable((By.XPATH, "(//button[@class = 'fs-button fs-button--default fs-button--small'])[2]")))
+    #click_button_until_specifyxpath_disappear(wait, driver, "//button[@class = 'fs-button fs-button--default fs-button--small']/span[contains(text(), '返回')]", "//button[@class = 'fs-button fs-button--default fs-button--small']/span[contains(text(), '返回')]", time_w = 0.1, times = 1)
+    click_button_until_specifyxpath_appear(wait, driver, specifyxpath = "//button[@class ='fs-button btnMarginLeft12 fs-button--default fs-button--small']/span[contains(text(), '重置')]", buttonxpath = "//button[@class = 'fs-button fs-button--default fs-button--small']/span[contains(text(), '返回')]")
     
 
 
-def downloading_formal(count, file, wait, path, wb, ws):
+def downloading_formal(count, file, wait, path, wb, ws, driver):
     count = count + 1
     countx = count + 1
     #填写序号
@@ -427,6 +437,10 @@ def downloading_formal(count, file, wait, path, wb, ws):
     #是否流动党员
     ershisan = wait.until(EC.presence_of_element_located((By.XPATH, "((//div[contains(text(), '是否流动党员')])[1]/following-sibling::div)[1]"))).text
     ws.cell(row=countx, column = 23, value = ershisan)
+
+    #党员所属行业
+    ershiba = wait.until(EC.presence_of_element_located((By.XPATH, "((//div[contains(text(), '党员所属行业')])[1]/following-sibling::div)[1]"))).text
+    ws.cell(row=countx, column = 28, value = ershiba)
     
     #切换选项卡
     switch_card_joininfo = wait.until(EC.element_to_be_clickable((By.ID, "tab-enterInfo")))
@@ -451,7 +465,8 @@ def downloading_formal(count, file, wait, path, wb, ws):
         wb.save(path)
     #debugging()
     print("填写第",count,"名党员",er,"信息成功") 
-    exit_member_card = wait.until(EC.element_to_be_clickable((By.XPATH, "(//button[@class = 'fs-button fs-button--default fs-button--small'])[2]")))
-    exit_member_card.click()
-
+    # exit_member_card = wait.until(EC.element_to_be_clickable((By.XPATH, "(//button[@class = 'fs-button fs-button--default fs-button--small'])[2]")))
+    # exit_member_card.click()
+    #click_button_until_specifyxpath_disappear(wait, driver, "//button[@class = 'fs-button fs-button--default fs-button--small']/span[contains(text(), '返回')]", "//button[@class = 'fs-button fs-button--default fs-button--small']/span[contains(text(), '返回')]", time_w = 0.5, times = 5)
+    click_button_until_specifyxpath_appear(wait, driver, specifyxpath = "//button[@class ='fs-button btnMarginLeft12 fs-button--default fs-button--small']/span[contains(text(), '重置')]", buttonxpath = "//button[@class = 'fs-button fs-button--default fs-button--small']/span[contains(text(), '返回')]")
 

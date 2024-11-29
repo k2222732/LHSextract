@@ -31,7 +31,7 @@ def main():
     driver = login._main()
     wait = WebDriverWait(driver, 2, 0.5)
     dev_func.access_dev_database(driver, wait)
-    dev_func.switch_role(wait, driver)
+    dev_func.switch_role_dev(wait, driver)
     #载入党员信息表
     #mfilepath = conf.pick_config_param(configfilepath = '..\\config.ini', str_class = '', str_param = '')
     mfilepath = './/材料图片保存处'
@@ -166,14 +166,6 @@ def main():
                     card7 = card7b
 
 
-
-
-
-
-
-                
-
-
                 card1_html = card1.get_attribute('outerHTML')
                 soup1 = BeautifulSoup(card1_html, 'html.parser')
                 element1 = soup1.find(lambda tag: tag.name == "div" and "递交入党申请书" in tag.text)
@@ -286,7 +278,7 @@ def jijifenzi(wait, driver, org_tree, job_tree, education_tree, person, jg):
     card1d = wait_return_subelement_absolute_notmust_v1(driver, wait, time_w=0.5, xpath="(//div[contains(text(), '递交入党申请书')])", times=1) 
     card2d = wait_return_subelement_absolute_notmust_v1(driver, wait, time_w=0.5, xpath="(//div[contains(text(), '党组织派人谈话')])", times=1) 
     card3d = wait_return_subelement_absolute_notmust_v1(driver, wait, time_w=0.5, xpath="(//div[contains(text(), '推荐和确定入党积极分子')])", times=1) 
-    card4d = wait_return_element_two_xpath(driver, xpath1= "(//div[contains(text(), '入党积极分子公示和备案')])[1]", xpath2= "(//div[contains(text(), '入党积极分子公示和备案')])[31]", timewait = 1)
+    card4d = wait_return_element_two_xpath(driver, xpath1= "(//div[contains(text(), '入党积极分子公示和备案')])[2]", xpath2= "(//div[contains(text(), '入党积极分子公示和备案')])[31]", timewait = 1)
     card5d = wait_return_subelement_absolute_notmust_v1(driver, wait, time_w=0.5, xpath="(//div[contains(text(), '指定培养联系人')])", times=1) 
     card6d = wait_return_subelement_absolute_notmust_v1(driver, wait, time_w=0.5, xpath="(//div[contains(text(), '入党积极分子培养教育考察')])", times=1) 
     card7d = wait_return_subelement_absolute_notmust_v1(driver, wait, time_w=0.5, xpath="(//div[contains(text(), '确定发展对象人选')])", times=1) 
@@ -333,7 +325,7 @@ def jijifenzi(wait, driver, org_tree, job_tree, education_tree, person, jg):
         card1 = card1d
         card2 = card2d
         card3 = card3d
-        card4 = card4e
+        card4 = card4d
         card5 = card5d
         card6 = card6d
         card7 = card7d
@@ -512,54 +504,59 @@ def step_1(driver, wait, data_dict, gmsfzhm, org_tree, job_tree, education_tree)
     #编辑#(//span[contains(text(), '编辑')])[1]
     cursor.commen_button(wait, driver, xpath="(//span[contains(text(), '编辑')])[1]")
     #姓名#(//input[@placeholder = '请输入内容'])[1]
-    cursor.input_text(wait, driver, xpath="(//input[@placeholder = '请输入内容'])[1]", text=data_dict[gmsfzhm]['姓名'])
+    cursor.input_text(wait, driver, xpath="(//td[contains(text(), '姓名' )]/../td//input)[1]", text=data_dict[gmsfzhm]['姓名'])
     #公民身份证号码#(//input[@placeholder = '请输入内容'])[2]
-    cursor.input_text(wait, driver, xpath="(//input[@placeholder = '请输入内容'])[2]", text=data_dict[gmsfzhm]['公民身份证号码'])
+    cursor.input_text(wait, driver, xpath="(//td[contains(text(), '姓名' )]/../td//input)[2]", text=data_dict[gmsfzhm]['公民身份证号码'])
     #实名认证#(//span[contains(text(), '实名认证')])[3]
     cursor.commen_button(wait, driver, xpath="(//span[contains(text(), '实名认证')])[3]")
-    #民族#(//input[@placeholder = '请选择字段项'])[1]
-    cursor.commen_button(wait, driver, xpath="(//input[@placeholder = '请选择字段项'])[1]")
-    cursor.select_background(wait, driver, element_xpath="//div[@class = 'el-tree objectTree']", label='span', value=data_dict[gmsfzhm]['民族'])
-    #性别#(//input[@placeholder = '请选择字段项'])[2]
-    cursor.commen_button(wait, driver, xpath="(//input[@placeholder = '请选择字段项'])[2]")
-    cursor.select_background(wait, driver, element_xpath="//div[@class = 'el-tree objectTree']", label='span', value=data_dict[gmsfzhm]['性别'])
-    #出生日期#(//input[@placeholder = '选择日期'])[1]
-    cursor.input_text(wait, driver, xpath="(//input[@placeholder = '选择日期'])[1]", text=data_dict[gmsfzhm]['出生日期'])
-    #学历#(//input[@placeholder = '请选择字段项'])[3]
-    cursor.commen_button(wait, driver, xpath="(//input[@placeholder = '请选择字段项'])[3]")
-    cursor.select_party_org(wait, driver, tree=education_tree, target=data_dict[gmsfzhm]['学历'], element_xpath="//div[@class = 'el-tree objectTree']", label_1 = 'span', label_2 = 'span')
-    #递交入党申请书日期#(//input[@placeholder = '选择日期'])[2]
-    cursor.input_text(wait, driver, xpath="(//input[@placeholder = '选择日期'])[2]", text=data_dict[gmsfzhm]['申请入党日期'])
-    t = wait_return_subelement_absolute(wait, time_w = 0.5, xpath = "(//input[@placeholder = '选择日期'])[2]")
-    t.send_keys(Keys.RETURN)
     #手机号码#(//input[@placeholder = '请输入联系方式'])[1]
-    cursor.input_text(wait, driver, xpath="(//input[@placeholder = '请输入联系方式'])[1]", text=data_dict[gmsfzhm]['手机号码'])
+    cursor.input_text(wait, driver, xpath="(//td[contains(text(), '联系方式' )]/../td//input)", text=data_dict[gmsfzhm]['手机号码'])
+    #民族#(//input[@placeholder = '请选择字段项'])[1]
+    #cursor.commen_button(wait, driver, xpath="(//input[@placeholder = '请选择字段项'])[1]")
+    #cursor.select_background(wait, driver, element_xpath="//div[@class = 'el-tree objectTree']", label='span', value=data_dict[gmsfzhm]['民族'])
+    #性别#(//input[@placeholder = '请选择字段项'])[2]
+    #cursor.commen_button(wait, driver, xpath="(//input[@placeholder = '请选择字段项'])[2]")
+    #cursor.select_background(wait, driver, element_xpath="//div[@class = 'el-tree objectTree']", label='span', value=data_dict[gmsfzhm]['性别'])
+    #出生日期#(//input[@placeholder = '选择日期'])[1]
+    #cursor.input_text(wait, driver, xpath="(//input[@placeholder = '选择日期'])[1]", text=data_dict[gmsfzhm]['出生日期'])
+    #学历#(//input[@placeholder = '请选择字段项'])[3]
+    cursor.commen_button(wait, driver, xpath="(//td[contains(text(), '学历' )]/../td//input)[1]")
+    cursor.select_party_org(wait, driver, tree=education_tree, target=data_dict[gmsfzhm]['学历'], element_xpath="//div[@class = 'el-tree objectTree']", label_1 = 'span', label_2 = 'span')
+    #政治面貌#(//input[@placeholder = '请选择字段项'])[6]
+    cursor.commen_button(wait, driver, xpath="(//td[contains(text(), '政治面貌' )]/../td//input)[2]")
+    cursor.select_background(wait, driver, element_xpath="//div[@class = 'el-tree objectTree']", label='span', value=data_dict[gmsfzhm]['政治面貌'])
     #家庭住址#(//input[@placeholder = '请输入内容'])[2]
-    cursor.input_text(wait, driver, xpath="(//input[@placeholder = '请输入家庭住址'])[1]", text=data_dict[gmsfzhm]['家庭住址'])
+    cursor.input_text(wait, driver, xpath="(//td[contains(text(), '现居住地' )]/../td//input)", text=data_dict[gmsfzhm]['家庭住址'])
     #工作单位及职务#(//input[@placeholder = '请输入内容'])[1]
-    cursor.input_text(wait, driver, xpath="(//input[@placeholder = '请输入工作单位及职务'])[1]", text=data_dict[gmsfzhm]['工作单位及职务'])
-    
+    cursor.input_text(wait, driver, xpath="(//td[contains(text(), '工作单位及职务' )]/../td//input)[1]", text=data_dict[gmsfzhm]['工作单位及职务'])
+    #工作岗位#(//input[@placeholder = '请选择字段项'])[5]
+    cursor.commen_button(wait, driver, xpath="(//td[contains(text(), '工作岗位' )]/../td//input)[2]")
+    cursor.select_party_org(wait, driver, tree=job_tree, target=data_dict[gmsfzhm]['工作岗位'], element_xpath="//div[@class = 'el-tree objectTree']", label_1 = 'span', label_2 = 'span')
     
     #背景信息#(//input[@placeholder = '请选择字段项'])[4]
-    cursor.commen_button(wait, driver, xpath="(//input[@placeholder = '请选择字段项'])[4]")
-    cursor.select_background(wait, driver, element_xpath="//div[@class = 'el-tree objectTree']", label='span', value='正常')
-    #工作岗位#(//input[@placeholder = '请选择字段项'])[5]
-    cursor.commen_button(wait, driver, xpath="(//input[@placeholder = '请选择字段项'])[5]")
-    cursor.select_party_org(wait, driver, tree=job_tree, target=data_dict[gmsfzhm]['工作岗位'], element_xpath="//div[@class = 'el-tree objectTree']", label_1 = 'span', label_2 = 'span')
-    #政治面貌#(//input[@placeholder = '请选择字段项'])[6]
-    cursor.commen_button(wait, driver, xpath="(//input[@placeholder = '请选择字段项'])[6]")
-    cursor.select_background(wait, driver, element_xpath="//div[@class = 'el-tree objectTree']", label='span', value=data_dict[gmsfzhm]['政治面貌'])
-    #重新入党#(//input[@placeholder = '请选择'])
-    cursor.commen_button(wait, driver, xpath="(//input[@placeholder = '请选择'])")
-    cursor.select_background(wait, driver, element_xpath="//ul[@class = 'el-scrollbar__view el-select-dropdown__list']", label='span', value='否')
-    #所属党组织#(//input[@placeholder = '请选择字段项'])[7]
-    cursor.commen_button(wait, driver, xpath="(//input[@placeholder = '请选择字段项'])[8]")
-    cursor.select_party_org(wait, driver, tree=org_tree, target = data_dict[gmsfzhm]['接受申请党组织'], element_xpath="//div[@class = 'el-tree objectTree']", label_1 = 'span', label_2 = 'span')
+    cursor.commen_button(wait, driver, xpath="(//td[contains(text(), '背景信息' )]/../td)[2]//input")
+    cursor.select_background(wait, driver, element_xpath="//div[@class = 'el-select-dropdown el-popper is-multiple']", label='span', value='正常')
+    cursor.commen_button(wait, driver, xpath="//span[contains(text(), '参加工作日期')]/../following-sibling::td//input")
+    #参加工作日期#(//input[@placeholder = '选择日期'])[2]
+    cursor.input_text(wait, driver, xpath="//span[contains(text(), '参加工作日期')]/../following-sibling::td//input", text=calculate_date_add(data_dict[gmsfzhm]['参加工作日期'],0))
+    a = wait_return_subelement_absolute(wait, time_w = 0.5, xpath = "//span[contains(text(), '参加工作日期')]/../following-sibling::td//input")
+    a.send_keys(Keys.RETURN)
+    #递交入党申请书日期#(//input[@placeholder = '选择日期'])[2]
+    cursor.input_text(wait, driver, xpath="(//td[contains(text(), '递交入党申请书日期')]/../td//input)[1]", text=calculate_date_add(data_dict[gmsfzhm]['申请入党日期'],0))
+    t = wait_return_subelement_absolute(wait, time_w = 0.5, xpath = "(//td[contains(text(), '递交入党申请书日期')]/../td//input)[1]")
+    t.send_keys(Keys.RETURN)
     #接受申请党组织#(//input[@placeholder = '请输入接受申请党组织'])[1]
-    cursor.input_text(wait, driver, xpath="(//input[@placeholder = '请输入接受申请党组织'])[1]", text=data_dict[gmsfzhm]['接受申请党组织'])
+    cursor.input_text(wait, driver, xpath="(//td[contains(text(), '接收入党申请的党组织' )]/../td//input)[2]", text=data_dict[gmsfzhm]['接受申请党组织'])
+    #重新入党#(//input[@placeholder = '请选择'])
+    cursor.commen_button(wait, driver, xpath="//td[contains(text(), '是否重新入党' )]/following-sibling::td//input")
+    cursor.select_background(wait, driver, element_xpath="//ul[@class = 'el-scrollbar__view el-select-dropdown__list']", label='span', value='否')
     #一线情况#
-    cursor.commen_button(wait, driver, xpath="(//input[@placeholder = '请选择字段项'])[7]")
+    cursor.commen_button(wait, driver, xpath="(//td[contains(text(), '一线情况' )]/../td//input)[2]")
     cursor.select_background(wait, driver, "//div[@class = 'el-tree objectTree']", label='span', value = data_dict[gmsfzhm]['一线情况'])
+    #所属党组织#(//input[@placeholder = '请选择字段项'])[7]
+    cursor.commen_button(wait, driver, xpath="(//td[contains(text(), '所属党组织' )]/../td//input)")
+    cursor.select_party_org(wait, driver, tree=org_tree, target = data_dict[gmsfzhm]['接受申请党组织'], element_xpath="//div[@class = 'el-tree objectTree']", label_1 = 'span', label_2 = 'span')
+    
     #保存#(//span[contains(text(), '保存')])[1]
     cursor.commen_button(wait, driver, xpath="(//span[contains(text(), '保存')])[1]")
     #编辑#(//span[contains(text(), '编辑')])[2]
@@ -584,57 +581,61 @@ def step_1_rebuild(driver, wait, data_dict, gmsfzhm, org_tree, job_tree, educati
     #编辑#(//span[contains(text(), '编辑')])[1]
     cursor.commen_button(wait, driver, xpath="(//span[contains(text(), '编辑')])[1]")
     #姓名#(//input[@placeholder = '请输入内容'])[1]
-    #cursor.input_text(wait, driver, xpath="(//input[@placeholder = '请输入内容'])[1]", text=data_dict[gmsfzhm]['姓名'])
+    #cursor.input_text(wait, driver, xpath="(//td[contains(text(), '姓名' )]/../td//input)[1]", text=data_dict[gmsfzhm]['姓名'])
     #公民身份证号码#(//input[@placeholder = '请输入内容'])[2]
-    #cursor.input_text(wait, driver, xpath="(//input[@placeholder = '请输入内容'])[2]", text=data_dict[gmsfzhm]['公民身份证号码'])
+    #cursor.input_text(wait, driver, xpath="(//td[contains(text(), '姓名' )]/../td//input)[2]", text=data_dict[gmsfzhm]['公民身份证号码'])
     #实名认证#(//span[contains(text(), '实名认证')])[3]
     #cursor.commen_button(wait, driver, xpath="(//span[contains(text(), '实名认证')])[3]")
-    #民族#(//input[@placeholder = '请选择字段项'])[1]
-    
-
-    cursor.commen_button(wait, driver, xpath="(//input[@placeholder = '请选择字段项'])[2]")
-    cursor.select_background(wait, driver, element_xpath="//div[@class = 'el-tree objectTree']", label='span', value=data_dict[gmsfzhm]['民族'])
-    #性别#(//input[@placeholder = '请选择字段项'])[2]
-    cursor.commen_button(wait, driver, xpath="(//input[@placeholder = '请选择字段项'])[3]")
-    cursor.select_background(wait, driver, element_xpath="//div[@class = 'el-tree objectTree']", label='span', value=data_dict[gmsfzhm]['性别'])
-    #出生日期#(//input[@placeholder = '选择日期'])[1]
-    cursor.input_text(wait, driver, xpath="(//input[@placeholder = '选择日期'])[1]", text=data_dict[gmsfzhm]['出生日期'])
-    #学历#(//input[@placeholder = '请选择字段项'])[3]
-    cursor.commen_button(wait, driver, xpath="(//input[@placeholder = '请选择字段项'])[4]")
-    cursor.select_party_org(wait, driver, tree=education_tree, target=data_dict[gmsfzhm]['学历'], element_xpath="//div[@class = 'el-tree objectTree']", label_1 = 'span', label_2 = 'span')
-    #递交入党申请书日期#(//input[@placeholder = '选择日期'])[2]
-    #cursor.input_text(wait, driver, xpath="(//input[@placeholder = '选择日期'])[2]", text=data_dict[gmsfzhm]['申请入党日期'])
     #手机号码#(//input[@placeholder = '请输入联系方式'])[1]
-    cursor.input_text(wait, driver, xpath="(//input[@placeholder = '请输入联系方式'])[1]", text=data_dict[gmsfzhm]['手机号码'])
+    cursor.input_text(wait, driver, xpath="(//td[contains(text(), '联系方式' )]/../td//input)[2]", text=data_dict[gmsfzhm]['手机号码'])
+    #民族#(//input[@placeholder = '请选择字段项'])[1]
+    #cursor.commen_button(wait, driver, xpath="(//input[@placeholder = '请选择字段项'])[1]")
+    #cursor.select_background(wait, driver, element_xpath="//div[@class = 'el-tree objectTree']", label='span', value=data_dict[gmsfzhm]['民族'])
+    #性别#(//input[@placeholder = '请选择字段项'])[2]
+    #cursor.commen_button(wait, driver, xpath="(//input[@placeholder = '请选择字段项'])[2]")
+    #cursor.select_background(wait, driver, element_xpath="//div[@class = 'el-tree objectTree']", label='span', value=data_dict[gmsfzhm]['性别'])
+    #出生日期#(//input[@placeholder = '选择日期'])[1]
+    #cursor.input_text(wait, driver, xpath="(//input[@placeholder = '选择日期'])[1]", text=data_dict[gmsfzhm]['出生日期'])
+    #学历#(//input[@placeholder = '请选择字段项'])[3]
+    cursor.commen_button(wait, driver, xpath="(//td[contains(text(), '学历' )]/../td//input)[1]")
+    cursor.select_party_org(wait, driver, tree=education_tree, target=data_dict[gmsfzhm]['学历'], element_xpath="//div[@class = 'el-tree objectTree']", label_1 = 'span', label_2 = 'span')
+    #政治面貌#(//input[@placeholder = '请选择字段项'])[6]
+    cursor.commen_button(wait, driver, xpath="(//td[contains(text(), '政治面貌' )]/../td//input)[2]")
+    cursor.select_background(wait, driver, element_xpath="//div[@class = 'el-tree objectTree']", label='span', value=data_dict[gmsfzhm]['政治面貌'])
     #家庭住址#(//input[@placeholder = '请输入内容'])[2]
-    cursor.input_text(wait, driver, xpath="(//input[@placeholder = '请输入家庭住址'])[1]", text=data_dict[gmsfzhm]['家庭住址'])
+    cursor.input_text(wait, driver, xpath="(//td[contains(text(), '现居住地' )]/../td//input)", text=data_dict[gmsfzhm]['家庭住址'])
     #工作单位及职务#(//input[@placeholder = '请输入内容'])[1]
-    cursor.input_text(wait, driver, xpath="(//input[@placeholder = '请输入工作单位及职务'])[1]", text=data_dict[gmsfzhm]['工作单位及职务'])
-    
+    cursor.input_text(wait, driver, xpath="(//td[contains(text(), '工作单位及职务' )]/../td//input)[1]", text=data_dict[gmsfzhm]['工作单位及职务'])
+    #工作岗位#(//input[@placeholder = '请选择字段项'])[5]
+    cursor.commen_button(wait, driver, xpath="(//td[contains(text(), '工作岗位' )]/../td//input)[2]")
+    cursor.select_party_org(wait, driver, tree=job_tree, target=data_dict[gmsfzhm]['工作岗位'], element_xpath="//div[@class = 'el-tree objectTree']", label_1 = 'span', label_2 = 'span')
     
     #背景信息#(//input[@placeholder = '请选择字段项'])[4]
-    #cursor.commen_button(wait, driver, xpath="(//input[@placeholder = '请选择字段项'])[4]")
-    #cursor.select_background(wait, driver, element_xpath="//div[@class = 'el-tree objectTree']", label='span', value='正常')
-    #工作岗位#(//input[@placeholder = '请选择字段项'])[5]
-    cursor.commen_button(wait, driver, xpath="(//input[@placeholder = '请选择字段项'])[6]")
-    cursor.select_party_org(wait, driver, tree=job_tree, target=data_dict[gmsfzhm]['工作岗位'], element_xpath="//div[@class = 'el-tree objectTree']", label_1 = 'span', label_2 = 'span')
-    #政治面貌#(//input[@placeholder = '请选择字段项'])[6]
-    cursor.commen_button(wait, driver, xpath="(//input[@placeholder = '请选择字段项'])[7]")
-    cursor.select_background(wait, driver, element_xpath="//div[@class = 'el-tree objectTree']", label='span', value=data_dict[gmsfzhm]['政治面貌'])
-    #重新入党#(//input[@placeholder = '请选择'])
-    cursor.commen_button(wait, driver, xpath="(//input[@placeholder = '请选择'])")
-    cursor.select_background(wait, driver, element_xpath="//ul[@class = 'el-scrollbar__view el-select-dropdown__list']", label='span', value='否')
-    #所属党组织#(//input[@placeholder = '请选择字段项'])[7]
-    cursor.commen_button(wait, driver, xpath="(//input[@placeholder = '请选择字段项'])[9]")
-    cursor.select_party_org(wait, driver, tree=org_tree, target = data_dict[gmsfzhm]['接受申请党组织'], element_xpath="//div[@class = 'el-tree objectTree']", label_1 = 'span', label_2 = 'span')
+    cursor.commen_button(wait, driver, xpath="(//td[contains(text(), '背景信息' )]/../td)[2]//input")
+    cursor.select_background(wait, driver, element_xpath="//div[@class = 'el-select-dropdown el-popper is-multiple']", label='span', value='正常')
+    cursor.commen_button(wait, driver, xpath="//span[contains(text(), '参加工作日期')]/../following-sibling::td//input")
+    #参加工作日期#(//input[@placeholder = '选择日期'])[2]
+    cursor.input_text(wait, driver, xpath="//span[contains(text(), '参加工作日期')]/../following-sibling::td//input", text=calculate_date_add(data_dict[gmsfzhm]['参加工作日期'],0))
+    a = wait_return_subelement_absolute(wait, time_w = 0.5, xpath = "//span[contains(text(), '参加工作日期')]/../following-sibling::td//input")
+    a.send_keys(Keys.RETURN)
+    #递交入党申请书日期#(//input[@placeholder = '选择日期'])[2]
+    cursor.input_text(wait, driver, xpath="(//td[contains(text(), '递交入党申请书日期')]/../td//input)[1]", text=calculate_date_add(data_dict[gmsfzhm]['申请入党日期'],0))
+    t = wait_return_subelement_absolute(wait, time_w = 0.5, xpath = "(//td[contains(text(), '递交入党申请书日期')]/../td//input)[1]")
+    t.send_keys(Keys.RETURN)
     #接受申请党组织#(//input[@placeholder = '请输入接受申请党组织'])[1]
-    #cursor.input_text(wait, driver, xpath="(//input[@placeholder = '请输入接受申请党组织'])[1]", text=data_dict[gmsfzhm]['接受申请党组织'])
+    cursor.input_text(wait, driver, xpath="(//td[contains(text(), '接收入党申请的党组织' )]/../td//input)[2]", text=data_dict[gmsfzhm]['接受申请党组织'])
+    #重新入党#(//input[@placeholder = '请选择'])
+    cursor.commen_button(wait, driver, xpath="//td[contains(text(), '是否重新入党' )]/following-sibling::td//input")
+    cursor.select_background(wait, driver, element_xpath="//ul[@class = 'el-scrollbar__view el-select-dropdown__list']", label='span', value='否')
     #一线情况#
-    cursor.commen_button(wait, driver, xpath="(//input[@placeholder = '请选择字段项'])[8]")
+    cursor.commen_button(wait, driver, xpath="(//td[contains(text(), '一线情况' )]/../td//input)[2]")
     cursor.select_background(wait, driver, "//div[@class = 'el-tree objectTree']", label='span', value = data_dict[gmsfzhm]['一线情况'])
-    #保存#(//span[contains(text(), '保存')])[1]
-    cursor.click_button_until_specifyxpath_disappear(wait=wait, driver=driver, specifyxpath="(//span[contains(text(), '保存')])[1]", buttonxpath="(//span[contains(text(), '保存')])[1]", time_w=0.1, times=2)
+    #所属党组织#(//input[@placeholder = '请选择字段项'])[7]
+    cursor.commen_button(wait, driver, xpath="(//td[contains(text(), '所属党组织' )]/../td//input)")
+    cursor.select_party_org(wait, driver, tree=org_tree, target = data_dict[gmsfzhm]['接受申请党组织'], element_xpath="//div[@class = 'el-tree objectTree']", label_1 = 'span', label_2 = 'span')
     
+    #保存#(//span[contains(text(), '保存')])[1]
+    cursor.commen_button(wait, driver, xpath="(//span[contains(text(), '保存')])[1]")
     #编辑#(//span[contains(text(), '编辑')])[2]
     cursor.commen_button(wait, driver, xpath="(//span[contains(text(), '编辑')])[2]")
     #上传图片#//input[@type="file"]
@@ -643,7 +644,8 @@ def step_1_rebuild(driver, wait, data_dict, gmsfzhm, org_tree, job_tree, educati
     absolute_path = current_working_dir + f"\\材料图片保存处\\{data_dict[gmsfzhm]['姓名']}+{gmsfzhm}\\入党申请书照片"
     cursor.upload_pic(pic_dir=absolute_path, input_xpath="//input[@type='file']", wait=wait, driver=driver)
     #保存#(//span[contains(text(), '保存')])[2]
-    cursor.click_button_until_specifyxpath_disappear(wait=wait, driver=driver, specifyxpath="(//span[contains(text(), '保存')])[1]", buttonxpath="(//span[contains(text(), '保存')])[1]", time_w=0.1, times=2)
+    cursor.click_button_until_specifyxpath_disappear(wait=wait, driver=driver, specifyxpath="//span[contains(text(), '取消')]", buttonxpath="(//span[contains(text(), '保存')])[1]", time_w=0.1, times=2)
+
     cursor.click_button_until_specifyxpath_disappear(wait=wait, driver=driver, specifyxpath="(//span[contains(text(),'提交')])[2]", buttonxpath="(//span[contains(text(),'提交')])[2]", time_w=0.1, times=2)
 
     
@@ -656,9 +658,9 @@ def step_2(driver, wait, data_dict, gmsfzhm):
     #编辑#(//span[contains(text(), '编辑')])[1]
     cursor.commen_button(wait, driver, xpath="(//span[contains(text(), '编辑')])[1]")
     #谈话人#(//input[@placeholder = '请输入内容'])[1]
-    cursor.input_text(wait, driver, xpath="(//input[@placeholder = '请输入内容'])[1]", text=data_dict[gmsfzhm]['培养联系人'])
+    cursor.input_text(wait, driver, xpath="(//td[contains(text(), '谈话人' )]/following-sibling::td//input)[1]", text=data_dict[gmsfzhm]['培养联系人'])
     #选择日期#(//input[@placeholder = '选择日期'])[1]
-    cursor.input_text(wait, driver, xpath="(//input[@placeholder = '选择日期'])[1]", text=data_dict[gmsfzhm]['申请入党日期'])
+    cursor.input_text(wait, driver, xpath="(//td[contains(text(), '谈话人' )]/following-sibling::td//input)[2]", text=calculate_date_add(data_dict[gmsfzhm]['申请入党日期'],0))
     #保存#
     cursor.click_button_until_specifyxpath_disappear(wait=wait, driver=driver, specifyxpath="(//span[contains(text(), '保存')])[1]", buttonxpath="(//span[contains(text(), '保存')])[1]", time_w=0.1, times=2)
     #党组织派人谈话记录#
@@ -684,7 +686,7 @@ def step_3(driver, wait, data_dict, gmsfzhm, jg):
     #1编辑#(//span[contains(text(), '编辑')])[1]
     cursor.commen_button(wait, driver, xpath="(//span[contains(text(), '编辑')])[1]")
     #党员推荐会议时间#(//input[@placeholder = '请选择日期'])[1]
-    cursor.input_text(wait, driver, xpath="(//input[@placeholder = '请选择日期'])[1]", text=data_dict[gmsfzhm]['积极分子会议日期'])
+    cursor.input_text(wait, driver, xpath="(//td[contains(text(), '党员推荐会议时间' )]/following-sibling::td//input)[1]", text=calculate_date_add(data_dict[gmsfzhm]['积极分子会议日期'],0))
     #上传双推会议纪录#(//input[@type="file"])[1]
     current_working_dir = os.getcwd()
     absolute_path = current_working_dir + f"\\材料图片保存处\\{data_dict[gmsfzhm]['姓名']}+{gmsfzhm}\\党员推荐会议记录"
@@ -695,24 +697,24 @@ def step_3(driver, wait, data_dict, gmsfzhm, jg):
     #2编辑#(//span[contains(text(), '编辑')])[3]
     cursor.commen_button(wait, driver, xpath="(//span[contains(text(), '编辑')])[3]")
     #时间#(//input[@placeholder = '请选择日期'])[1]
-    cursor.input_text(wait, driver, xpath="(//input[@placeholder = '请选择日期'])[1]",  text=data_dict[gmsfzhm]['积极分子会议日期'])
+    cursor.input_text(wait, driver, xpath="(//td[contains(text(), '时间' )]/following-sibling::td//input)[1]",  text=calculate_date_add(data_dict[gmsfzhm]['积极分子会议日期'],0))
     t = wait_return_subelement_absolute(wait, time_w = 0.5, xpath = "(//input[@placeholder = '请选择日期'])[1]")
     t.send_keys(Keys.RETURN)
     #地点#(//input[@placeholder = '请输入内容'])[1]
-    cursor.input_text(wait, driver, xpath="(//input[contains(@placeholder, '请输入内容')])[1]", text='单位党务会议室')
+    cursor.input_text(wait, driver, xpath="(//td[contains(text(), '地点' )]/following-sibling::td//input)[1]", text='单位党务会议室')
     #应到人数#
-    cursor.input_text(wait, driver, xpath="(//input[contains(@placeholder, '请输入内容')])[3]", text=data_dict[gmsfzhm]["积极分子确定会议应到人数"])
+    cursor.input_text(wait, driver, xpath="(//td[contains(text(), '应到人数' )]/following-sibling::td//input)[1]", text=data_dict[gmsfzhm]["积极分子确定会议应到人数"])
     #实到人数#
-    cursor.input_text(wait, driver, xpath="(//input[contains(@placeholder, '请输入内容')])[4]", text=data_dict[gmsfzhm]["积极分子确定会议实到人数"])
+    cursor.input_text(wait, driver, xpath="(//td[contains(text(), '实到人数' )]/following-sibling::td//input)[1]", text=data_dict[gmsfzhm]["积极分子确定会议实到人数"])
     #缺席人数#
-    cursor.input_text(wait, driver, xpath="(//input[contains(@placeholder, '请输入内容')])[5]", text=data_dict[gmsfzhm]["积极分子确定会议应到人数"] - data_dict[gmsfzhm]["积极分子确定会议实到人数"])
+    cursor.input_text(wait, driver, xpath="(//td[contains(text(), '缺席人数' )]/following-sibling::td//input)[1]", text=data_dict[gmsfzhm]["积极分子确定会议应到人数"] - data_dict[gmsfzhm]["积极分子确定会议实到人数"])
     #会议类型#(//input[@placeholder = '请选择字段项'])[1]
-    cursor.commen_button(wait, driver, xpath = "(//input[@placeholder = '请选择字段项'])[2]")
+    cursor.commen_button(wait, driver, xpath = "(//td[contains(text(), '会议类型' )]/following-sibling::td//input)[1]")
     cursor.select_background(wait, driver, "//div[@class = 'el-tree objectTree']", "span", "党员大会")
     #党支部书记#(//input[@placeholder = '请输入内容'])[3]
-    cursor.input_text(wait, driver, xpath="(//input[@placeholder = '请输入内容'])[2]", text=data_dict[gmsfzhm]['党支部书记'])
+    cursor.input_text(wait, driver, xpath="(//td[contains(text(), '党支部书记' )]/following-sibling::td//input)[1]", text=data_dict[gmsfzhm]['党支部书记'])
     #列席组织员#(//input[@placeholder = '请输入内容'])[4]
-    cursor.input_text(wait, driver, xpath="(//input[@placeholder = '请输入内容'])[6]", text=data_dict[gmsfzhm]['积极分子会议的列席组织员'])
+    cursor.input_text(wait, driver, xpath="(//td[contains(text(), '列席组织员' )]/following-sibling::td//input)[1]", text=data_dict[gmsfzhm]['积极分子会议的列席组织员'])
     #会议研究意见#(//textarea[@placeholder = '请输入内容'])[1]
     cursor.input_text(wait, driver, xpath="(//textarea[@placeholder = '请输入内容'])[1]", text='同意')
     #保存#(//span[contains(text(), '保存')])[3]
@@ -738,8 +740,6 @@ def step_3(driver, wait, data_dict, gmsfzhm, jg):
     #time.sleep(1)
     #cursor.commen_button(wait, driver, xpath="(//input[@placeholder = '请选择字段项'])[1]")
     #cursor.select_party_org(wait, driver, tree=jg, target=data_dict[gmsfzhm]['籍贯'], element_xpath = "//div[@class = 'el-tree objectTree']", label_1 = 'span', label_2 = 'span')
-    ##参加工作日期#(//input[@placeholder = '选择日期'])[2]
-    #cursor.input_text(wait, driver, xpath="(//input[@placeholder = '选择日期'])[2]", text=data_dict[gmsfzhm]['参加工作日期'])
     #
     #
     ##保存#(//span[contains(text(), '保存')])[4]
@@ -758,10 +758,10 @@ def step_3(driver, wait, data_dict, gmsfzhm, jg):
 def step_3_rebuild(driver, wait, data_dict, gmsfzhm, jg):
     #推荐和确定入党积极分子#(//a[contains(text(), '查看详情')])[3]
     #cursor.commen_button(wait, driver, xpath="(//a[contains(text(), '查看详情')])[3]")
-    #编辑#(//span[contains(text(), '编辑')])[1]
+    #1编辑#(//span[contains(text(), '编辑')])[1]
     cursor.commen_button(wait, driver, xpath="(//span[contains(text(), '编辑')])[1]")
     #党员推荐会议时间#(//input[@placeholder = '请选择日期'])[1]
-    cursor.input_text(wait, driver, xpath="(//input[@placeholder = '请选择日期'])[1]",  text=data_dict[gmsfzhm]['积极分子会议日期'])
+    cursor.input_text(wait, driver, xpath="(//td[contains(text(), '党员推荐会议时间' )]/following-sibling::td//input)[1]", text=calculate_date_add(data_dict[gmsfzhm]['积极分子会议日期'],0))
     #上传双推会议纪录#(//input[@type="file"])[1]
     current_working_dir = os.getcwd()
     absolute_path = current_working_dir + f"\\材料图片保存处\\{data_dict[gmsfzhm]['姓名']}+{gmsfzhm}\\党员推荐会议记录"
@@ -769,35 +769,33 @@ def step_3_rebuild(driver, wait, data_dict, gmsfzhm, jg):
     #保存#(//span[contains(text(), '保存')])[1]
     cursor.click_button_until_specifyxpath_disappear(wait=wait, driver=driver, specifyxpath="(//span[contains(text(), '保存')])[1]", buttonxpath="(//span[contains(text(), '保存')])[1]", time_w=0.1, times=2)
 
-    #编辑#(//span[contains(text(), '编辑')])[3]
+    #2编辑#(//span[contains(text(), '编辑')])[3]
     cursor.commen_button(wait, driver, xpath="(//span[contains(text(), '编辑')])[3]")
     #时间#(//input[@placeholder = '请选择日期'])[1]
-    cursor.input_text(wait, driver, xpath="(//input[@placeholder = '请选择日期'])[1]",  text=data_dict[gmsfzhm]['积极分子会议日期'])
+    cursor.input_text(wait, driver, xpath="(//td[contains(text(), '时间' )]/following-sibling::td//input)[1]",  text=calculate_date_add(data_dict[gmsfzhm]['积极分子会议日期'],0))
     t = wait_return_subelement_absolute(wait, time_w = 0.5, xpath = "(//input[@placeholder = '请选择日期'])[1]")
     t.send_keys(Keys.RETURN)
     #地点#(//input[@placeholder = '请输入内容'])[1]
-    cursor.input_text(wait, driver, xpath="(//input[contains(@placeholder, '请输入内容')])[1]", text='单位党务会议室')
+    cursor.input_text(wait, driver, xpath="(//td[contains(text(), '地点' )]/following-sibling::td//input)[1]", text='单位党务会议室')
     #应到人数#
-    cursor.input_text(wait, driver, xpath="(//input[contains(@placeholder, '请输入内容')])[3]", text=data_dict[gmsfzhm]["积极分子确定会议应到人数"])
+    cursor.input_text(wait, driver, xpath="(//td[contains(text(), '应到人数' )]/following-sibling::td//input)[1]", text=data_dict[gmsfzhm]["积极分子确定会议应到人数"])
     #实到人数#
-    cursor.input_text(wait, driver, xpath="(//input[contains(@placeholder, '请输入内容')])[4]", text=data_dict[gmsfzhm]["积极分子确定会议实到人数"])
+    cursor.input_text(wait, driver, xpath="(//td[contains(text(), '实到人数' )]/following-sibling::td//input)[1]", text=data_dict[gmsfzhm]["积极分子确定会议实到人数"])
     #缺席人数#
-    cursor.input_text(wait, driver, xpath="(//input[contains(@placeholder, '请输入内容')])[5]", text=data_dict[gmsfzhm]["积极分子确定会议应到人数"] - data_dict[gmsfzhm]["积极分子确定会议实到人数"])
+    cursor.input_text(wait, driver, xpath="(//td[contains(text(), '缺席人数' )]/following-sibling::td//input)[1]", text=data_dict[gmsfzhm]["积极分子确定会议应到人数"] - data_dict[gmsfzhm]["积极分子确定会议实到人数"])
     #会议类型#(//input[@placeholder = '请选择字段项'])[1]
-    cursor.commen_button(wait, driver, xpath = "(//input[@placeholder = '请选择字段项'])[2]")
+    cursor.commen_button(wait, driver, xpath = "(//td[contains(text(), '会议类型' )]/following-sibling::td//input)[1]")
     cursor.select_background(wait, driver, "//div[@class = 'el-tree objectTree']", "span", "党员大会")
-    
-    
     #党支部书记#(//input[@placeholder = '请输入内容'])[3]
-    cursor.input_text(wait, driver, xpath="(//input[@placeholder = '请输入内容'])[2]", text=data_dict[gmsfzhm]['党支部书记'])
+    cursor.input_text(wait, driver, xpath="(//td[contains(text(), '党支部书记' )]/following-sibling::td//input)[1]", text=data_dict[gmsfzhm]['党支部书记'])
     #列席组织员#(//input[@placeholder = '请输入内容'])[4]
-    cursor.input_text(wait, driver, xpath="(//input[@placeholder = '请输入内容'])[6]", text=data_dict[gmsfzhm]['积极分子会议的列席组织员'])
+    cursor.input_text(wait, driver, xpath="(//td[contains(text(), '列席组织员' )]/following-sibling::td//input)[1]", text=data_dict[gmsfzhm]['积极分子会议的列席组织员'])
     #会议研究意见#(//textarea[@placeholder = '请输入内容'])[1]
     cursor.input_text(wait, driver, xpath="(//textarea[@placeholder = '请输入内容'])[1]", text='同意')
     #保存#(//span[contains(text(), '保存')])[3]
     cursor.click_button_until_specifyxpath_disappear(wait=wait, driver=driver, specifyxpath="(//span[contains(text(), '保存')])[3]", buttonxpath="(//span[contains(text(), '保存')])[3]", time_w=0.1, times=2)
 
-    #编辑#(//span[contains(text(), '编辑')])[4]
+    #3编辑#(//span[contains(text(), '编辑')])[4]
     cursor.commen_button(wait, driver, xpath="(//span[contains(text(), '编辑')])[4]")
     #研究确定入党积极分子会议纪录#(//input[@type="file"])[3]
     current_working_dir = os.getcwd()
@@ -805,20 +803,7 @@ def step_3_rebuild(driver, wait, data_dict, gmsfzhm, jg):
     cursor.upload_pic(pic_dir=absolute_path, input_xpath="(//input[@type='file'])[3]", wait=wait, driver=driver)
     #保存#(//span[contains(text(), '保存')])[3]
     cursor.click_button_until_specifyxpath_disappear(wait=wait, driver=driver, specifyxpath="(//span[contains(text(), '保存')])[3]", buttonxpath="(//span[contains(text(), '保存')])[3]", time_w=0.1, times=2)
-    #4编辑#(//span[contains(text(), '编辑')])[5]
-    #工作单位及职务
-    cursor.commen_button(wait, driver, xpath="(//span[contains(text(), '编辑')])[5]")
-    cursor.input_text(wait, driver, xpath="(//input[@placeholder = '请输入内容'])[1]", text=data_dict[gmsfzhm]['工作单位及职务'])
-
-
-    #一线情况
-    cursor.commen_button(wait, driver, xpath="(//input[@placeholder = '请选择字段项'])[4]")
-    cursor.select_background(wait, driver, "//div[@class = 'el-tree objectTree']", label='span', value = data_dict[gmsfzhm]['一线情况'])
-
-    #家庭住址
-    cursor.input_text(wait, driver, xpath="(//input[@placeholder = '请输入内容'])[2]", text=data_dict[gmsfzhm]['家庭住址'])
-
-    cursor.click_button_until_specifyxpath_disappear(wait=wait, driver=driver, specifyxpath="(//span[contains(text(), '保存')])[4]", buttonxpath="(//span[contains(text(), '保存')])[4]", time_w=0.1, times=2)
+    
     #cursor.commen_button(wait, driver, xpath="(//span[contains(text(), '编辑')])[5]")
     #籍贯#(//input[@placeholder = '请选择字段项'])[1]
     #cursor.commen_button(wait, driver, xpath="(//input[@placeholder = '请选择字段项'])[1]")
@@ -830,8 +815,6 @@ def step_3_rebuild(driver, wait, data_dict, gmsfzhm, jg):
     #time.sleep(1)
     #cursor.commen_button(wait, driver, xpath="(//input[@placeholder = '请选择字段项'])[1]")
     #cursor.select_party_org(wait, driver, tree=jg, target=data_dict[gmsfzhm]['籍贯'], element_xpath = "//div[@class = 'el-tree objectTree']", label_1 = 'span', label_2 = 'span')
-    ##参加工作日期#(//input[@placeholder = '选择日期'])[2]
-    #cursor.input_text(wait, driver, xpath="(//input[@placeholder = '选择日期'])[2]", text=data_dict[gmsfzhm]['参加工作日期'])
     #
     #
     ##保存#(//span[contains(text(), '保存')])[4]
@@ -854,9 +837,9 @@ def step_4(driver, wait, data_dict, gmsfzhm):
     #编辑#(//span[contains(text(), '编辑')])[2]
     cursor.commen_button(wait, driver, xpath="(//span[contains(text(), '编辑')])[2]")
     #公示起止日期#(//input[@placeholder = '开始日期'])[1]
-    cursor.input_text(wait, driver, xpath="(//input[@placeholder = '开始日期'])[1]", text=calculate_date_add(data_dict[gmsfzhm]['申请入党日期'],197))
+    cursor.input_text(wait, driver, xpath="(//input[@placeholder = '开始日期'])[1]", text=calculate_date_add(data_dict[gmsfzhm]['确定入党积极分子日期'],0))
     #公示起止日期#(//input[@placeholder = '结束日期'])[1]
-    cursor.input_text(wait, driver, xpath="(//input[@placeholder = '结束日期'])[1]", text=calculate_date_add(data_dict[gmsfzhm]['申请入党日期'],204))
+    cursor.input_text(wait, driver, xpath="(//input[@placeholder = '结束日期'])[1]", text=calculate_date_add(data_dict[gmsfzhm]['确定入党积极分子日期'],8))
     #公示结果#(//input[@placeholder = '请选择'])[1]
     cursor.commen_button(wait, driver, xpath="//span[@class = 'el-input__suffix-inner']")
     cursor.commen_button(wait, driver, xpath="(//span[contains(text(), '通过')])[3]")
@@ -866,11 +849,11 @@ def step_4(driver, wait, data_dict, gmsfzhm):
     #编辑#(//span[contains(text(), '编辑')])[3]
     cursor.commen_button(wait, driver, xpath="(//span[contains(text(), '编辑')])[3]")
     #基层党委备案审查日期#(//input[@placeholder = '选择日期'])[1]
-    cursor.input_text(wait, driver, xpath="(//input[@placeholder = '选择日期'])[1]", text=calculate_date_add(data_dict[gmsfzhm]['申请入党日期'],197))
+    cursor.input_text(wait, driver, xpath="(//input[@placeholder = '选择日期'])[1]", text=calculate_date_add(data_dict[gmsfzhm]['确定入党积极分子日期'],8))
     t = wait_return_subelement_absolute(wait, time_w = 0.5, xpath = "(//input[@placeholder = '选择日期'])[1]")
     t.send_keys(Keys.RETURN) 
     #基层党委备案审查意见#(//input[@placeholder = '请选择字段项'])[1]
-    cursor.commen_button(wait, driver, xpath="(//input[@placeholder = '请选择字段项'])[2]")
+    cursor.commen_button(wait, driver, xpath="//td[contains(text(), '基层党委备案审查意见')]/../td//input")
     cursor.commen_button(wait, driver, xpath="(//span[contains(text(), '同意')])[1]")
     #意见#//textarea[@placeholder = '请输入内容']
     cursor.input_text(wait, driver, xpath="//textarea[@placeholder = '请输入内容']", text ="同意")
@@ -895,7 +878,7 @@ def step_5(driver, wait, data_dict, gmsfzhm):
     #入党日期(现支部不需)#(//input[@placeholder='选择日期'])[1]
     #学历(现支部不需)#(//input[@placeholder='请选择字段项'])
     #自何时起负责培养#(//input[@placeholder='选择日期'])[2]
-    cursor.input_text(wait, driver, xpath="(//input[@placeholder='选择日期'])[2]", text=calculate_date_add(data_dict[gmsfzhm]['申请入党日期'],198))
+    cursor.input_text(wait, driver, xpath="(//input[@placeholder='选择日期'])[2]", text=calculate_date_add(data_dict[gmsfzhm]['确定入党积极分子日期'],8))
     cursor.input_text(wait, driver, xpath="(//input[@placeholder='选择日期'])[2]", text="\n")
     #保存#(//span[contains(text(), "保存")])[1]
     cursor.click_button_until_specifyxpath_disappear(wait, driver, specifyxpath="(//span[contains(text(), '保存')])[1]", buttonxpath="(//span[contains(text(), '保存')])[1]", time_w= 0.8, times=2)

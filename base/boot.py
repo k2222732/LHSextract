@@ -75,14 +75,14 @@ def recursion_org_v1(tree_root, wait, driver, root_node:TreeNode, index, xpath3,
     return index
 
 def synchronizing_job(wait, driver, input_node:TreeNode):
-    wait_click_xpath(wait, driver, xpath="(//input[@placeholder = '请选择字段项'])[5]")
+    wait_click_xpath(wait, driver, xpath="(//input[@placeholder = '请选择字段项'])[6]")
     #采集根组织信息
     root_text = 'root'
     input_node.set_value(value=root_text)
     #获取根节点结构体//div[@class = "tree_wrapper"]//div[@role = "treeitem"]/div[@role = "group"]到tree_root
     tree_root = wait_return_subelement_absolute(wait, time_w = 0.5, xpath = "//div[@class = 'el-tree objectTree']")
     recursion_job(tree_root = tree_root, wait = wait, driver = driver, root_node = input_node)
-    wait_click_xpath(wait, driver, xpath="(//input[@placeholder = '请选择字段项'])[5]")
+    wait_click_xpath(wait, driver, xpath="(//input[@placeholder = '请选择字段项'])[6]")
 
 
 

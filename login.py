@@ -54,7 +54,7 @@ def _main():
     login(account, password, driver, url, wait)
     return driver
 
-
+    
 def driver_create(chrome_path, chromedriver_path):
     chrome_options = Options()
     #chrome_options.add_argument('--incognito')

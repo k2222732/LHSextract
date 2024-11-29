@@ -34,15 +34,19 @@ def goodboy(coachs, students, students_gift):
         else:
             coachs_pocket[index_c] = students_gift[max_score_student_index]
 
-
-coachs = xls2list("G:\\project\\LHSextract\\开发区参与考核企业名单（新版）.xlsx", 'B2', coachs)
+#设置操作文件
+coachs = xls2list('G:\\OneDrive - lingdu\\wkzz\\2024.11.26祥峰调度\\更新后的数据.xlsx', 'c5', coachs)
+#设置参考模板不规范名位置
 students = xls2list("G:\\project\\LHSextract\\企业关键字对应规范名.xlsx", 'A1', students)
 for index, student in enumerate(students):
     students[index] = [student, 0]
+#设置参考模板规范名位置
 students_gift = xls2list("G:\\project\\LHSextract\\企业关键字对应规范名.xlsx", 'B1', students_gift)
 coachs_amount = len(coachs)
 coachs_pocket = [''] * coachs_amount
 goodboy(coachs, students, students_gift)
+#设置输出位置
+list2xls('G:\\OneDrive - lingdu\\wkzz\\2024.11.26祥峰调度\\更新后的数据.xlsx', 'd5', coachs_pocket)
 print(coachs_pocket)
 
 

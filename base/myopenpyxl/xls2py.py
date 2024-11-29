@@ -24,3 +24,19 @@ def xls2list(workbookpath, str, list):
 
 def char_to_number(char):
     return ord(char.lower()) - ord('a') + 1
+
+def list2xls(workbookpath, str, list):
+    workbook = openpyxl.load_workbook(workbookpath)
+    ws = workbook.active
+    start_cell = str
+    start_row = ws[start_cell].row
+    letter = ''.join([char for char in start_cell if char.isalpha()])
+    number = char_to_number(letter)
+
+    for i, value in enumerate(list):
+        ws.cell(row=start_row + i, column=number, value=value)
+    
+    workbook.save(workbookpath)
+
+
+    

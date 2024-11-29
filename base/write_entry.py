@@ -187,8 +187,11 @@ def click_button_until_specifyxpath_disappear(wait, driver, specifyxpath, button
 def click_button_until_specifyxpath_appear(wait, driver, specifyxpath, buttonxpath):
     while True:
         # 查找并点击按钮
-        button = driver.find_element(By.XPATH, buttonxpath)
-        button.click()
+        try:
+            button = wait.until(EC.element_to_be_clickable((By.XPATH, buttonxpath)))
+            button.click()
+        except:
+            pass
         try:
             # 等待目标元素出现
             wait.until(EC.presence_of_element_located((By.XPATH, specifyxpath)))

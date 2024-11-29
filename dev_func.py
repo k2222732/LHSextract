@@ -192,7 +192,7 @@ def new_excel(wait):
         if stop_event.is_set():
             return
         switch_devtarg(wait)
-        temp = wait.until(EC.presence_of_element_located((By.XPATH, "//div[@class = 'el-table person-table el-table--fit el-table--border el-table--enable-row-hover el-table--enable-row-transition']")))
+        temp = wait.until(EC.presence_of_element_located((By.XPATH, "//div[@class = 'searchForm flexCell node_flex']/following-sibling::div")))
         temp_html = temp.get_attribute("outerHTML")
         if "暂无数据" in temp_html:
             pass
@@ -231,7 +231,7 @@ def rebuild(excel_file_path, wait, member_excel,wb,ws):
     switch_informal_mem(wait)
     infomem_total_amount = get_total_amount(wait, xpath = "//span[@class = 'el-pagination__total']")
     switch_devtarg(wait)
-    temp = wait.until(EC.presence_of_element_located((By.XPATH, "//div[@class = 'el-table person-table el-table--fit el-table--border el-table--enable-row-hover el-table--enable-row-transition']")))
+    temp = wait.until(EC.presence_of_element_located((By.XPATH, "//div[@class = 'searchForm flexCell node_flex']/following-sibling::div")))
     temp_html = temp.get_attribute("outerHTML")
     if "暂无数据" in temp_html:
         devtar_total_amount = 0
@@ -257,7 +257,7 @@ def rebuild(excel_file_path, wait, member_excel,wb,ws):
         if stop_event.is_set():
             return
         switch_devtarg(wait)
-        temp = wait.until(EC.presence_of_element_located((By.XPATH, "//div[@class = 'el-table person-table el-table--fit el-table--border el-table--enable-row-hover el-table--enable-row-transition']")))
+        temp = wait.until(EC.presence_of_element_located((By.XPATH, "//div[@class = 'searchForm flexCell node_flex']/following-sibling::div")))
         temp_html = temp.get_attribute("outerHTML")
         if "暂无数据" in temp_html:
             pass
@@ -281,13 +281,13 @@ def rebuild(excel_file_path, wait, member_excel,wb,ws):
         if stop_event.is_set():
             return
         switch_devtarg(wait)
-        temp = wait.until(EC.presence_of_element_located((By.XPATH, "//div[@class = 'el-table person-table el-table--fit el-table--border el-table--enable-row-hover el-table--enable-row-transition']")))
+        temp = wait.until(EC.presence_of_element_located((By.XPATH, "//div[@class = 'searchForm flexCell node_flex']/following-sibling::div")))
         temp_html = temp.get_attribute("outerHTML")
         if "暂无数据" in temp_html:
             pass
         else:
             devtar_total_amount = get_total_amount(wait, xpath = "//span[@class = 'el-pagination__total']")
-        synchronizing(wait, member_excel, excel_file_path, control=3,wb=wb,ws=ws)
+            synchronizing(wait, member_excel, excel_file_path, control=3,wb=wb,ws=ws)
         if stop_event.is_set():
             return
         switch_activist(wait)
