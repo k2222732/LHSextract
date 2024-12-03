@@ -87,7 +87,7 @@ def new_excel(driver, wait, member_total_amount):
         columns = ["序号","姓名", "性别", "公民身份号码", "民族", "出生日期", "学历", "人员类别", "学位", 
             "所在党支部", "手机号码", "入党日期", "转正日期", "党龄", "党龄校正值", "新社会阶层类型", 
             "工作岗位", "从事专业技术职务", "是否农民工", "现居住地", "户籍所在地", "是否失联党员", 
-            "是否流动党员", "入党类型", "转正情况", "入党时所在支部", "延长预备期时间","党员所属行业"]
+            "是否流动党员", "入党类型", "转正情况", "入党时所在支部", "延长预备期时间","党员所属行业", "工作岗位补充"]
         
         wb = openpyxl.Workbook()
         ws = wb.active
@@ -305,6 +305,9 @@ def downloading_informal(count, file, wait, path, wb, ws, driver):
     #党员所属行业
     ershiba = wait.until(EC.presence_of_element_located((By.XPATH, "((//div[contains(text(), '党员所属行业')])[1]/following-sibling::div)[1]"))).text
     ws.cell(row=countx, column = 28, value = ershiba)
+    #工作岗位补充
+    ershijiu = wait.until(EC.presence_of_element_located((By.XPATH, "((//div[contains(text(), '工作岗位补充')])[1]/following-sibling::div)[1]"))).text
+    ws.cell(row=countx, column = 29, value = ershijiu)
     
     #切换选项卡
     switch_card_joininfo = wait.until(EC.element_to_be_clickable((By.ID, "tab-enterInfo")))
@@ -441,6 +444,10 @@ def downloading_formal(count, file, wait, path, wb, ws, driver):
     #党员所属行业
     ershiba = wait.until(EC.presence_of_element_located((By.XPATH, "((//div[contains(text(), '党员所属行业')])[1]/following-sibling::div)[1]"))).text
     ws.cell(row=countx, column = 28, value = ershiba)
+
+    #工作岗位补充
+    ershijiu = wait.until(EC.presence_of_element_located((By.XPATH, "((//div[contains(text(), '工作岗位补充')])[1]/following-sibling::div)[1]"))).text
+    ws.cell(row=countx, column = 29, value = ershijiu)
     
     #切换选项卡
     switch_card_joininfo = wait.until(EC.element_to_be_clickable((By.ID, "tab-enterInfo")))
