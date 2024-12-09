@@ -132,9 +132,12 @@ def main(args:list[str]):
 
         #//input[@placeholder = '请输入主持人']  <--  (//div[@aria-label = 'checkbox-group'])[2]/label[1]
         #element_zcr = wait.until(EC.presence_of_element_located((By.XPATH, "(//div[@aria-label = 'checkbox-group'])[2]/label[1]")))
-        element_zcr = wait_return_subelement_absolute(wait, time_w=0.5, xpath="(//div[@aria-label = 'checkbox-group'])[2]/label[1]")
-        zcr = element_zcr.get_attribute('textContent')
-        input_text(wait, driver, xpath="//input[@placeholder = '请输入主持人']", text=zcr)
+                # element_zcr = wait_return_subelement_absolute(wait, time_w=0.5, xpath="(//div[@aria-label = 'checkbox-group'])[2]/label[1]")
+                # zcr = element_zcr.get_attribute('textContent')
+                # input_text(wait, driver, xpath="//input[@placeholder = '请输入主持人']", text=zcr)
+        commen_button(wait, driver, xpath="//label[contains(text(), '主持人')]/following-sibling::div")
+        commen_button(wait, driver, xpath="(//div[@class = 'fs-select-dropdown fs-popper'])[3]//ul[@class = 'fs-scrollbar__view fs-select-dropdown__list']/li[1]")
+        
         #//input[@placeholder = '请输入记录人']  <--  (//div[@aria-label = 'checkbox-group'])[2]/label[2]
         element_jlr = wait.until(EC.presence_of_element_located((By.XPATH, "(//div[@aria-label = 'checkbox-group'])[2]/label[2]")))
         jlr = element_jlr.get_attribute('textContent')
