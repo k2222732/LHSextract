@@ -164,9 +164,10 @@ def new_excel(wait):
         rebuild(excel_file_path, wait, member_excel, wb, ws)
     else:
         os.makedirs(dev_directory, exist_ok=True)
-        columns = ["序号", "姓名","性别","公民身份证号码","民族","出生日期","学历","申请入党日期","手机号码","背景信息","工作岗位",
+        columns = ["序号", "姓名","性别","公民身份证号码","民族","出生日期","学历","申请入党日期","手机号码","背景信息","申请入党阶段工作岗位",
                 "政治面貌","接受申请党组织","籍贯","入团日期","参加工作日期","申请入党日期","确定入党积极分子日期",
-                "工作单位及职务","家庭住址","加入党组织日期","转为正式党员日期","人员类别","党籍状态","入党类型","所在党支部", "人员类型", "隶属党组织"]
+                "工作单位及职务","家庭住址","加入党组织日期","转为正式党员日期","人员类别","党籍状态","入党类型","积极分子阶段一线情况", "人员类型", "隶属党组织",
+                "预备党员阶段一线情况", "预备党员阶段工作岗位", "预备党员阶段所属行业", "申请入党阶段一线情况", "积极分子阶段工作岗位"]
             
         # df = pd.DataFrame(columns=columns)
         # df.to_excel(excel_file_path, index=False)
@@ -536,6 +537,8 @@ def downloading(file, wait, path, control, wb, ws, yixianrudang = False):
             name_temp = jibenxinxi_download(file, path, wait, countx, count, wb, ws)
             jijifenzi_download(path, file, wait, countx, control, wb, ws)
             yubeidangyuan(path, file, wait, countx, control, wb, ws)
+            ershiqi = "正式党员"
+            ws.cell(row = countx, column = 27, value =ershiqi)
             print("填写第",count,"个正式党员",name_temp,"信息成功") 
             amount_mem_complete = amount_mem_complete + 1
         elif yixianrudang== True:
@@ -543,6 +546,8 @@ def downloading(file, wait, path, control, wb, ws, yixianrudang = False):
             countx = count + 1
             temp_countx = count
             name_temp = formal_yixian_download(file, path, wait, countx, count, wb, ws)
+            ershiqi = "正式党员"
+            ws.cell(row = countx, column = 27, value =ershiqi)
             print("填写第",count,"个正式党员",name_temp,"信息成功") 
             amount_mem_complete = amount_mem_complete + 1
 
@@ -555,6 +560,8 @@ def downloading(file, wait, path, control, wb, ws, yixianrudang = False):
         name_temp = jibenxinxi_download(file, path, wait, countx, count, wb, ws)
         jijifenzi_download(path, file, wait, countx, control, wb, ws)
         yubeidangyuan(path, file, wait, countx, control, wb, ws)
+        ershiqi = "预备党员"
+        ws.cell(row = countx, column = 27, value =ershiqi)
         print("填写第",count,"个预备党员",name_temp,"信息成功") 
         amount_infomem_complete = amount_infomem_complete + 1
 
@@ -566,6 +573,52 @@ def downloading(file, wait, path, control, wb, ws, yixianrudang = False):
         temp_countx = count
         name_temp = jibenxinxi_download(file, path, wait, countx, count, wb, ws)
         jijifenzi_download(path, file, wait, countx, control, wb, ws)
+        
+        #加入党组织日期
+        ershiyi = "-"
+        ws.cell(row = countx, column = 21, value =ershiyi)
+        #人员类别
+        ershisan = "-"
+        ws.cell(row = countx, column = 23, value =ershisan)
+        #党籍状态
+        ershisi = "-"
+        ws.cell(row = countx, column = 24, value =ershisi)
+        #入党类型
+        ershiwu = "-"
+        ws.cell(row = countx, column = 25, value =ershiwu)
+        # 人员类型
+        ershiqi = "发展对象"
+        ws.cell(row = countx, column = 27, value =ershiqi)
+
+
+        #加入党组织日期
+        ershiyi = "-"
+        ws.cell(row = countx, column = 21, value =ershiyi)
+        #转为正式党员日期
+        ershier = "-"
+        ws.cell(row = countx, column = 22, value =ershier)
+        #人员类别
+        ershisan = "-"
+        ws.cell(row = countx, column = 23, value =ershisan)
+        #党籍状态
+        ershisi = "-"
+        ws.cell(row = countx, column = 24, value =ershisi)
+        #入党类型
+        ershiwu = "-"
+        ws.cell(row = countx, column = 25, value =ershiwu)
+
+        #预备党员阶段一线情况
+        ershijiu = "-"
+        ws.cell(row = countx, column = 29, value =ershijiu)
+
+        #预备党员阶段工作岗位
+        sanshi = "-"
+        ws.cell(row = countx, column = 30, value =sanshi)
+
+        #预备党员阶段所属行业
+        sanshiyi = "-"
+        ws.cell(row = countx, column = 31, value =sanshiyi)
+
         print("填写第",count,"个发展对象",name_temp,"信息成功") 
         amount_devtar_complete = amount_devtar_complete + 1
 
@@ -577,6 +630,38 @@ def downloading(file, wait, path, control, wb, ws, yixianrudang = False):
         temp_countx = count
         name_temp = jibenxinxi_download(file, path, wait, countx, count, wb, ws)
         jijifenzi_download(path, file, wait, countx, control, wb, ws)
+        #加入党组织日期
+        ershiyi = "-"
+        ws.cell(row = countx, column = 21, value =ershiyi)
+        #转为正式党员日期
+        ershier = "-"
+        ws.cell(row = countx, column = 22, value =ershier)
+        #人员类别
+        ershisan = "-"
+        ws.cell(row = countx, column = 23, value =ershisan)
+        #党籍状态
+        ershisi = "-"
+        ws.cell(row = countx, column = 24, value =ershisi)
+        #入党类型
+        ershiwu = "-"
+        ws.cell(row = countx, column = 25, value =ershiwu)
+
+        # 人员类型
+        ershiqi = "积极分子"
+        ws.cell(row = countx, column = 27, value =ershiqi)
+
+        #预备党员阶段一线情况
+        ershijiu = "-"
+        ws.cell(row = countx, column = 29, value =ershijiu)
+
+        #预备党员阶段工作岗位
+        sanshi = "-"
+        ws.cell(row = countx, column = 30, value =sanshi)
+
+        #预备党员阶段所属行业
+        sanshiyi = "-"
+        ws.cell(row = countx, column = 31, value =sanshiyi)
+
         print("填写第",count,"个积极分子",name_temp,"信息成功") 
         amount_activist_complete = amount_activist_complete + 1
 
@@ -589,7 +674,6 @@ def downloading(file, wait, path, control, wb, ws, yixianrudang = False):
         name_temp = jibenxinxi_download(file, path, wait, countx, count, wb, ws)
         if "入党积极分子基本信息" in driver0.page_source:
             jijifenzi_download(path, file, wait, countx, control, wb, ws)
-            
             # 加入党组织日期
             ershiyi = "-"
             ws.cell(row = countx, column = 21, value =ershiyi)
@@ -605,15 +689,6 @@ def downloading(file, wait, path, control, wb, ws, yixianrudang = False):
             # 入党类型
             ershiwu = "-"
             ws.cell(row = countx, column = 25, value =ershiwu)
-            # 所在党支部
-            ershiliu = "-"
-            ws.cell(row = countx, column = 26, value =ershiliu)
-
-            # 人员类型
-            ershiqi = "入党申请人"
-            ws.cell(row = countx, column = 27, value =ershiqi)
-            print("填写第",count,"个入党申请人",name_temp,"信息成功") 
-            amount_applicant_complete = amount_applicant_complete + 1
         else:
             #籍贯
             shisi = "-"
@@ -651,14 +726,34 @@ def downloading(file, wait, path, control, wb, ws, yixianrudang = False):
             # 入党类型
             ershiwu = "-"
             ws.cell(row = countx, column = 25, value =ershiwu)
-            # 所在党支部
+
+            # 积极分子阶段工作岗位
+            sanshisan = "-"
+            ws.cell(row = countx, column = 33, value =sanshisan)
+
+            # 积极分子阶段一线情况
             ershiliu = "-"
-            ws.cell(row = countx, column = 26, value =ershiliu)
-            # 人员类型
-            ershiqi = "入党申请人"
-            ws.cell(row = countx, column = 27, value =ershiqi)
-            print("填写第",count,"个入党申请人",name_temp,"信息成功") 
-            amount_applicant_complete = amount_applicant_complete + 1
+            ws.cell(row = countx, column = 26, value = ershiliu)
+
+
+        # 人员类型
+        ershiqi = "入党申请人"
+        ws.cell(row = countx, column = 27, value =ershiqi)
+
+        #预备党员阶段一线情况
+        ershijiu = "-"
+        ws.cell(row = countx, column = 29, value =ershijiu)
+
+        #预备党员阶段工作岗位
+        sanshi = "-"
+        ws.cell(row = countx, column = 30, value =sanshi)
+
+        #预备党员阶段所属行业
+        sanshiyi = "-"
+        ws.cell(row = countx, column = 31, value =sanshiyi)
+        
+        print("填写第",count,"个入党申请人",name_temp,"信息成功") 
+        amount_applicant_complete = amount_applicant_complete + 1
 
 
 
