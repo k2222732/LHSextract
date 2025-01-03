@@ -173,9 +173,15 @@ def rebuild(driver, wait, excel_file_path, org_excel, ws, wb, excel_file_path_m)
                     except:
                         arrow = wait_return_subelement_relative(1, complete_path, xpath="./span")
 
-        target = wait_return_subelement_relative_v2(1, container, xpath=f".//span[contains(text(), '{current_node_text}')]/..")
+        target = wait_return_subelement_relative_v2(1, container, xpath=f".//span[text() = '{current_node_text}']/..")
         target.click()
         downloading(file = org_excel, wait = wait, driver = driver, path = excel_file_path, rebuild = True, ws=sheet0, wb=workbook)
+        if amount_that_complete%100 == 0:
+            wb.save(excel_file_path)
+
+    wb.save(excel_file_path)
+        
+
         
 #在newexcel函数中执行init（）
 def init(driver, wait, org_directory):
@@ -224,6 +230,7 @@ def new_excel(wait, driver):
     #！！！！！初始化，将党组织信息录入到excel中
     
     if os.path.isfile(excel_file_path):
+
         time.sleep(3)
         org_excel = load_workbook(excel_file_path)
         config = configparser.ConfigParser()
@@ -309,7 +316,7 @@ def synchronizing(wait, org_excel, org_excel_path, driver, ws, wb, node_amount):
                 scroll = wait_return_subelement_absolute(wait, 1, "//div[@class = 'tree_wrapper']")
                 driver.execute_script("arguments[0].scrollTop = arguments[0].scrollHeight", scroll)
                 arrow.click()         #！！！！！！！！！！！！！！！！！！！！！！！！！！！！
-        target = wait_return_subelement_relative_v2(1, container, xpath=f".//span[contains(text(), '{current_node_text}')]/..")
+        target = wait_return_subelement_relative_v2(1, container, xpath=f".//span[text() = '{current_node_text}']/..")
         target.click()
         downloading(file = org_excel, wait = wait, driver = driver, path = org_excel_path, rebuild=False, ws=ws, wb=wb, )
        
@@ -572,7 +579,10 @@ def downloading(file, wait, driver, path, rebuild, ws, wb):
     #如果字符串org_type里面包含字眼"公司"则执行下面两行代码
     #if "公司" in org_type:
     if "公司" in org_type or "企业" in org_type:
-        ershiqi = wait.until(EC.presence_of_element_located((By.XPATH, "//label[contains(text(), '在岗职工数')]/following-sibling::div"))).text
+        try:
+            ershiqi = WebDriverWait(driver, 5).until(EC.presence_of_element_located((By.XPATH, "//label[contains(text(), '在岗职工数')]/following-sibling::div"))).text
+        except:
+            ershiqi = "非企业"
         ws.cell(row=countx, column = 27, value=ershiqi)
     
     else:
@@ -580,14 +590,20 @@ def downloading(file, wait, driver, path, rebuild, ws, wb):
         ws.cell(row=countx, column = 27, value=ershiqi)
     #在企业控制（控股）情况
     if "公司" in org_type or "企业" in org_type:
-        ershiba = wait.until(EC.presence_of_element_located((By.XPATH, "//label[contains(text(), '企业控制（控股）情况')]/following-sibling::div"))).text
+        try:
+            ershiba = WebDriverWait(driver, 5).until(EC.presence_of_element_located((By.XPATH, "//label[contains(text(), '企业控制（控股）情况')]/following-sibling::div"))).text
+        except:
+            ershiba = "非企业"
         ws.cell(row=countx, column = 28, value=ershiba)
     else:
         ershiba = "缺项"
         ws.cell(row=countx, column = 28, value=ershiba)
     #企业规模
     if "公司" in org_type or "企业" in org_type:
-        ershijiu = wait.until(EC.presence_of_element_located((By.XPATH, "//label[contains(text(), '企业规模')]/following-sibling::div"))).text
+        try:
+            ershijiu = WebDriverWait(driver, 5).until(EC.presence_of_element_located((By.XPATH, "//label[contains(text(), '企业规模')]/following-sibling::div"))).text
+        except:
+            ershijiu = "非企业"
         ws.cell(row=countx, column = 29, value=ershijiu)
     else:
         ershijiu = "缺项"
@@ -598,7 +614,10 @@ def downloading(file, wait, driver, path, rebuild, ws, wb):
 
     #民营科技企业标识
     if "公司" in org_type or "企业" in org_type:
-        sanshiyi = wait.until(EC.presence_of_element_located((By.XPATH, "//label[contains(text(), '民营科技企业标识')]/following-sibling::div"))).text
+        try:
+            sanshiyi = WebDriverWait(driver, 5).until(EC.presence_of_element_located((By.XPATH, "//label[contains(text(), '民营科技企业标识')]/following-sibling::div"))).text
+        except:
+            sanshiyi = "非企业"
         ws.cell(row=countx, column = 31, value=sanshiyi)
     else:
         sanshiyi = "缺项"
@@ -692,7 +711,7 @@ def downloading(file, wait, driver, path, rebuild, ws, wb):
         # 上级主管部门名称
         sishisi = "缺项"
         ws.cell(row=countx, column = 44, value=sishisi)
-        wb.save(path)
+        
     # 切换选项卡到班子成员
     while 1:
         try:
