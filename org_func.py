@@ -177,9 +177,11 @@ def rebuild(driver, wait, excel_file_path, org_excel, ws, wb, excel_file_path_m)
         target.click()
         downloading(file = org_excel, wait = wait, driver = driver, path = excel_file_path, rebuild = True, ws=sheet0, wb=workbook)
         if amount_that_complete%100 == 0:
-            wb.save(excel_file_path)
+            workbook.save(excel_file_path)
+        elif amount_that_complete == org_totol_amount:
+            workbook.save(excel_file_path)
 
-    wb.save(excel_file_path)
+    
         
 
         
@@ -319,6 +321,10 @@ def synchronizing(wait, org_excel, org_excel_path, driver, ws, wb, node_amount):
         target = wait_return_subelement_relative_v2(1, container, xpath=f".//span[text() = '{current_node_text}']/..")
         target.click()
         downloading(file = org_excel, wait = wait, driver = driver, path = org_excel_path, rebuild=False, ws=ws, wb=wb, )
+        if amount_that_complete%100 == 0:
+            wb.save(org_excel_path)
+        elif amount_that_complete == org_totol_amount:
+            wb.save(org_excel_path)
        
     
     
@@ -448,10 +454,10 @@ def downloading(file, wait, driver, path, rebuild, ws, wb):
     #组织树 #wait.until(EC.presence_of_element_located((By.XPATH, "(//div[@class = 'card-class']//div[@class = 'fs-tabs__content']//div[@class = 'row-val-shot'])[3]"))).text
     ws.cell(row=countx, column = 3, value="-")
     #党组织简称#
-    si = wait.until(EC.presence_of_element_located((By.XPATH, "//span[contains(text(), '党组织简称')]/../following-sibling::*/div[1]"))).text
+    si = wait.until(EC.presence_of_element_located((By.XPATH, "//span[contains(text(), '党组织常用简称')]/../following-sibling::*/div[1]"))).text
     ws.cell(row=countx, column = 4, value=si) 
     #党内统计用党组织简称#
-    wu = wait.until(EC.presence_of_element_located((By.XPATH, "(//span[contains(text(),  '党内统计用党组织简称')]/../following-sibling::div/div)[1]"))).text
+    wu = wait.until(EC.presence_of_element_located((By.XPATH, "//span[contains(text(), '党组织常用简称')]/../following-sibling::*/div[1]"))).text
     ws.cell(row=countx, column = 5, value=wu)
     #成立日期#
     liu = wait.until(EC.presence_of_element_located((By.XPATH, "//span[contains(text(),  '成立日期')]/../following-sibling::div/div[1]"))).text
@@ -673,7 +679,7 @@ def downloading(file, wait, driver, path, rebuild, ws, wb):
         # 上级主管部门名称
         sishisi = wait.until(EC.presence_of_element_located((By.XPATH, "//label[contains(text(), '上级主管部门名称')]/following-sibling::div"))).text
         ws.cell(row=countx, column = 44, value=sishisi)
-        wb.save(path)
+        
 
     else:
         sanshisan = "缺项"
@@ -727,7 +733,13 @@ def downloading(file, wait, driver, path, rebuild, ws, wb):
             councilcard = wait.until(EC.element_to_be_clickable((By.ID, "tab-class")))
             time.sleep(0.5)
     # 采集班子成员信息
-    table_council(name_temp, wait, driver)
+    temp = wait.until(EC.presence_of_element_located((By.XPATH, "(//div[@class='fs-table fs-table--fit fs-table--border fs-table--scrollable-x fs-table--enable-row-transition fs-table--mini'])[1]")))
+    temp_html = temp.get_attribute("outerHTML")
+    if "暂无数据" in temp_html:
+        pass
+    else:
+        table_council(name_temp, wait, driver)
+    
 
     # right_arrow = wait_return_subelement_absolute_notmust(wait, 1, "//i[@class = 'fs-icon-arrow-right']", 3)
     

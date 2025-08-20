@@ -154,6 +154,7 @@ def rebuild(driver, excel_file_path, wait, member_total_amount, member_excel, me
 
 def synchronizing(driver, wait, member_total_amount, member_excel, member_excel_path, wb, ws):
     global amount_that_complete
+    current_scroll = 0
     while amount_that_complete < member_total_amount:
         page_number = int(amount_that_complete / 100 + 1)
         row_number = int(amount_that_complete % 100 + 1)
@@ -170,9 +171,20 @@ def synchronizing(driver, wait, member_total_amount, member_excel, member_excel_
             strip_num = member_total_amount % 100
         else:
             strip_num = 100
+        current_scroll_old = current_scroll
         current_scroll = ((row_number%100)/strip_num)*int(scroll_height)
         #access_info_page(wait, row_number)
-        click_button_until_specifyxpath_appear(wait, driver, specifyxpath = "//span[contains(text(), '党员详情')]", buttonxpath = f"(//table[@class='fs-table__body'])[3]/tbody/tr[{row_number}]/td[3]//div[@role = 'button']")
+        result = click_button_until_specifyxpath_appear_bool(wait, driver, specifyxpath = "//span[contains(text(), '党员详情')]", buttonxpath = f"(//table[@class='fs-table__body'])[3]/tbody/tr[{row_number}]/td[3]", time_w =0.5, times = 3)
+        if result == False:
+            while 1:
+                try:
+                    driver.execute_script("arguments[0].scrollTop = arguments[1]", scroll, current_scroll_old)
+                    result = click_button_until_specifyxpath_appear_bool(wait, driver, specifyxpath = "//span[contains(text(), '党员详情')]", buttonxpath = f"(//table[@class='fs-table__body'])[3]/tbody/tr[{row_number}]/td[3]", time_w =0.5, times = 3)
+                #如果出现异常代表已经进来了
+                except:
+                    break
+                if result == True:
+                    break
         while 1:
             try:
                 downloading(amount_that_complete, member_excel, wait, member_excel_path, wb, ws, driver)
@@ -180,7 +192,11 @@ def synchronizing(driver, wait, member_total_amount, member_excel, member_excel_
                 break
             except:
                 #access_info_page(wait, row_number)
-                click_button_until_specifyxpath_appear(wait, driver, specifyxpath = "//span[contains(text(), '党员详情')]", buttonxpath = f"(//table[@class='fs-table__body'])[3]/tbody/tr[{row_number}]/td[3]//div[@role = 'button']")
+                try:
+                    click_button_until_specifyxpath_appear_except(wait, driver, specifyxpath = "//span[contains(text(), '党员详情')]", buttonxpath = f"(//table[@class='fs-table__body'])[3]/tbody/tr[{row_number}]/td[3]//div[@role = 'button']", time_w = 0.5, times = 3)
+                except:
+                    driver.execute_script("arguments[0].scrollTop = arguments[1]", scroll, current_scroll_old)
+
         amount_that_complete = amount_that_complete + 1
         ##在这里检查线程关闭信号
         if stop_event.is_set():
@@ -190,7 +206,7 @@ def synchronizing(driver, wait, member_total_amount, member_excel, member_excel_
 
 def downloading(count, file, wait, path, wb, ws, driver):
     while 1:
-            rylb = wait.until(EC.presence_of_element_located((By.XPATH, "(//div[@class = 'card-class']//div[@class = 'fs-tabs__content']//div[@class = 'row-val-shot'])[7]"))).text
+            rylb = wait.until(EC.presence_of_element_located((By.XPATH, "(//div[contains(text(), '人员类别')]/following-sibling::div)[1]"))).text
             if rylb == '正式党员':
                 downloading_formal(count, file, wait, path, wb, ws, driver)
                 break
@@ -210,47 +226,47 @@ def downloading_informal(count, file, wait, path, wb, ws, driver):
     ws.cell(row=countx, column = 1, value = yi)
     #file.save(path)
     #填写姓名
-    er = wait.until(EC.presence_of_element_located((By.XPATH, "(//div[@class = 'card-class']//div[@class = 'fs-tabs__content']//div[@class = 'row-val-shot'])[1]"))).text
+    er = wait.until(EC.presence_of_element_located((By.XPATH, "(//div[contains(text(), '姓名')]/following-sibling::div)[1]"))).text
     ws.cell(row=countx, column=2, value=er)
     #file.save(path)
     #性别
-    san = wait.until(EC.presence_of_element_located((By.XPATH, "(//div[@class = 'card-class']//div[@class = 'fs-tabs__content']//div[@class = 'row-val-shot'])[3]"))).text
+    san = wait.until(EC.presence_of_element_located((By.XPATH, "(//div[contains(text(), '性别')]/following-sibling::div)[1]"))).text
     ws.cell(row=countx, column = 3, value = san)
     #file.save(path)
     #身份证
-    si = wait.until(EC.presence_of_element_located((By.XPATH, "(//div[@class = 'card-class']//div[@class = 'fs-tabs__content']//div[@class = 'row-val-shot'])[2]"))).text
+    si = wait.until(EC.presence_of_element_located((By.XPATH, "(//div[contains(text(), '公民身份号码')]/following-sibling::div)[1]"))).text
     ws.cell(row=countx, column = 4, value = si)
     #file.save(path)
     #民族
-    wu = wait.until(EC.presence_of_element_located((By.XPATH, "(//div[@class = 'card-class']//div[@class = 'fs-tabs__content']//div[@class = 'row-val-shot'])[4]"))).text
+    wu = wait.until(EC.presence_of_element_located((By.XPATH, "(//div[contains(text(), '民族')]/following-sibling::div)[1]"))).text
     ws.cell(row=countx, column = 5, value = wu)
     #file.save(path)
     #出生日期
-    liu = wait.until(EC.presence_of_element_located((By.XPATH, "(//div[@class = 'card-class']//div[@class = 'fs-tabs__content']//div[@class = 'row-val-shot'])[5]"))).text
+    liu = wait.until(EC.presence_of_element_located((By.XPATH, "(//div[contains(text(), '出生日期')]/following-sibling::div)[1]"))).text
     ws.cell(row=countx, column = 6, value = liu)
     #file.save(path)
     #学历
-    qi = wait.until(EC.presence_of_element_located((By.XPATH, "(//div[@class = 'card-class']//div[@class = 'fs-tabs__content']//div[@class = 'row-val-shot'])[6]"))).text
+    qi = wait.until(EC.presence_of_element_located((By.XPATH, "(//div[contains(text(), '学历')]/following-sibling::div)[1]"))).text
     ws.cell(row=countx, column = 7, value = qi)
     #file.save(path)
     #人员类别
-    ba = wait.until(EC.presence_of_element_located((By.XPATH, "(//div[@class = 'card-class']//div[@class = 'fs-tabs__content']//div[@class = 'row-val-shot'])[7]"))).text
+    ba = wait.until(EC.presence_of_element_located((By.XPATH, "(//div[contains(text(), '人员类别')]/following-sibling::div)[1]"))).text
     ws.cell(row=countx, column = 8, value = ba)
     #file.save(path)
     #学位
-    jiu = wait.until(EC.presence_of_element_located((By.XPATH, "(//div[@class = 'card-class']//div[@class = 'fs-tabs__content']//div[@class = 'row-val-shot'])[8]"))).text
+    jiu = wait.until(EC.presence_of_element_located((By.XPATH, "(//div[contains(text(), '学位')]/following-sibling::div)[1]"))).text
     ws.cell(row=countx, column = 9, value = jiu)
     #file.save(path)
     #所在党支部
-    shi = wait.until(EC.presence_of_element_located((By.XPATH, "//div[@class = 'card-class']//div[@class = 'row-vals-shot']"))).text
+    shi = wait.until(EC.presence_of_element_located((By.XPATH, "(//div[contains(text(), '所在党支部')]/following-sibling::div)[1]"))).text
     ws.cell(row=countx, column = 10, value = shi)
     #file.save(path)
     #手机号码
-    shiyi = wait.until(EC.presence_of_element_located((By.XPATH, "(//div[@class = 'card-class']//div[@class = 'fs-tabs__content']//div[@class = 'row-val-shot'])[9]"))).text
+    shiyi = wait.until(EC.presence_of_element_located((By.XPATH, "(//div[contains(text(), '手机号码')]/following-sibling::div)[1]"))).text
     ws.cell(row=countx, column = 11, value = shiyi)
     #file.save(path)
     #入党日期
-    shier = wait.until(EC.presence_of_element_located((By.XPATH, "(//div[@class = 'card-class']//div[@class = 'fs-tabs__content']//div[@class = 'row-val-shot'])[10]"))).text
+    shier = wait.until(EC.presence_of_element_located((By.XPATH, "(//div[contains(text(), '入党日期')]/following-sibling::div)[1]"))).text
     ws.cell(row=countx, column = 12, value = shier)
     #file.save(path)
     #转正日期
@@ -266,7 +282,7 @@ def downloading_informal(count, file, wait, path, wb, ws, driver):
     ws.cell(row=countx, column = 15, value = shiwu)
     #file.save(path)
     #新社会阶层类型
-    shiliu = wait.until(EC.presence_of_element_located((By.XPATH, "(//div[@class = 'card-class']//div[@class = 'fs-tabs__content']//div[@class = 'row-val-big'])[2]"))).text
+    shiliu = wait.until(EC.presence_of_element_located((By.XPATH, "(//div[contains(text(), '新社会阶层类型')]/following-sibling::div)[1]"))).text
     ws.cell(row=countx, column = 16, value = shiliu)
     #file.save(path)
     #工作岗位
@@ -348,63 +364,63 @@ def downloading_formal(count, file, wait, path, wb, ws, driver):
     ws.cell(row=countx, column = 1, value = yi)
     #file.save(path)
     #填写姓名
-    er = wait.until(EC.presence_of_element_located((By.XPATH, "(//div[@class = 'card-class']//div[@class = 'fs-tabs__content']//div[@class = 'row-val-shot'])[1]"))).text
+    er = wait.until(EC.presence_of_element_located((By.XPATH, "(//div[contains(text(), '姓名')]/following-sibling::div)[1]"))).text
     ws.cell(row=countx, column = 2, value = er)
     #file.save(path)
     #性别
-    san = wait.until(EC.presence_of_element_located((By.XPATH, "(//div[@class = 'card-class']//div[@class = 'fs-tabs__content']//div[@class = 'row-val-shot'])[3]"))).text
+    san = wait.until(EC.presence_of_element_located((By.XPATH, "(//div[contains(text(), '性别')]/following-sibling::div)[1]"))).text
     ws.cell(row=countx, column = 3, value = san)
     #file.save(path)
     #身份证
-    si = wait.until(EC.presence_of_element_located((By.XPATH, "(//div[@class = 'card-class']//div[@class = 'fs-tabs__content']//div[@class = 'row-val-shot'])[2]"))).text
+    si = wait.until(EC.presence_of_element_located((By.XPATH, "(//div[contains(text(), '公民身份号码')]/following-sibling::div)[1]"))).text
     ws.cell(row=countx, column = 4, value = si)
     #file.save(path)
     #民族
-    wu = wait.until(EC.presence_of_element_located((By.XPATH, "(//div[@class = 'card-class']//div[@class = 'fs-tabs__content']//div[@class = 'row-val-shot'])[4]"))).text
+    wu = wait.until(EC.presence_of_element_located((By.XPATH, "(//div[contains(text(), '民族')]/following-sibling::div)[1]"))).text
     ws.cell(row=countx, column = 5, value = wu)
     #file.save(path)
     #出生日期
-    liu = wait.until(EC.presence_of_element_located((By.XPATH, "(//div[@class = 'card-class']//div[@class = 'fs-tabs__content']//div[@class = 'row-val-shot'])[5]"))).text
+    liu = wait.until(EC.presence_of_element_located((By.XPATH, "(//div[contains(text(), '出生日期')]/following-sibling::div)[1]"))).text
     ws.cell(row=countx, column = 6, value = liu)
     #file.save(path)
     #学历
-    qi = wait.until(EC.presence_of_element_located((By.XPATH, "(//div[@class = 'card-class']//div[@class = 'fs-tabs__content']//div[@class = 'row-val-shot'])[6]"))).text
+    qi = wait.until(EC.presence_of_element_located((By.XPATH, "(//div[contains(text(), '学历')]/following-sibling::div)[1]"))).text
     ws.cell(row=countx, column = 7, value = qi)
     #file.save(path)
     #人员类别
-    ba = wait.until(EC.presence_of_element_located((By.XPATH, "(//div[@class = 'card-class']//div[@class = 'fs-tabs__content']//div[@class = 'row-val-shot'])[7]"))).text
+    ba = wait.until(EC.presence_of_element_located((By.XPATH, "(//div[contains(text(), '人员类别')]/following-sibling::div)[1]"))).text
     ws.cell(row=countx, column = 8, value = ba)
     #file.save(path)
     #学位
-    jiu = wait.until(EC.presence_of_element_located((By.XPATH, "(//div[@class = 'card-class']//div[@class = 'fs-tabs__content']//div[@class = 'row-val-shot'])[8]"))).text
+    jiu = wait.until(EC.presence_of_element_located((By.XPATH, "(//div[contains(text(), '学位')]/following-sibling::div)[1]"))).text
     ws.cell(row=countx, column = 9, value = jiu)
     #file.save(path)
     #所在党支部
-    shi = wait.until(EC.presence_of_element_located((By.XPATH, "//div[@class = 'card-class']//div[@class = 'row-vals-shot']"))).text
+    shi = wait.until(EC.presence_of_element_located((By.XPATH, "(//div[contains(text(), '所在党支部')]/following-sibling::div)[1]"))).text
     ws.cell(row=countx, column = 10, value = shi)
     #file.save(path)
     #手机号码
-    shiyi = wait.until(EC.presence_of_element_located((By.XPATH, "(//div[@class = 'card-class']//div[@class = 'fs-tabs__content']//div[@class = 'row-val-shot'])[9]"))).text
+    shiyi = wait.until(EC.presence_of_element_located((By.XPATH, "(//div[contains(text(), '手机号码')]/following-sibling::div)[1]"))).text
     ws.cell(row=countx, column = 11, value = shiyi)
     #file.save(path)
     #入党日期
-    shier = wait.until(EC.presence_of_element_located((By.XPATH, "(//div[@class = 'card-class']//div[@class = 'fs-tabs__content']//div[@class = 'row-val-shot'])[10]"))).text
+    shier = wait.until(EC.presence_of_element_located((By.XPATH, "(//div[contains(text(), '入党日期')]/following-sibling::div)[1]"))).text
     ws.cell(row=countx, column = 12, value = shier)
     #file.save(path)
     #转正日期
-    shisan = wait.until(EC.presence_of_element_located((By.XPATH, "(//div[@class = 'card-class']//div[@class = 'fs-tabs__content']//div[@class = 'row-val-big'])[1]"))).text
+    shisan = wait.until(EC.presence_of_element_located((By.XPATH, "(//div[contains(text(), '转正日期')]/following-sibling::div)[1]"))).text
     ws.cell(row=countx, column = 13, value = shisan)
     #file.save(path)
     #党龄
-    shisi = wait.until(EC.presence_of_element_located((By.XPATH, "(//div[@class = 'card-class']//div[@class = 'table-row'])[7]//div[2]"))).text
+    shisi = wait.until(EC.presence_of_element_located((By.XPATH, "(//div[contains(text(), '党龄')]/following-sibling::div)[1]"))).text
     ws.cell(row=countx, column = 14, value = shisi)
     #file.save(path)
     #党龄矫正值
-    shiwu = wait.until(EC.presence_of_element_located((By.XPATH, "(//div[@class = 'card-class']//div[@class = 'fs-tabs__content']//div[@class = 'row-val-big'])[2]"))).text
+    shiwu = wait.until(EC.presence_of_element_located((By.XPATH, "(//div[contains(text(), '党龄校正值')]/following-sibling::div)[1]"))).text
     ws.cell(row=countx, column = 15, value = shiwu)
     #file.save(path)
     #新社会阶层类型
-    shiliu = wait.until(EC.presence_of_element_located((By.XPATH, "(//div[@class = 'card-class']//div[@class = 'fs-tabs__content']//div[@class = 'row-val-big'])[4]"))).text
+    shiliu = wait.until(EC.presence_of_element_located((By.XPATH, "(//div[contains(text(), '新社会阶层类型')]/following-sibling::div)[1]"))).text
     ws.cell(row=countx, column = 16, value = shiliu)
     #file.save(path)
     #工作岗位

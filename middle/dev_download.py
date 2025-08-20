@@ -71,12 +71,32 @@ def jibenxinxi_download(file, path, wait, countx, count, wb, ws):
     #申请人阶段一线情况
     table_element = wait.until(EC.presence_of_element_located((By.XPATH, "//div[@id = 'pane-1']//table[@class = 'y_table form-table']")))
     table_html = table_element.get_attribute("innerHTML")
+
+
     if "一线情况" in table_html:
-        sanshier = wait.until(EC.presence_of_element_located((By.XPATH, "(//td[contains(text(), '一线情况')]/following-sibling::td)[1]"))).text
-        ws.cell(row = countx, column = 32, value =sanshier)
+        while 1:
+            sanshier = wait_return_subelement_try(wait, time_w = 0.5, xpath="(//td[contains(text(), '一线情况')]/following-sibling::td)[1]")
+            if sanshier is not False:
+                sanshier = sanshier.get_attribute("textContent")
+                break
+            else:
+                sanshier = wait_return_subelement_try(wait, time_w = 0.5, xpath="(//td[contains(text(), '一线情况')]/following-sibling::td)")
+                if sanshier is not False:
+                    sanshier = sanshier.get_attribute("textContent")
+                    break
+
+            ws.cell(row = countx, column = 32, value =sanshier)
     else:
         sanshier = '无一线情况字段'
         ws.cell(row = countx, column = 32, value =sanshier)
+
+
+#    if "一线情况" in table_html:
+#        sanshier = wait.until(EC.presence_of_element_located((By.XPATH, "(//td[contains(text(), '一线情况')]/following-sibling::td)[1]"))).text
+#        ws.cell(row = countx, column = 32, value =sanshier)
+#    else:
+#        sanshier = '无一线情况字段'
+#        ws.cell(row = countx, column = 32, value =sanshier)
 
     return name_temp
 
@@ -129,12 +149,31 @@ def jijifenzi_download(path, file, wait, countx, control, wb, ws):
         #积极分子阶段一线情况
         table_element = wait.until(EC.presence_of_element_located((By.XPATH, "//div[@id = 'pane-2']//table[@class = 'y_table form-table']")))
         table_html = table_element.get_attribute("innerHTML")
+
+
         if "一线情况" in table_html:
-            ershiliu = wait.until(EC.presence_of_element_located((By.XPATH, "(//td[contains(text(), '一线情况')]/following-sibling::td)[2]"))).text
+            while 1:
+                ershiliu = wait_return_subelement_try(wait, time_w = 0.5, xpath="(//td[contains(text(), '一线情况')]/following-sibling::td)[2]")
+                if ershiliu is not False:
+                    ershiliu = ershiliu.get_attribute("textContent")
+                    break
+                else:
+                    ershiliu = wait_return_subelement_try(wait, time_w = 0.5, xpath="(//td[contains(text(), '一线情况')]/following-sibling::td)")
+                    if ershiliu is not False:
+                        ershiliu = ershiliu.get_attribute("textContent")
+                        break
+
             ws.cell(row = countx, column = 26, value =ershiliu)
         else:
             ershiliu = '无一线情况字段'
             ws.cell(row = countx, column = 26, value =ershiliu)
+
+#        if "一线情况" in table_html:
+#            ershiliu = wait.until(EC.presence_of_element_located((By.XPATH, "(//td[contains(text(), '一线情况')]/following-sibling::td)[2]"))).text
+#            ws.cell(row = countx, column = 26, value =ershiliu)
+#        else:
+#            ershiliu = '无一线情况字段'
+#           ws.cell(row = countx, column = 26, value =ershiliu)
 
         #积极分子阶段工作岗位
         sanshisan = wait.until(EC.presence_of_element_located((By.XPATH, "(//td[contains(text(), '工作岗位')])[2]/following-sibling::td[1]"))).text
@@ -191,7 +230,17 @@ def yubeidangyuan(path, file, wait, countx, control, wb, ws):
         table_element = wait.until(EC.presence_of_element_located((By.XPATH, "//div[@id = 'pane-4']//table[@class = 'y_table form-table']")))
         table_html = table_element.get_attribute("innerHTML")
         if "一线情况" in table_html:
-            ershijiu = wait_return_subelement_absolute(wait, time_w = 0.5, xpath="(//td[contains(text(), '一线情况')]/following-sibling::td)[4]").get_attribute("textContent")
+            while 1:
+                ershijiu = wait_return_subelement_try(wait, time_w = 0.5, xpath="(//td[contains(text(), '一线情况')]/following-sibling::td)[2]")
+                if ershijiu is not False:
+                    ershijiu = ershijiu.get_attribute("textContent")
+                    break
+                else:
+                    ershijiu = wait_return_subelement_try(wait, time_w = 0.5, xpath="(//td[contains(text(), '一线情况')]/following-sibling::td)")
+                    if ershijiu is not False:
+                        ershijiu = ershijiu.get_attribute("textContent")
+                        break
+
             ws.cell(row = countx, column = 29, value =ershijiu)
         else:
             ershijiu = '无一线情况字段'
@@ -269,10 +318,10 @@ def formal_yixian_download(file, path, wait, countx, count, wb, ws):
     shisan = '-'
     ws.cell(row = countx, column = 13, value =shisan)
     #入团日期
-    shiwu = wait.until(EC.presence_of_element_located((By.XPATH, "(//td[contains(text(), '入团日期')])/following-sibling::td[1]"))).text
+    shiwu = wait.until(EC.presence_of_element_located((By.XPATH, "//table[@class = 'y_table form-table']//span[contains(text(), '入团日期')]"))).text
     ws.cell(row = countx, column = 15, value =shiwu)
     #参加工作日期
-    shiliu = wait.until(EC.presence_of_element_located((By.XPATH, "(//td[contains(text(), '参加工作日期')])/following-sibling::td[1]"))).text
+    shiliu = wait.until(EC.presence_of_element_located((By.XPATH, "//table[@class = 'y_table form-table']//span[contains(text(), '参加工作日期')]"))).text
     ws.cell(row = countx, column = 16, value =shiliu)
     #申请入党日期
     shiqi = wait.until(EC.presence_of_element_located((By.XPATH, "(//td[contains(text(), '递交入党申请书日期')])/following-sibling::td[1]"))).text
@@ -302,7 +351,7 @@ def formal_yixian_download(file, path, wait, countx, count, wb, ws):
     ershiwu = wait.until(EC.presence_of_element_located((By.XPATH, "(//td[contains(text(), '入党类型')])[1]/following-sibling::td[1]"))).text
     ws.cell(row = countx, column = 25, value =ershiwu)
     #所在党支部
-    ershiliu = wait.until(EC.presence_of_element_located((By.XPATH, "(//td[contains(text(), '所属党组织')])[1]/following-sibling::td[1]"))).text
+    ershiliu = wait.until(EC.presence_of_element_located((By.XPATH, "//span[contains(text(), '所属党组织')]/following-sibling::span"))).text
     ws.cell(row=countx, column=26, value = ershiliu)
     ershiqi = "正式党员"
     ws.cell(row = countx, column = 27, value =ershiqi)

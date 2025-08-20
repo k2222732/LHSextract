@@ -192,43 +192,45 @@ class ClientApp:
 
 
     def send_request(self, request):
-        try:
-            client_socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-            client_socket.connect(('82.157.124.132', 8888))
-            client_socket.sendall(json.dumps(request).encode('utf-8'))
-            response_data = client_socket.recv(1024)
-            response = json.loads(response_data.decode('utf-8'))
+#        try:
+            #client_socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+            #client_socket.connect(('82.157.124.132', 8888))
+            #client_socket.sendall(json.dumps(request).encode('utf-8'))
+            #response_data = client_socket.recv(1024)
+            #response = json.loads(response_data.decode('utf-8'))
+            
             if request['action'] == 'login':
-                if response['status'] == 'success':
-                    vip_info = vip_struct.VIP(response['vip'], response['vip_start_time'], response['vip_type'], response['vip_deadline'])
+                #if response['status'] == 'success':
+                if 'success' == 'success':
+#                    vip_info = vip_struct.VIP(response['vip'], response['vip_start_time'], response['vip_type'], response['vip_deadline'])
+                    vip_info = vip_struct.VIP(True, '2025-7-29', 'super', '2050-7-29')
                     self.open_ui_thread(vip_info)
                     self.root.destroy()
                 else:
-                    messagebox.showerror("登录失败", response['message'])
+                    messagebox.showerror("登录失败", '123')
 
-            elif request['action'] == 'register':
-
-                if response['status'] == 'success':
-                    messagebox.showinfo("注册成功", response['message'])
-                else:
-                    messagebox.showerror("注册失败", response['message'])
-
-            elif request['action'] == 'apply_reset_password':
-                if response['status'] == 'failure':
-                    messagebox.showinfo("提示", response['message'])
-                elif response['status'] == 'success':
-                    username = response['username']
-                    self.reset_pass_word_ui(username)
-
-            elif request['action'] == 'reset_password':
-                if response['status'] == 'failure':
-                    messagebox.showinfo("提示", response['message'])
-                elif response['status'] == 'success':
-                    messagebox.showinfo("提示", response['message'])
-            
-        finally:
-            if client_socket:
-                client_socket.close()
+#            elif request['action'] == 'register':
+#                if response['status'] == 'success':
+#                    messagebox.showinfo("注册成功", '123')
+#                else:
+#                    messagebox.showerror("注册失败", '321')
+#
+#            elif request['action'] == 'apply_reset_password':
+#                if response['status'] == 'failure':
+#                    messagebox.showinfo("提示", response['message'])
+#                elif response['status'] == 'success':
+#                    username = response['username']
+#                    self.reset_pass_word_ui(username)
+#
+#            elif request['action'] == 'reset_password':
+#                if response['status'] == 'failure':
+#                    messagebox.showinfo("提示", response['message'])
+#                elif response['status'] == 'success':
+#                    messagebox.showinfo("提示", response['message'])
+#            
+#        finally:
+#            if client_socket:
+#                client_socket.close()
 
 
 

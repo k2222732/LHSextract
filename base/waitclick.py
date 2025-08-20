@@ -102,6 +102,26 @@ def wait_return_subelement_absolute(wait, time_w, xpath):
             traceback.print_exc()
             time.sleep(time_w)
 
+
+#鲁棒返回对象（次数）
+def wait_return_subelement_try(wait, time_w, xpath):
+    i = 1
+    while(1):
+        try:
+            target_element = wait.until(EC.presence_of_element_located((By.XPATH, xpath)))
+            return target_element
+        except:
+            traceback.print_exc()
+            i = i + 1
+            if i < 5:
+                break
+            else:
+                time.sleep(time_w)
+    return False
+
+
+
+
 def wait_return_subelement_absolute_v1(wait, time_w, xpath):
     while(1):
         try:

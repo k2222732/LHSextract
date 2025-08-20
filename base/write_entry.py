@@ -220,6 +220,26 @@ def click_button_until_specifyxpath_appear_except(wait, driver, specifyxpath, bu
             i = i +1
             
 
+def click_button_until_specifyxpath_appear_bool(wait, driver, specifyxpath, buttonxpath, time_w, times):
+    
+    i = 1
+    while True:
+        if i >= times:
+            return False
+        # 查找并点击按钮
+        try:
+            button = WebDriverWait(driver, 4).until(EC.element_to_be_clickable((By.XPATH, buttonxpath)))
+            button.click()
+        except:
+            pass
+        try:
+            # 等待目标元素出现
+            WebDriverWait(driver, time_w).until(EC.presence_of_element_located((By.XPATH, specifyxpath)))
+            break
+        except:
+            i = i +1
+    return True
+
 #等待某个xpath出现，然后再消失
 def wait_specifyxpath_appear_disappear(wait, driver, xpath):
     wait.until(EC.visibility_of_element_located(By.XPATH, xpath))

@@ -43,7 +43,8 @@ text = ("开展“不忘初心，牢记使命”主题党日活动\n"
 #三会一课内容
 zbordw = ""#支部还是党委
 qc = "202406  “请党放心 强国有我”——青年党员学习研讨"#期次
-excel_path = "G:\\project\\LHSextract\\三会一课未上传\\三会一课未上传名单.xlsx"#未上传名单的路径
+#excel_path = "G:\\project\\LHSextract\\三会一课未上传\\三会一课未上传名单.xlsx"#未上传名单的路径
+excel_path = "D:\\code\\LHSextract\\三会一课未上传\\三会一课未上传名单.xlsx"#未上传名单的路径
 
 
 def init(args:list[str]):
