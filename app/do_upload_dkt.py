@@ -215,7 +215,8 @@ def recursion_org(tree_root, wait, driver, root_node:TreeNode):
             wait_click_xpath_relative(wait=wait,time_w = 0.5, element = item, xpath = ".//span[@class = 'el-tree-node__expand-icon el-icon-caret-right']")
             new_tree_root = wait_return_subelement_relative(time_w = 0.5, element= item, xpath = ".//div[@role = 'group']")
             recursion_org(new_tree_root, wait, driver, new_node)
-            
+
+
 
 
 
