@@ -196,7 +196,7 @@ def switch_applicant(wait):
 
 
 def set_amount_perpage(wait):
-    wait_click_xpath(wait, time_w = 0.5, xpath = "(//input[@class = 'el-input__inner'])[4]")
+    wait_click_xpath(wait, time_w = 0.5, xpath = "//span[contains(text(),'前往')]/preceding-sibling::span[1]")
     wait_click_xpath(wait, time_w = 0.5, xpath = "//span[contains(text(), '100条/页')]")
     num = get_total_amount_list(wait, xpath="(//input[@class = 'el-input__inner'])[4]")
     while 1:
@@ -204,7 +204,7 @@ def set_amount_perpage(wait):
             break
         else:
             time.sleep(1)
-            wait_click_xpath(wait, time_w = 0.5, xpath = "(//input[@class = 'el-input__inner'])[4]")
+            wait_click_xpath(wait, time_w = 0.5, xpath = "//span[contains(text(),'前往')]/preceding-sibling::span[1]")
             wait_click_xpath(wait, time_w = 0.5, xpath = "//span[contains(text(), '100条/页')]")        
 
 def get_total_amount_list(wait, xpath):
