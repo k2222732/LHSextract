@@ -68,6 +68,7 @@ def main(args:list[str]):
     dev_func.switch_role_dev(wait, driver)
     commen_button(wait, driver, xpath="(//span[contains(text(), '人员信息')])[1]")
     #(//span[contains(text(), '人员信息')])[1]
+    commen_button(wait, driver, xpath="//div[contains(text(),'全称')]")
     org_tree = TreeNode()
     synchronizing_org(wait, driver, input_node=org_tree)
     try:
@@ -144,14 +145,18 @@ def main(args:list[str]):
         input_text(wait, driver, xpath="//input[@placeholder = '请输入记录人']", text=jlr)
         #//input[@placeholder = '开始时间']
         
-        input_text_v1(wait, driver, xpath="//input[@placeholder = '开始时间']", text=hdsj['开始时间']+'\n', times=3)
+        #input_text_v1(wait, driver, xpath="//input[@placeholder = '开始时间']", text=hdsj['开始时间']+'\n', times=3)
         #//input[@placeholder = '结束时间']
-        input_text_v1(wait, driver, xpath="//input[@placeholder = '结束时间']", text=hdsj['结束时间']+'\n', times=3)
-        commen_button(wait, driver, xpath="(//span[contains(text(), '确定')]/..)[2]")
+        #input_text_v1(wait, driver, xpath="//input[@placeholder = '结束时间']", text=hdsj['结束时间']+'\n', times=3)
+        #commen_button(wait, driver, xpath="(//span[contains(text(), '确定')]/..)[2]")
+        input_text_v1(wait, driver, xpath="//input[@placeholder = '活动日期']", text=hdsj['开始时间']+'\n', times=3)
+        input_text_v1(wait, driver, xpath="(//label[contains(text(), '时长')]/..//following-sibling::div)[1]//input", text=hdsj['结束时间']+'\n', times=3)
         #//input[@placeholder = '请输入活动地点']
         input_text(wait, driver, xpath="//input[@placeholder = '请输入活动地点']", text="单位党务活动室")
+
         #(//label[@class = 'fs-checkbox left-checkbox margin-right-10-px']//span[@class = 'fs-checkbox__input'])[1]   全选
-        commen_button(wait, driver, xpath="(//label[@class = 'fs-checkbox left-checkbox margin-right-10-px']//span[@class = 'fs-checkbox__input'])[1]")
+        commen_button(wait, driver, xpath="//span[contains(text(), '全体党员')]")
+        #commen_button(wait, driver, xpath="(//label[@class = 'fs-checkbox left-checkbox margin-right-10-px']//span[@class = 'fs-checkbox__input'])[1]")
         #driver.switch_to.frame(driver.find_element(By.ID, "edui1_iframeholder"))
         while(1):
            try:

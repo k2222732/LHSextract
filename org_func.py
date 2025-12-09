@@ -733,6 +733,7 @@ def downloading(file, wait, driver, path, rebuild, ws, wb):
             councilcard = wait.until(EC.element_to_be_clickable((By.ID, "tab-class")))
             time.sleep(0.5)
     # 采集班子成员信息
+    time.sleep(1)
     temp = wait.until(EC.presence_of_element_located((By.XPATH, "//span[contains(text(),'班子信息集')]/../../following-sibling::div[2]")))
     temp_html = temp.get_attribute("outerHTML")
     if "暂无数据" in temp_html:

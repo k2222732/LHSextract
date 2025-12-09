@@ -43,8 +43,8 @@ text = ("开展“不忘初心，牢记使命”主题党日活动\n"
 #三会一课内容
 zbordw = ""#支部还是党委
 qc = "202406  “请党放心 强国有我”——青年党员学习研讨"#期次
-#excel_path = "G:\\project\\LHSextract\\三会一课未上传\\三会一课未上传名单.xlsx"#未上传名单的路径
-excel_path = "D:\\code\\LHSextract\\三会一课未上传\\三会一课未上传名单.xlsx"#未上传名单的路径
+excel_path = "G:\\project\\LHSextract\\三会一课未上传\\三会一课未上传名单.xlsx"#未上传名单的路径
+#excel_path = "D:\\code\\LHSextract\\三会一课未上传\\三会一课未上传名单.xlsx"#未上传名单的路径
 
 
 def init(args:list[str]):
@@ -73,6 +73,8 @@ def main(args:list[str]):
     dev_func.access_dev_database(driver, wait)
     dev_func.switch_role_dev(wait, driver)
     commen_button(wait, driver, xpath="(//span[contains(text(), '人员信息')])[1]")
+    #org_func.access_org_database(driver, wait)
+    commen_button(wait, driver, xpath="//div[contains(text(),'全称')]")
     #(//span[contains(text(), '人员信息')])[1]
 
     org_tree = TreeNode()
@@ -153,16 +155,16 @@ def main(args:list[str]):
         jlr = element_jlr.get_attribute('textContent')
         input_text(wait, driver, xpath="//input[@placeholder = '请输入记录人']", text=jlr)
         #//input[@placeholder = '开始时间']
-        input_text_v1(wait, driver, xpath="//input[@placeholder = '开始时间']", text=hdsj['开始时间']+'\n', times=3)
-        input_text_v1(wait, driver, xpath="//input[@placeholder = '结束时间']", text=hdsj['结束时间']+'\n', times=3)
-        commen_button(wait, driver, xpath="(//span[contains(text(), '确定')]/..)[2]")
+        input_text_v1(wait, driver, xpath="//input[@placeholder = '活动日期']", text=hdsj['开始时间']+'\n', times=3)
+        input_text_v1(wait, driver, xpath="(//label[contains(text(), '时长')]/..//following-sibling::div)[1]//input", text=hdsj['结束时间']+'\n', times=3)
+        #commen_button(wait, driver, xpath="(//span[contains(text(), '确定')]/..)[2]")
         #//input[@placeholder = '结束时间']
         
         
         #//input[@placeholder = '请输入活动地点']
         input_text(wait, driver, xpath="//input[@placeholder = '请输入活动地点']", text="单位党务活动室")
         #(//label[@class = 'fs-checkbox left-checkbox margin-right-10-px']//span[@class = 'fs-checkbox__input'])[1]   全选
-        commen_button(wait, driver, xpath="(//label[@class = 'fs-checkbox left-checkbox margin-right-10-px']//span[@class = 'fs-checkbox__input'])[1]")
+        commen_button(wait, driver, xpath="//span[contains(text(), '全体党员')]")
         #driver.switch_to.frame(driver.find_element(By.ID, "edui1_iframeholder"))
         while(1):
            try:
@@ -194,11 +196,13 @@ def main(args:list[str]):
 def synchronizing_org(wait, driver, input_node:TreeNode):
     #wait_click_xpath(wait, driver, xpath="(//input[@placeholder = '请选择字段项'])[8]")
     root_org = wait_return_subelement_absolute(wait, time_w = 0.5, xpath = "(//span[@class = 'el-tree-node__label'])[1]")
+    #root_org = wait_return_subelement_absolute(wait, time_w = 0.5, xpath = "(//div[@class = 'fs-tree-node__content'])[1]")
     #采集根组织信息
     root_text = root_org.get_attribute('textContent')
     input_node.set_value(value=root_text)
     #获取根节点结构体//div[@class = "tree_wrapper"]//div[@role = "treeitem"]/div[@role = "group"]到tree_root
     tree_root = wait_return_subelement_absolute(wait, time_w = 0.5, xpath = "//div[@class = 'el-tree-node__children']")
+    #tree_root = wait_return_subelement_absolute(wait, time_w = 0.5, xpath = "(//div[@class = 'fs-tree-node__children'])[1]")
     recursion_org(tree_root = tree_root, wait = wait, driver = driver, root_node = input_node)
 
 

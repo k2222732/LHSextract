@@ -55,8 +55,9 @@ def main(arg):
     #获取全体支部名单
     dev_func.access_dev_database(driver, wait)
     dev_func.switch_role_dev(wait, driver)
-    commen_button(wait, driver, xpath="(//span[contains(text(), '人员信息')])[1]")
     #(//span[contains(text(), '人员信息')])[1]
+    commen_button(wait, driver, xpath="(//span[contains(text(), '人员信息')])[1]")
+    commen_button(wait, driver, xpath="//div[contains(text(),'全称')]")
     org_tree = TreeNode()
     app.do_upload_dkt.synchronizing_org(wait, driver, input_node=org_tree)
     org_tree.copy_to_list(quanti)
