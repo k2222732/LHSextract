@@ -365,10 +365,17 @@ def jijifenzi(wait, driver, org_tree, job_tree, education_tree, person, jg):
     element3 = soup3.find(lambda tag: tag.name == "div" and "推荐和确定入党积极分子" in tag.text)
     style3 = element3.get('style')
 
+    
     card4_html = card4.get_attribute('outerHTML')
     soup4 = BeautifulSoup(card4_html, 'html.parser')
     element4 = soup4.find(lambda tag: tag.name == "div" and "入党积极分子公示和备案" in tag.text)
     style4 = element4.get('style')
+    if style4 == None:
+        time.sleep(30)
+        card4_html = card4.get_attribute('outerHTML')
+        soup4 = BeautifulSoup(card4_html, 'html.parser')
+        element4 = soup4.find(lambda tag: tag.name == "div" and "入党积极分子公示和备案" in tag.text)
+        style4 = element4.get('style')
 
     card5_html = card5.get_attribute('outerHTML')
     soup5 = BeautifulSoup(card5_html, 'html.parser')
@@ -510,7 +517,7 @@ def step_1(driver, wait, data_dict, gmsfzhm, org_tree, job_tree, education_tree)
     #实名认证#(//span[contains(text(), '实名认证')])[3]
     cursor.commen_button(wait, driver, xpath="(//span[contains(text(), '实名认证')])[3]")
     #手机号码#(//input[@placeholder = '请输入联系方式'])[1]
-    cursor.input_text(wait, driver, xpath="(//td[contains(text(), '联系方式' )]/../td//input)", text=data_dict[gmsfzhm]['手机号码'])
+    cursor.input_text(wait, driver, xpath="(//td[contains(text(), '联系方式' )]/../td//input)[1]", text=data_dict[gmsfzhm]['手机号码'])
     #民族#(//input[@placeholder = '请选择字段项'])[1]
     #cursor.commen_button(wait, driver, xpath="(//input[@placeholder = '请选择字段项'])[1]")
     #cursor.select_background(wait, driver, element_xpath="//div[@class = 'el-tree objectTree']", label='span', value=data_dict[gmsfzhm]['民族'])
@@ -729,6 +736,17 @@ def step_3(driver, wait, data_dict, gmsfzhm, jg):
     #保存#(//span[contains(text(), '保存')])[3]
     cursor.click_button_until_specifyxpath_disappear(wait=wait, driver=driver, specifyxpath="(//span[contains(text(), '保存')])[3]", buttonxpath="(//span[contains(text(), '保存')])[3]", time_w=0.1, times=2)
     
+
+    #入党积极分子基本情况
+    cursor.commen_button(wait, driver, xpath="(//span[contains(text(), '编辑')])[5]")
+    #新就业群体
+    cursor.commen_button(wait, driver, xpath="//td[contains(text(), '新就业群体' )]/following-sibling::td[1]//input")
+    cursor.select_background(wait, driver, element_xpath="//div[@class='el-tree objectTree']", label='span', value='无')
+    #是否农民工
+    cursor.commen_button(wait, driver, xpath="//td[contains(text(), '是否农民工' )]/following-sibling::td[1]//input")
+    cursor.select_background(wait, driver, element_xpath="//div[@class='el-tree objectTree']", label='span', value='否')
+    #保存
+    cursor.click_button_until_specifyxpath_disappear(wait=wait, driver=driver, specifyxpath="(//span[contains(text(), '保存')])[4]", buttonxpath="(//span[contains(text(), '保存')])[4]", time_w=0.1, times=2)
     #cursor.commen_button(wait, driver, xpath="(//span[contains(text(), '编辑')])[5]")
     #籍贯#(//input[@placeholder = '请选择字段项'])[1]
     #cursor.commen_button(wait, driver, xpath="(//input[@placeholder = '请选择字段项'])[1]")
@@ -804,6 +822,16 @@ def step_3_rebuild(driver, wait, data_dict, gmsfzhm, jg):
     #保存#(//span[contains(text(), '保存')])[3]
     cursor.click_button_until_specifyxpath_disappear(wait=wait, driver=driver, specifyxpath="(//span[contains(text(), '保存')])[3]", buttonxpath="(//span[contains(text(), '保存')])[3]", time_w=0.1, times=2)
     
+    #入党积极分子基本情况
+    cursor.commen_button(wait, driver, xpath="(//span[contains(text(), '编辑')])[5]")
+    #新就业群体
+    cursor.commen_button(wait, driver, xpath="//td[contains(text(), '新就业群体' )]/following-sibling::td[1]//input")
+    cursor.select_background(wait, driver, element_xpath="//div[@class='el-tree objectTree']", label='span', value='无')
+    #是否农民工
+    cursor.commen_button(wait, driver, xpath="//td[contains(text(), '是否农民工' )]/following-sibling::td[1]//input")
+    cursor.select_background(wait, driver, element_xpath="//div[@class='el-tree objectTree']", label='span', value='否')
+    #保存
+    cursor.click_button_until_specifyxpath_disappear(wait=wait, driver=driver, specifyxpath="(//span[contains(text(), '保存')])[4]", buttonxpath="(//span[contains(text(), '保存')])[4]", time_w=0.1, times=2)
     #cursor.commen_button(wait, driver, xpath="(//span[contains(text(), '编辑')])[5]")
     #籍贯#(//input[@placeholder = '请选择字段项'])[1]
     #cursor.commen_button(wait, driver, xpath="(//input[@placeholder = '请选择字段项'])[1]")
@@ -877,6 +905,8 @@ def step_5(driver, wait, data_dict, gmsfzhm):
     #选择联系人（其他支部）#//input[@placeholder='请输入']
     #入党日期(现支部不需)#(//input[@placeholder='选择日期'])[1]
     #学历(现支部不需)#(//input[@placeholder='请选择字段项'])
+    cursor.commen_button(wait, driver, xpath="//label[contains(text(), '学历')]/following-sibling::div")
+    cursor.select_background(wait, driver, element_xpath="//div[@class='el-tree objectTree']", label='span', value='高中')
     #自何时起负责培养#(//input[@placeholder='选择日期'])[2]
     cursor.input_text(wait, driver, xpath="(//input[@placeholder='选择日期'])[2]", text=calculate_date_add(data_dict[gmsfzhm]['确定入党积极分子日期'],8))
     cursor.input_text(wait, driver, xpath="(//input[@placeholder='选择日期'])[2]", text="\n")
