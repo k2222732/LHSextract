@@ -151,12 +151,12 @@ def main(args:list[str]):
 
 
         #//input[@placeholder = '请输入记录人']  <--  (//div[@aria-label = 'checkbox-group'])[2]/label[2]
-        element_jlr = wait.until(EC.presence_of_element_located((By.XPATH, "(//div[@aria-label = 'checkbox-group'])[2]/label[2]")))
+        element_jlr = wait.until(EC.presence_of_element_located((By.XPATH, "(//div[@aria-label = 'checkbox-group'])[3]/label[1]")))
         jlr = element_jlr.get_attribute('textContent')
         input_text(wait, driver, xpath="//input[@placeholder = '请输入记录人']", text=jlr)
         #//input[@placeholder = '开始时间']
         input_text_v1(wait, driver, xpath="//input[@placeholder = '活动日期']", text=hdsj['开始时间']+'\n', times=3)
-        input_text_v1(wait, driver, xpath="(//label[contains(text(), '时长')]/..//following-sibling::div)[1]//input", text=hdsj['结束时间']+'\n', times=3)
+        #input_text_v1(wait, driver, xpath="(//label[contains(text(), '时长')]/..//following-sibling::div)[1]//input", text=hdsj['结束时间']+'\n', times=3)
         #commen_button(wait, driver, xpath="(//span[contains(text(), '确定')]/..)[2]")
         #//input[@placeholder = '结束时间']
         
