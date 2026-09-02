@@ -102,7 +102,7 @@ def switch_item_org(wait):
             item_org = wait.until(EC.element_to_be_clickable((By.XPATH, '//*[contains(text(), "党组织管理")]/..')))
     while(1):
         try:
-            org_info = wait.until(EC.element_to_be_clickable((By.XPATH, '(//*[contains(text(), "信息管理")]/..)[3]')))
+            org_info = wait.until(EC.element_to_be_clickable((By.XPATH, '(//*[contains(text(), "信息管理")]/..)[4]')))
             break
         except:
             time.sleep(0.1)
@@ -111,7 +111,7 @@ def switch_item_org(wait):
             org_info.click()
             break
         except:
-            org_info = wait.until(EC.element_to_be_clickable((By.XPATH, '(//*[contains(text(), "信息管理")]/..)[3]')))
+            org_info = wait.until(EC.element_to_be_clickable((By.XPATH, '(//*[contains(text(), "信息管理")]/..)[4]')))
 
 
 def rebuild(driver, wait, excel_file_path, org_excel, ws, wb, excel_file_path_m):
@@ -435,6 +435,20 @@ def downloading(file, wait, driver, path, rebuild, ws, wb):
     #填写序号#
     file.active.cell(row=countx, column=1).value = count
     ws.cell(row=countx, column = 1, value=count)
+
+        #切换选项卡
+    while(1):
+        try:
+            company_info = wait.until(EC.element_to_be_clickable((By.XPATH, "//div[contains(text(), '党组织基本信息')]")))
+            break
+        except:
+            time.sleep(0.1)
+    while(1):
+        try:
+            company_info.click()
+            break
+        except:
+            company_info = wait.until(EC.element_to_be_clickable((By.XPATH, "//div[contains(text(), '党组织基本信息')]")))
     
     #填写党组织全称#
     name_temp = wait.until(EC.visibility_of_element_located((By.XPATH, "//span[contains(text(), '党组织全称')]/../following-sibling::*/div[1]"))).text
