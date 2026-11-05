@@ -30,6 +30,7 @@ from base.write_entry import *
 from selenium.common.exceptions import NoSuchElementException
 import json
 from typing import List
+import member_func
 
 
 
@@ -38,7 +39,7 @@ hdsj = {"开始时间":"2024-07-01 00:00", "结束时间":"2024-07-01 00:30"}#�
 text = "测试测试测试测试测试测试测试测试测试测试测试测试"#三会一课内容
 zbordw = ""#支部还是党委
 qc = "202406  “请党放心 强国有我”——青年党员学习研讨"#期次
-excel_path = "G:\project\LHSextract\三会一课未上传\三会一课未上传名单.xlsx"#未上传名单的路径
+excel_path = "D:\code\LHSextract\三会一课未上传\三会一课未上传名单.xlsx"#未上传名单的路径
 
 def init(args:list[str]):
     global qc
@@ -64,9 +65,9 @@ def main(args:list[str]):
     result = []
     driver = login._main()
     wait = WebDriverWait(driver, 2, 0.5)
-    dev_func.access_dev_database(driver, wait)
-    dev_func.switch_role_dev(wait, driver)
-    commen_button(wait, driver, xpath="(//span[contains(text(), '人员信息')])[1]")
+    member_func.access_member_database(driver, wait)
+    member_func.switch_role(wait)
+    #commen_button(wait, driver, xpath="(//span[contains(text(), '人员信息')])[1]")
     #(//span[contains(text(), '人员信息')])[1]
     commen_button(wait, driver, xpath="//div[contains(text(),'全称')]")
     org_tree = TreeNode()
@@ -187,12 +188,13 @@ def main(args:list[str]):
 
 def synchronizing_org(wait, driver, input_node:TreeNode):
     #wait_click_xpath(wait, driver, xpath="(//input[@placeholder = '请选择字段项'])[8]")
-    root_org = wait_return_subelement_absolute(wait, time_w = 0.5, xpath = "(//span[@class = 'el-tree-node__label'])[1]")
+    root_org = wait_return_subelement_absolute(wait, time_w = 0.5, xpath = "(//div[@class='fs-tree-node is-expanded is-current is-focusable']//div)[1]")
     #采集根组织信息
     root_text = root_org.get_attribute('textContent')
     input_node.set_value(value=root_text)
     #获取根节点结构体//div[@class = "tree_wrapper"]//div[@role = "treeitem"]/div[@role = "group"]到tree_root
-    tree_root = wait_return_subelement_absolute(wait, time_w = 0.5, xpath = "//div[@class = 'el-tree-node__children']")
+    #tree_root = wait_return_subelement_absolute(wait, time_w = 0.5, xpath = "//div[@class = 'el-tree-node__children']")
+    tree_root = wait_return_subelement_absolute(wait, time_w = 0.5, xpath = "//div[@class='fs-tree-node is-expanded is-current is-focusable']")
     recursion_org(tree_root = tree_root, wait = wait, driver = driver, root_node = input_node)
 
 
@@ -217,7 +219,7 @@ def recursion_org(tree_root, wait, driver, root_node:TreeNode):
         if div_element and test[0] == 'is-leaf':
             next
         else:
-            wait_click_xpath_relative(wait=wait,time_w = 0.5, element = item, xpath = ".//span[@class = 'el-tree-node__expand-icon el-icon-caret-right']")
+            wait_click_xpath_relative(wait=wait,time_w = 0.5, element = item, xpath = ".//span[@class = 'fs-tree-node__expand-icon fs-icon-caret-right']")
             new_tree_root = wait_return_subelement_relative(time_w = 0.5, element= item, xpath = ".//div[@role = 'group']")
             recursion_org(new_tree_root, wait, driver, new_node)
 

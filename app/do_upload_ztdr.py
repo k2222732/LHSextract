@@ -16,7 +16,7 @@ import time
 from base.solv_date import calculate_date_add
 from selenium.webdriver.common.by import By
 from selenium.webdriver.common.action_chains import ActionChains
-import dev_func
+import member_func
 from bs4 import BeautifulSoup
 import middle.switch_role
 from selenium.webdriver.common.by import By
@@ -28,6 +28,7 @@ from base.write_entry import *
 from selenium.common.exceptions import NoSuchElementException
 import json
 from typing import List
+import app.do_upload_dkt
 
 
 hdzt = "四月份主题党日"#活动主题
@@ -43,7 +44,7 @@ text = ("开展“不忘初心，牢记使命”主题党日活动\n"
 #三会一课内容
 zbordw = ""#支部还是党委
 qc = "202406  “请党放心 强国有我”——青年党员学习研讨"#期次
-excel_path = "G:\\project\\LHSextract\\三会一课未上传\\三会一课未上传名单.xlsx"#未上传名单的路径
+excel_path = "D:\\code\\LHSextract\\三会一课未上传\\三会一课未上传名单.xlsx"#未上传名单的路径
 #excel_path = "D:\\code\\LHSextract\\三会一课未上传\\三会一课未上传名单.xlsx"#未上传名单的路径
 
 
@@ -70,15 +71,15 @@ def main(args:list[str]):
     result = []
     driver = login._main()
     wait = WebDriverWait(driver, 2, 0.5)
-    dev_func.access_dev_database(driver, wait)
-    dev_func.switch_role_dev(wait, driver)
-    commen_button(wait, driver, xpath="(//span[contains(text(), '人员信息')])[1]")
+    member_func.access_member_database(driver, wait)
+    member_func.switch_role(wait)
+    #commen_button(wait, driver, xpath="(//span[contains(text(), '人员信息')])[1]")
     #org_func.access_org_database(driver, wait)
     commen_button(wait, driver, xpath="//div[contains(text(),'全称')]")
     #(//span[contains(text(), '人员信息')])[1]
 
     org_tree = TreeNode()
-    synchronizing_org(wait, driver, input_node=org_tree)
+    app.do_upload_dkt.synchronizing_org(wait, driver, input_node=org_tree)
     try:
         for handle in driver.window_handles:
             driver.switch_to.window(handle)
@@ -192,18 +193,6 @@ def main(args:list[str]):
         print(element)
     input("按任意键结束")
 
-
-def synchronizing_org(wait, driver, input_node:TreeNode):
-    #wait_click_xpath(wait, driver, xpath="(//input[@placeholder = '请选择字段项'])[8]")
-    root_org = wait_return_subelement_absolute(wait, time_w = 0.5, xpath = "(//span[@class = 'el-tree-node__label'])[1]")
-    #root_org = wait_return_subelement_absolute(wait, time_w = 0.5, xpath = "(//div[@class = 'fs-tree-node__content'])[1]")
-    #采集根组织信息
-    root_text = root_org.get_attribute('textContent')
-    input_node.set_value(value=root_text)
-    #获取根节点结构体//div[@class = "tree_wrapper"]//div[@role = "treeitem"]/div[@role = "group"]到tree_root
-    tree_root = wait_return_subelement_absolute(wait, time_w = 0.5, xpath = "//div[@class = 'el-tree-node__children']")
-    #tree_root = wait_return_subelement_absolute(wait, time_w = 0.5, xpath = "(//div[@class = 'fs-tree-node__children'])[1]")
-    recursion_org(tree_root = tree_root, wait = wait, driver = driver, root_node = input_node)
 
 
     
